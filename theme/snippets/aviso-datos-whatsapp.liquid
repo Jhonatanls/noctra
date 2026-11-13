@@ -1,0 +1,9 @@
+{%- comment -%}
+  Aviso de tratamiento de datos junto a los botones de WhatsApp (Ley 1581 de 2012, RNF-09).
+  El enlace aparece cuando la política de privacidad está cargada en el admin
+  (Configuración → Políticas).
+{%- endcomment -%}
+<p class="nota-legal">
+  Al escribirnos por WhatsApp aceptas el tratamiento de tus datos según nuestra
+  {% if shop.privacy_policy %}<a href="{{ shop.privacy_policy.url }}">política de datos</a>{% else %}política de datos{% endif %}.
+</p>

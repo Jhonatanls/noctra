@@ -57,6 +57,9 @@
               {{- variante.compare_at_price | money -}}
             </s>
           </p>
+          {%- if cart.taxes_included -%}
+            <p class="nota-legal">IVA incluido.</p>
+          {%- endif -%}
 
         {%- when 'selector' -%}
           <div class="ficha__selector" {{ block.shopify_attributes }}>
@@ -138,8 +141,9 @@
                 rel="noopener"
                 data-boton-whatsapp
               >
-                {%- if variante.available -%}Pedir por WhatsApp{%- else -%}Avísame por WhatsApp{%- endif -%}
+                {%- if variante.available -%}Pedir por WhatsApp{%- else -%}Preguntar disponibilidad por WhatsApp{%- endif -%}
               </a>
+              {% render 'aviso-datos-whatsapp' %}
             {%- endif -%}
           </div>
 

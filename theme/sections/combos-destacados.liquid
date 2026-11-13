@@ -23,13 +23,23 @@
           <p class="combo__precio precio">{{ block.settings.precio }}</p>
           {%- if block.settings.nota != blank -%}
             <p class="combo__nota">{{ block.settings.nota }}</p>
+          {%- elsif request.design_mode -%}
+            <p class="aviso-editor">Falta la vigencia y las condiciones de este combo. Es obligatorio antes de publicar.</p>
           {%- endif -%}
           {%- if block.settings.enlace != blank -%}
-            <a class="boton boton--secundario combo__boton" href="{{ block.settings.enlace }}">Armar mi combo</a>
+            <a class="boton boton--secundario combo__boton" href="{{ block.settings.enlace }}">Ver productos del combo</a>
           {%- endif -%}
         </li>
       {%- endfor -%}
     </ul>
+
+    {%- if section.settings.terminos != blank -%}
+      <p class="nota-legal combos__terminos">
+        <a href="{{ section.settings.terminos.url }}">Consulta los términos y condiciones de los combos</a>
+      </p>
+    {%- elsif request.design_mode -%}
+      <p class="aviso-editor combos__terminos">Falta la página de términos de los combos. Es obligatoria antes de publicar.</p>
+    {%- endif -%}
   </div>
 </section>
 
@@ -38,7 +48,8 @@
   "name": "Combos destacados",
   "settings": [
     { "type": "text", "id": "titulo", "label": "Título", "default": "Combos Noctra" },
-    { "type": "text", "id": "texto", "label": "Texto", "default": "Arma tu look y paga menos. El descuento se aplica solo en el carrito." }
+    { "type": "text", "id": "texto", "label": "Texto", "default": "Combos de precio fijo. El descuento se aplica solo en el carrito." },
+    { "type": "page", "id": "terminos", "label": "Página de términos de los combos", "info": "Obligatoria antes de publicar: vigencia, productos elegibles, límites y si se acumulan con otros descuentos." }
   ],
   "blocks": [
     {
@@ -48,7 +59,7 @@
         { "type": "text", "id": "nombre", "label": "Nombre", "default": "Look completo" },
         { "type": "text", "id": "detalle", "label": "Qué incluye", "default": "2 tenis + 1 gorra" },
         { "type": "text", "id": "precio", "label": "Precio", "default": "$350.000", "info": "Debe coincidir con el combo configurado en el motor de descuentos." },
-        { "type": "text", "id": "nota", "label": "Nota", "info": "Opcional. Ejemplo: vigencia o productos elegibles." },
+        { "type": "text", "id": "nota", "label": "Vigencia y condiciones", "info": "Obligatorio antes de publicar. Ejemplo: Válido hasta el 31 de diciembre de 2026 o hasta agotar existencias. Tenis y gorras de la colección En combo." },
         { "type": "url", "id": "enlace", "label": "Enlace", "info": "Colección con los productos elegibles." }
       ]
     }
