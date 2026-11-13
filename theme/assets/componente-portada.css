@@ -1,0 +1,101 @@
+/* Portada de Noctra (SPEC-002).
+   --p va de 0 a 1 con el scroll (theme.js). Sin JS vale 1: se ve el logo completo.
+   Geometría tomada del logo completo: el logotipo mide 0,735 veces el alto del isotipo
+   y su centro queda en el 51,6 % de ese alto. */
+
+.portada { --p: 1; position: relative; display: block; }
+.portada--animada { height: var(--recorrido-portada); }
+
+.portada__fijo {
+  position: relative;
+  min-height: calc(100svh - var(--alto-encabezado));
+  display: grid;
+  overflow: hidden;
+}
+.portada--animada .portada__contenido { padding-block-end: var(--espacio-16); }
+.portada--animada .portada__fijo {
+  position: sticky;
+  top: var(--alto-encabezado);
+  height: calc(100svh - var(--alto-encabezado));
+}
+
+.portada__medio { position: absolute; inset: 0; }
+.portada__medio::after { content: ""; position: absolute; inset: 0; background: var(--color-velo-imagen); }
+.portada__imagen, .portada__video { width: 100%; height: 100%; object-fit: cover; }
+.portada--con-medio { color: var(--color-sobre-imagen); }
+
+.portada__contenido {
+  position: relative;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  justify-items: center;
+  gap: var(--espacio-6);
+  padding-block: var(--espacio-6) var(--espacio-10);
+  text-align: center;
+}
+
+/* Escena del logo */
+.portada__escena { position: relative; width: 100%; height: 100%; min-height: var(--alto-escena); margin: 0; }
+
+.portada__isotipo {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  height: var(--alto-escena);
+  width: auto;
+  color: var(--color-acento);
+  transform:
+    translate(-50%, -50%)
+    translateY(calc((1 - var(--p)) * -0.15 * var(--alto-escena)))
+    scale(calc(0.3 + 0.7 * var(--p)));
+  will-change: transform;
+}
+.portada--con-medio .portada__isotipo { color: var(--color-sobre-imagen); }
+
+.portada__letras {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: calc(var(--alto-escena) * 0.735);
+  display: block;
+  transform:
+    translate(-50%, -50%)
+    translateY(calc((0.17 - 0.154 * var(--p)) * var(--alto-escena)));
+  will-change: transform;
+  /* Halo del color del fondo: "talla" el logotipo sobre el isotipo, con un filo dorado */
+  filter:
+    drop-shadow(var(--halo-letras) 0 0 var(--color-fondo))
+    drop-shadow(calc(-1 * var(--halo-letras)) 0 0 var(--color-fondo))
+    drop-shadow(0 var(--halo-letras) 0 var(--color-fondo))
+    drop-shadow(0 calc(-1 * var(--halo-letras)) 0 var(--color-fondo))
+    drop-shadow(0 0 0.5px var(--color-oro));
+}
+.portada__logo { display: block; width: 100%; height: auto; color: var(--color-texto); }
+.portada--con-medio .portada__logo { color: var(--color-sobre-imagen); }
+
+.portada__titulo { font-size: var(--texto-hero); margin: 0; align-self: center; }
+
+.portada__pie { display: grid; justify-items: center; gap: var(--espacio-4); }
+.portada__eslogan { margin: 0; }
+.portada--con-medio .portada__eslogan { color: var(--color-sobre-imagen); }
+
+.portada__indicacion {
+  position: absolute;
+  left: 50%;
+  bottom: var(--espacio-3);
+  transform: translateX(-50%);
+  display: grid;
+  justify-items: center;
+  font-size: var(--texto-xs);
+  letter-spacing: var(--espaciado-boton);
+  color: var(--color-oro);
+  opacity: clamp(0, calc(1 - var(--p) * 4), 1);
+}
+.portada__indicacion::after {
+  content: "";
+  display: block;
+  width: var(--borde-fino);
+  height: var(--espacio-6);
+  margin-block-start: var(--espacio-1);
+  background: var(--color-oro);
+}

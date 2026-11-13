@@ -1,0 +1,44 @@
+# Trae a Git lo que el equipo cambió en el editor de Shopify del tema publicado
+# (textos, imágenes, orden de secciones) y abre un pull request hacia prod.
+# Corre cada noche y antes de cada release (manual). Regla: no se despliega a prod
+# con un pull request de sincronización abierto sin unir.
+name: Sincronizar desde producción
+
+on:
+  schedule:
+    - cron: "0 7 * * *"   # 2:00 a. m. hora de Colombia
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sincronizar:
+    runs-on: ubuntu-latest
+    environment: prod
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: prod
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install -g @shopify/cli@latest
+      - name: Bajar archivos de configuración del tema publicado
+        env:
+          SHOPIFY_CLI_THEME_TOKEN: ${{ secrets.SHOPIFY_CLI_THEME_TOKEN }}
+          SHOPIFY_FLAG_STORE: ${{ vars.SHOPIFY_STORE }}
+        run: |
+          shopify theme pull --path theme --theme "${{ vars.SHOPIFY_THEME_ID }}" \
+            --only "templates/*.json" --only "sections/*.json" --only "config/settings_data.json"
+      - name: Abrir pull request si hay cambios
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: sync/editor-produccion
+          base: prod
+          commit-message: "sync: cambios del editor de Shopify en producción"
+          title: "Sincronizar cambios del editor de producción"
+          body: |
+            Cambios hechos por el equipo en el editor de Shopify del tema publicado.
+            Después de unir este PR a prod, abre un PR `back/...` de prod hacia test y dev.

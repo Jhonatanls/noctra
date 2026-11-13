@@ -1,0 +1,23 @@
+{%- comment -%}
+  Botón flotante de WhatsApp (RF-21). No se muestra si no hay número configurado.
+  El mensaje cambia según la página: en un producto incluye su nombre y enlace.
+{%- endcomment -%}
+{%- if settings.whatsapp_numero != blank -%}
+  {%- liquid
+    assign numero = settings.whatsapp_numero | remove: '+' | remove: ' ' | remove: '-'
+    assign mensaje = settings.whatsapp_mensaje
+    if request.page_type == 'product'
+      assign mensaje = 'Hola, quiero información sobre ' | append: product.title | append: ': ' | append: shop.url | append: product.url
+    endif
+  -%}
+  <a
+    class="whatsapp-flotante"
+    href="https://wa.me/{{ numero }}?text={{ mensaje | url_encode }}"
+    target="_blank"
+    rel="noopener"
+    data-whatsapp-flotante
+  >
+    <span class="oculto-visual">Escríbenos por WhatsApp</span>
+    {% render 'icono', nombre: 'whatsapp' %}
+  </a>
+{%- endif -%}

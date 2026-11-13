@@ -1,0 +1,42 @@
+{
+  "type": "header",
+  "name": "Encabezado",
+  "sections": {
+    "anuncios": {
+      "type": "barra-anuncios",
+      "blocks": {
+        "envios": {
+          "type": "mensaje",
+          "settings": {
+            "texto": "Envíos a toda Colombia"
+          }
+        },
+        "cuotas": {
+          "type": "mensaje",
+          "settings": {
+            "texto": "Paga a cuotas con Addi o Sistecrédito"
+          }
+        },
+        "combos": {
+          "type": "mensaje",
+          "settings": {
+            "texto": "Combos desde $350.000"
+          }
+        }
+      },
+      "block_order": [
+        "envios",
+        "cuotas",
+        "combos"
+      ]
+    },
+    "encabezado": {
+      "type": "encabezado",
+      "settings": {}
+    }
+  },
+  "order": [
+    "anuncios",
+    "encabezado"
+  ]
+}

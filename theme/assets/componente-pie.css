@@ -1,0 +1,29 @@
+.pie {
+  margin-block-start: var(--espacio-16);
+  padding-block: 0 var(--espacio-24);
+  font-size: var(--texto-s);
+}
+.pie__sello { display: flex; align-items: center; gap: var(--espacio-4); margin-block-end: var(--espacio-10); }
+.pie__linea { flex: 1; height: var(--borde-fino); background: var(--color-oro); }
+.pie__logotipo { height: var(--espacio-6); width: auto; color: var(--color-texto); margin-block-end: var(--espacio-3); }
+.pie__rejilla { display: grid; gap: var(--espacio-8); }
+.pie__isotipo { height: var(--alto-logo-pie); width: auto; color: var(--color-acento); }
+.pie__lista { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--espacio-3); }
+.pie__lista a { text-decoration: none; color: var(--color-texto-2); }
+.pie__lista a:hover { color: var(--color-acento); }
+.pie__base {
+  margin-block-start: var(--espacio-10);
+  padding-block-start: var(--espacio-6);
+  border-block-start: var(--borde-fino) solid var(--color-oro-suave);
+  display: grid;
+  gap: var(--espacio-4);
+  color: var(--color-texto-2);
+}
+.pie__pagos { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--espacio-2); }
+.pie__pago { width: 2.375rem; height: auto; }
+.pie__legal { font-size: var(--texto-xs); margin: 0; }
+
+@media (min-width: 750px) {
+  .pie__rejilla { grid-template-columns: 2fr 1fr 1fr; }
+  .pie { padding-block-end: var(--espacio-12); }
+}

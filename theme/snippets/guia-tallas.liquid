@@ -1,0 +1,67 @@
+{%- comment -%}
+  Guía de tallas (RF-06, SPEC-004).
+  Datos: metaobjeto guia_tallas (campos eur, cm, us). Si no existe, usa una tabla de
+  referencia general marcada como provisional. Las medidas reales por horma las carga el equipo.
+  Parámetros: id_prefijo (string único en la página).
+{%- endcomment -%}
+{%- liquid
+  assign entradas = shop.metaobjects.guia_tallas.values
+  assign usa_referencia = true
+  if entradas.size > 0
+    assign usa_referencia = false
+  endif
+  assign referencia = '36:22.5:4|37:23.2:5|38:23.8:5.5|39:24.5:6.5|40:25.2:7|41:25.8:8|42:26.5:8.5|43:27.2:9.5|44:27.8:10|45:28.5:11|46:29.2:12' | split: '|'
+-%}
+<div class="guia-tallas" id="{{ id_prefijo }}-guia">
+  <p class="guia-tallas__clave">
+    La forma más segura: busca la talla <strong>EUR</strong> en la etiqueta de un tenis que te quede bien y pide ese mismo número.
+  </p>
+
+  <div class="guia-tallas__tabla-envoltura">
+    <table class="guia-tallas__tabla">
+      <caption class="oculto-visual">Equivalencias de talla</caption>
+      <thead>
+        <tr><th scope="col">EUR</th><th scope="col">Pie (cm)</th><th scope="col">US</th></tr>
+      </thead>
+      <tbody>
+        {%- if usa_referencia -%}
+          {%- for fila in referencia -%}
+            {%- assign partes = fila | split: ':' -%}
+            <tr><th scope="row">{{ partes[0] }}</th><td>{{ partes[1] | replace: '.', ',' }}</td><td>{{ partes[2] | replace: '.', ',' }}</td></tr>
+          {%- endfor -%}
+        {%- else -%}
+          {%- for entrada in entradas -%}
+            <tr><th scope="row">{{ entrada.eur.value }}</th><td>{{ entrada.cm.value | replace: '.', ',' }}</td><td>{{ entrada.us.value | replace: '.', ',' }}</td></tr>
+          {%- endfor -%}
+        {%- endif -%}
+      </tbody>
+    </table>
+  </div>
+  {%- if usa_referencia -%}
+    <p class="guia-tallas__nota">Tabla de referencia general. Puede variar según el modelo; si tienes dudas, escríbenos por WhatsApp.</p>
+  {%- endif -%}
+
+  <h3 class="guia-tallas__subtitulo">Cómo medir tu pie en casa</h3>
+  <ol class="guia-tallas__pasos">
+    <li>Pon una hoja en el piso contra la pared.</li>
+    <li>Párate encima con el talón tocando la pared.</li>
+    <li>Marca en la hoja la punta de tu dedo más largo.</li>
+    <li>Mide en centímetros desde el borde de la hoja hasta la marca.</li>
+    <li>Busca esa medida en la tabla. Si quedas entre dos tallas, elige la mayor.</li>
+  </ol>
+
+  <script type="application/json" data-datos-guia-tallas>
+    [
+      {%- if usa_referencia -%}
+        {%- for fila in referencia -%}
+          {%- assign partes = fila | split: ':' -%}
+          {"eur": {{ partes[0] | json }}, "cm": {{ partes[1] | json }}, "us": {{ partes[2] | json }}}{% unless forloop.last %},{% endunless %}
+        {%- endfor -%}
+      {%- else -%}
+        {%- for entrada in entradas -%}
+          {"eur": {{ entrada.eur.value | append: '' | json }}, "cm": {{ entrada.cm.value | append: '' | json }}, "us": {{ entrada.us.value | append: '' | json }}}{% unless forloop.last %},{% endunless %}
+        {%- endfor -%}
+      {%- endif -%}
+    ]
+  </script>
+</div>

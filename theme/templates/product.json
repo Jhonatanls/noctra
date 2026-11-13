@@ -1,0 +1,23 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-product",
+      "blocks": {
+        "titulo": { "type": "titulo" },
+        "precio": { "type": "precio" },
+        "selector": { "type": "selector", "settings": { "mostrar_guia": true } },
+        "botones": { "type": "botones" },
+        "descripcion": { "type": "descripcion" },
+        "envios": {
+          "type": "desplegable",
+          "settings": {
+            "titulo": "Envíos y cambios",
+            "contenido": "<p>Enviamos a toda Colombia. Si la talla no te queda, te la cambiamos.</p>"
+          }
+        }
+      },
+      "block_order": ["titulo", "precio", "selector", "botones", "descripcion", "envios"]
+    }
+  },
+  "order": ["main"]
+}

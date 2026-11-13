@@ -1,0 +1,81 @@
+{{ 'componente-portada.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign tiene_medio = false
+  if section.settings.video != blank or section.settings.imagen != blank
+    assign tiene_medio = true
+  endif
+  assign usa_logo = false
+  if section.settings.titulo == blank
+    assign usa_logo = true
+  endif
+  assign animar = false
+  if usa_logo and section.settings.animacion_logo
+    assign animar = true
+  endif
+-%}
+
+{%- comment -%}
+  Portada (SPEC-002). Con la animación activa, al hacer scroll el isotipo crece y el logotipo
+  sube hasta superponerse, formando el logo completo de Noctra. Sin JavaScript o con
+  "reducir movimiento" se muestra directamente el logo completo.
+{%- endcomment -%}
+<portada-noctra
+  class="portada{% if tiene_medio %} portada--con-medio{% endif %}{% if usa_logo %} portada--logo{% endif %}"
+  {% if animar %}data-animar{% endif %}
+>
+  <div class="portada__fijo">
+    {%- if tiene_medio -%}
+      <div class="portada__medio">
+        {%- if section.settings.video != blank -%}
+          {{ section.settings.video | video_tag: autoplay: true, loop: true, muted: true, playsinline: true, controls: false, preload: 'metadata', class: 'portada__video', image_size: '1600x' }}
+        {%- else -%}
+          {%- assign alt_imagen = section.settings.imagen.alt | default: settings.nombre_marca -%}
+          {{ section.settings.imagen | image_url: width: 2400 | image_tag: widths: '750, 1100, 1500, 2000, 2400', sizes: '100vw', class: 'portada__imagen', loading: 'eager', fetchpriority: 'high', alt: alt_imagen }}
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    <div class="contenedor portada__contenido">
+      {%- if usa_logo -%}
+        <h1 class="portada__escena">
+          <span class="oculto-visual">{{ settings.nombre_marca }}</span>
+          {% render 'logo', variante: 'isotipo', clase: 'portada__isotipo', decorativo: true %}
+          <span class="portada__letras">{% render 'logo', variante: 'wordmark', clase: 'portada__logo', decorativo: true %}</span>
+        </h1>
+      {%- else -%}
+        <h1 class="portada__titulo">{{ section.settings.titulo }}</h1>
+      {%- endif -%}
+
+      <div class="portada__pie">
+        {% render 'ornamento' %}
+        {%- if section.settings.subtitulo != blank -%}
+          <p class="eslogan portada__eslogan">{{ section.settings.subtitulo }}</p>
+        {%- endif -%}
+        {%- if section.settings.boton_texto != blank -%}
+          <a class="boton" href="{{ section.settings.boton_enlace | default: routes.all_products_collection_url }}">{{ section.settings.boton_texto }}</a>
+        {%- endif -%}
+      </div>
+    </div>
+
+    {%- if animar -%}
+      <span class="portada__indicacion" aria-hidden="true">Desliza</span>
+    {%- endif -%}
+  </div>
+</portada-noctra>
+
+{% schema %}
+{
+  "name": "Portada",
+  "settings": [
+    { "type": "video", "id": "video", "label": "Video de fondo", "info": "Menos de 3 MB, sin sonido. Se muestra en bucle detrás del logo." },
+    { "type": "image_picker", "id": "imagen", "label": "Imagen de fondo", "info": "Se usa si no hay video." },
+    { "type": "checkbox", "id": "animacion_logo", "label": "Animar el logo al hacer scroll", "default": true, "info": "El isotipo crece y el logotipo se superpone hasta formar el logo completo." },
+    { "type": "text", "id": "titulo", "label": "Titular en texto", "info": "Déjalo vacío para mostrar el logo de Noctra." },
+    { "type": "text", "id": "subtitulo", "label": "Eslogan", "default": "Viste la noche" },
+    { "type": "text", "id": "boton_texto", "label": "Texto del botón", "default": "Ver la colección" },
+    { "type": "url", "id": "boton_enlace", "label": "Enlace del botón" }
+  ],
+  "presets": [{ "name": "Portada" }]
+}
+{% endschema %}

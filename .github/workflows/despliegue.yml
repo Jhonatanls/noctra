@@ -1,0 +1,50 @@
+# Despliegue continuo de Noctra.
+#   dev  -> tema "Noctra · Dev" en la tienda de desarrollo
+#   test -> tema no publicado "Noctra · Pre-prod" en la tienda real (vista previa)
+#   prod -> tema publicado en la tienda real (dominio propio). Requiere aprobación manual.
+# Las credenciales viven en GitHub Environments (dev, test, prod), nunca en el repositorio.
+name: Despliegue
+
+on:
+  push:
+    branches: [dev, test, prod]
+  workflow_dispatch:
+
+concurrency:
+  group: despliegue-${{ github.ref_name }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  desplegar:
+    name: Desplegar ${{ github.ref_name }}
+    runs-on: ubuntu-latest
+    environment: ${{ github.ref_name }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm test
+      - run: npm install -g @shopify/cli@latest
+      - run: shopify theme check --path theme --fail-level error
+
+      - name: Subir tema a Shopify
+        env:
+          SHOPIFY_CLI_THEME_TOKEN: ${{ secrets.SHOPIFY_CLI_THEME_TOKEN }}
+          SHOPIFY_FLAG_STORE: ${{ vars.SHOPIFY_STORE }}
+          TEMA: ${{ vars.SHOPIFY_THEME_ID }}
+        run: |
+          EXTRA=""
+          if [ "${{ github.ref_name }}" = "prod" ]; then EXTRA="--allow-live"; fi
+          # settings_data.json guarda lo que el equipo configura en el editor: nunca se pisa desde Git.
+          shopify theme push --path theme --theme "$TEMA" --ignore "config/settings_data.json" $EXTRA
+
+      - name: Etiquetar versión de producción
+        if: github.ref_name == 'prod'
+        run: |
+          VERSION="prod-$(date -u +%Y%m%d-%H%M)"
+          git tag "$VERSION"
+          git push origin "$VERSION"

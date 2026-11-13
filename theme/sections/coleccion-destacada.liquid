@@ -1,0 +1,36 @@
+{{ 'componente-tarjeta.css' | asset_url | stylesheet_tag }}
+
+{%- assign coleccion = section.settings.coleccion -%}
+<section class="seccion">
+  <div class="contenedor">
+    <div class="encabezado-seccion">
+      <h2>{{ section.settings.titulo | default: coleccion.title }}</h2>
+      {%- if coleccion != blank and section.settings.mostrar_enlace -%}
+        <a href="{{ coleccion.url }}">Ver todo</a>
+      {%- endif -%}
+    </div>
+
+    {%- if coleccion != blank and coleccion.products_count > 0 -%}
+      <ul class="rejilla-productos">
+        {%- for producto in coleccion.products limit: section.settings.cantidad -%}
+          <li>{% render 'tarjeta-producto', producto: producto %}</li>
+        {%- endfor -%}
+      </ul>
+    {%- elsif request.design_mode -%}
+      <p>Elige una colección en la configuración de esta sección.</p>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Colección destacada",
+  "settings": [
+    { "type": "text", "id": "titulo", "label": "Título" },
+    { "type": "collection", "id": "coleccion", "label": "Colección" },
+    { "type": "range", "id": "cantidad", "label": "Productos a mostrar", "min": 2, "max": 12, "step": 2, "default": 8 },
+    { "type": "checkbox", "id": "mostrar_enlace", "label": "Mostrar enlace Ver todo", "default": true }
+  ],
+  "presets": [{ "name": "Colección destacada" }]
+}
+{% endschema %}

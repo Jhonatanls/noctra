@@ -1,0 +1,25 @@
+<section class="seccion">
+  <div class="contenedor">
+    <h1>Colecciones</h1>
+    <ul class="lista-colecciones">
+      {%- for coleccion in collections -%}
+        <li>
+          <a href="{{ coleccion.url }}" class="lista-colecciones__enlace">
+            {%- if coleccion.featured_image != blank -%}
+              {%- assign alt_col = coleccion.featured_image.alt | default: coleccion.title -%}
+              {{ coleccion.featured_image | image_url: width: 900 | image_tag: widths: '450, 900', sizes: '(min-width: 990px) 33vw, 100vw', loading: 'lazy', alt: alt_col }}
+            {%- endif -%}
+            <span class="lista-colecciones__nombre">{{ coleccion.title }}</span>
+          </a>
+        </li>
+      {%- endfor -%}
+    </ul>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Lista de colecciones",
+  "settings": []
+}
+{% endschema %}

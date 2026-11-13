@@ -1,0 +1,17 @@
+# Entornos de la Shopify CLI para trabajo local. Sin contraseñas ni tokens:
+# en local la CLI pide iniciar sesión; en GitHub Actions usa los secretos de cada Environment.
+# Uso: shopify theme dev -e desarrollo
+
+[environments.desarrollo]
+store = "PENDIENTE-noctra-dev.myshopify.com"
+path = "theme"
+
+[environments.preprod]
+store = "PENDIENTE-noctra.myshopify.com"
+theme = "PENDIENTE-ID-TEMA-PREPROD"
+path = "theme"
+
+[environments.produccion]
+store = "PENDIENTE-noctra.myshopify.com"
+theme = "PENDIENTE-ID-TEMA-PUBLICADO"
+path = "theme"

@@ -1,0 +1,27 @@
+.carrito__envio { margin-block-end: var(--espacio-6); }
+.carrito__envio p { margin-block-end: var(--espacio-2); }
+.carrito__barra { height: var(--espacio-1); background: var(--color-borde); border-radius: var(--radio-redondo); overflow: hidden; }
+.carrito__barra-relleno { display: block; height: 100%; background: var(--color-oro); }
+
+.carrito__lineas { list-style: none; margin: 0; padding: 0; display: grid; }
+.carrito__linea {
+  display: grid;
+  grid-template-columns: 6rem 1fr auto;
+  gap: var(--espacio-4);
+  padding-block: var(--espacio-5);
+  border-block-end: var(--borde-fino) solid var(--color-borde);
+}
+.carrito__foto { background: var(--color-superficie); aspect-ratio: 4 / 5; border-radius: var(--radio-m); overflow: hidden; }
+.carrito__foto img { width: 100%; height: 100%; object-fit: cover; }
+.carrito__datos { display: grid; gap: var(--espacio-2); align-content: start; }
+.carrito__nombre { text-decoration: none; font-weight: var(--peso-medio); }
+.carrito__variante, .carrito__descuento { margin: 0; font-size: var(--texto-s); color: var(--color-texto-2); }
+.carrito__descuento { color: var(--color-oro); }
+.carrito__cantidad input { width: 5rem; }
+.carrito__quitar { font-size: var(--texto-s); }
+.carrito__precio { margin: 0; text-align: end; display: grid; }
+
+.carrito__resumen { margin-block-start: var(--espacio-8); display: grid; gap: var(--espacio-3); max-width: 28rem; margin-inline-start: auto; }
+.carrito__ahorro, .carrito__total { display: flex; justify-content: space-between; margin: 0; }
+.carrito__total { font-size: var(--texto-l); }
+.carrito__nota { font-size: var(--texto-xs); color: var(--color-texto-2); margin: 0; }

@@ -1,0 +1,27 @@
+{%- comment -%}
+  Logotipo de Noctra. El SVG se aplica como máscara y toma el color del texto (sirve en modo claro y oscuro).
+  Parámetros:
+    variante: 'wordmark' (por defecto) o 'isotipo'
+    clase: clases extra
+    decorativo: true para ocultarlo a lectores de pantalla (cuando el nombre ya está en el texto)
+  Si el equipo sube un logo en la configuración del tema, la variante wordmark usa esa imagen.
+{%- endcomment -%}
+{%- liquid
+  assign variante = variante | default: 'wordmark'
+  if variante == 'isotipo'
+    assign archivo = 'noctra-isotipo.svg'
+    assign proporcion = '2476 / 3876'
+  else
+    assign archivo = 'noctra-wordmark.svg'
+    assign proporcion = '3116 / 1092'
+  endif
+-%}
+{%- if variante == 'wordmark' and settings.logo != blank -%}
+  {{ settings.logo | image_url: width: 480 | image_tag: widths: '240, 480', sizes: '240px', alt: settings.nombre_marca, class: clase, loading: 'eager' }}
+{%- else -%}
+  <span
+    class="logo logo--{{ variante }} {{ clase }}"
+    {% if decorativo %}aria-hidden="true"{% else %}role="img" aria-label="{{ settings.nombre_marca | escape }}"{% endif %}
+    style="--logo-url: url('{{ archivo | asset_url }}'); aspect-ratio: {{ proporcion }};"
+  ></span>
+{%- endif -%}

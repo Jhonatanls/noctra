@@ -1,0 +1,63 @@
+{
+  "sections": {
+    "portada": {
+      "type": "portada",
+      "settings": {
+        "subtitulo": "Viste la noche",
+        "boton_texto": "Ver la colección",
+        "animacion_logo": true
+      }
+    },
+    "tenis": {
+      "type": "coleccion-destacada",
+      "settings": {
+        "titulo": "Tenis",
+        "cantidad": 8,
+        "mostrar_enlace": true
+      }
+    },
+    "gorras": {
+      "type": "coleccion-destacada",
+      "settings": {
+        "titulo": "Gorras",
+        "cantidad": 4,
+        "mostrar_enlace": true
+      }
+    },
+    "combos": {
+      "type": "combos-destacados",
+      "settings": {
+        "titulo": "Combos Noctra",
+        "texto": "Arma tu look y paga menos. El descuento se aplica solo en el carrito."
+      },
+      "blocks": {
+        "look": {
+          "type": "combo",
+          "settings": {
+            "nombre": "Look completo",
+            "detalle": "2 tenis + 1 gorra",
+            "precio": "$350.000"
+          }
+        },
+        "tres": {
+          "type": "combo",
+          "settings": {
+            "nombre": "Tres pares",
+            "detalle": "3 tenis",
+            "precio": "$420.000"
+          }
+        }
+      },
+      "block_order": [
+        "look",
+        "tres"
+      ]
+    }
+  },
+  "order": [
+    "portada",
+    "combos",
+    "tenis",
+    "gorras"
+  ]
+}

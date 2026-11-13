@@ -1,0 +1,69 @@
+{%- comment -%}
+  Tarjeta de producto (SPEC-003, RF-03).
+  Parámetros: producto (product), carga ('lazy' por defecto).
+  Sellos, máximo dos, en orden: Agotado, Últimas unidades, Combo, Nuevo.
+{%- endcomment -%}
+{%- liquid
+  assign carga = carga | default: 'lazy'
+  assign inventario = 0
+  assign rastreado = false
+  for v in producto.variants
+    if v.inventory_management == 'shopify'
+      assign rastreado = true
+      if v.inventory_quantity > 0
+        assign inventario = inventario | plus: v.inventory_quantity
+      endif
+    endif
+  endfor
+
+  assign sellos = ''
+  if producto.available == false
+    assign sellos = sellos | append: 'agotado,'
+  elsif rastreado and inventario <= settings.umbral_ultimas_unidades
+    assign sellos = sellos | append: 'ultimas,'
+  endif
+  if producto.tags contains 'combo'
+    assign sellos = sellos | append: 'combo,'
+  endif
+  if producto.tags contains 'nuevo'
+    assign sellos = sellos | append: 'nuevo,'
+  endif
+  assign lista_sellos = sellos | split: ','
+  assign imagen = producto.featured_media.preview_image
+  assign segunda = producto.media[1].preview_image
+-%}
+<article class="tarjeta">
+  <a class="tarjeta__enlace" href="{{ producto.url }}">
+    <div class="tarjeta__medio marco">
+      {%- if imagen != blank -%}
+        {%- assign alt_imagen = imagen.alt | default: producto.title -%}
+        {{ imagen | image_url: width: 900 | image_tag: widths: '300, 450, 600, 900', sizes: '(min-width: 990px) 25vw, 50vw', loading: carga, alt: alt_imagen, class: 'tarjeta__imagen' }}
+        {%- if segunda != blank -%}
+          {{ segunda | image_url: width: 900 | image_tag: widths: '450, 600, 900', sizes: '25vw', loading: 'lazy', alt: '', class: 'tarjeta__imagen tarjeta__imagen--segunda' }}
+        {%- endif -%}
+      {%- else -%}
+        {{ 'product-1' | placeholder_svg_tag: 'tarjeta__imagen' }}
+      {%- endif -%}
+      {%- if lista_sellos.size > 0 -%}
+        <ul class="tarjeta__sellos">
+          {%- for sello in lista_sellos limit: 2 -%}
+            {%- case sello -%}
+              {%- when 'agotado' -%}<li class="sello sello--agotado">Agotado</li>
+              {%- when 'ultimas' -%}<li class="sello">Últimas unidades</li>
+              {%- when 'combo' -%}<li class="sello sello--combo">Combo</li>
+              {%- when 'nuevo' -%}<li class="sello">Nuevo</li>
+            {%- endcase -%}
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
+    </div>
+    <h3 class="tarjeta__nombre">{{ producto.title }}</h3>
+  </a>
+  <p class="tarjeta__precio">
+    {%- if producto.price_varies -%}Desde {% endif -%}
+    <span class="precio">{{ producto.price | money }}</span>
+    {%- if producto.compare_at_price > producto.price -%}
+      <s class="precio__anterior"><span class="oculto-visual">Antes</span>{{ producto.compare_at_price | money }}</s>
+    {%- endif -%}
+  </p>
+</article>

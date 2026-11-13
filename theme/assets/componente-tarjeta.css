@@ -1,0 +1,63 @@
+.encabezado-seccion {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--espacio-4);
+  margin-block-end: var(--espacio-8);
+  padding-block-end: var(--espacio-3);
+  border-block-end: var(--borde-fino) solid var(--color-oro-suave);
+}
+.encabezado-seccion::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: calc(-1 * var(--espacio-1));
+  width: var(--espacio-2);
+  height: var(--espacio-2);
+  background: var(--color-fondo);
+  border: var(--borde-fino) solid var(--color-oro);
+  transform: rotate(45deg);
+}
+.encabezado-seccion h2 { margin: 0; }
+.encabezado-seccion a { font-size: var(--texto-s); }
+
+.tarjeta { display: grid; gap: var(--espacio-2); }
+.tarjeta__enlace { text-decoration: none; display: grid; gap: var(--espacio-3); }
+.tarjeta__medio {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  background: var(--color-superficie);
+  border: var(--borde-fino) solid var(--color-oro-suave);
+  border-radius: var(--radio-m);
+  overflow: hidden;
+}
+.tarjeta__medio::before, .tarjeta__medio::after { opacity: 0; transition: opacity var(--duracion-media) var(--curva); }
+@media (hover: hover) {
+  .tarjeta__enlace:hover .tarjeta__medio::before, .tarjeta__enlace:hover .tarjeta__medio::after { opacity: 1; }
+  .tarjeta__enlace:hover .tarjeta__medio { border-color: var(--color-oro); }
+}
+.tarjeta__imagen { width: 100%; height: 100%; object-fit: cover; }
+.tarjeta__imagen--segunda { position: absolute; inset: 0; opacity: 0; transition: opacity var(--duracion-media) var(--curva); }
+@media (hover: hover) {
+  .tarjeta__enlace:hover .tarjeta__imagen--segunda { opacity: 1; }
+}
+.tarjeta__sellos {
+  position: absolute;
+  top: var(--espacio-2);
+  inset-inline-start: var(--espacio-2);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--espacio-1);
+  justify-items: start;
+}
+.tarjeta__nombre {
+  font-family: var(--fuente-texto);
+  font-weight: var(--peso-medio);
+  font-size: var(--texto-m);
+  letter-spacing: var(--espaciado-boton);
+  margin: 0;
+}
+.tarjeta__precio { margin: 0; font-size: var(--texto-s); }

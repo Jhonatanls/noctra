@@ -1,0 +1,69 @@
+{{ 'componente-encabezado.css' | asset_url | stylesheet_tag }}
+
+<header class="encabezado">
+  <div class="contenedor encabezado__fila">
+    <details class="encabezado__movil">
+      <summary class="encabezado__icono">
+        <span class="oculto-visual">Abrir menú</span>
+        {% render 'icono', nombre: 'menu' %}
+      </summary>
+      <nav class="encabezado__panel" aria-label="Menú">
+        <ul class="encabezado__lista-movil">
+          {%- for enlace in section.settings.menu.links -%}
+            <li><a href="{{ enlace.url }}"{% if enlace.active %} aria-current="page"{% endif %}>{{ enlace.title }}</a></li>
+          {%- endfor -%}
+        </ul>
+      </nav>
+    </details>
+
+    <a href="{{ routes.root_url }}" class="encabezado__marca" aria-label="{{ settings.nombre_marca | escape }}, inicio">
+      {% render 'logo', variante: 'wordmark', clase: 'encabezado__logo' %}
+    </a>
+
+    <nav class="encabezado__nav" aria-label="Menú principal">
+      <ul class="encabezado__lista">
+        {%- for enlace in section.settings.menu.links -%}
+          <li><a href="{{ enlace.url }}"{% if enlace.active %} aria-current="page"{% endif %}>{{ enlace.title }}</a></li>
+        {%- endfor -%}
+      </ul>
+    </nav>
+
+    <div class="encabezado__acciones">
+      <a href="{{ routes.search_url }}" class="encabezado__icono">
+        <span class="oculto-visual">Buscar</span>
+        {% render 'icono', nombre: 'buscar' %}
+      </a>
+      {%- if shop.customer_accounts_enabled -%}
+        <a href="{{ routes.account_url }}" class="encabezado__icono encabezado__cuenta">
+          <span class="oculto-visual">Mi cuenta</span>
+          {% render 'icono', nombre: 'cuenta' %}
+        </a>
+      {%- endif -%}
+      <button type="button" class="encabezado__icono" data-cambiar-tema aria-label="Cambiar entre modo claro y oscuro">
+        {% render 'icono', nombre: 'modo' %}
+      </button>
+      <a href="{{ routes.cart_url }}" class="encabezado__icono encabezado__carrito">
+        <span class="oculto-visual">Carrito,</span>
+        {% render 'icono', nombre: 'carrito' %}
+        <span class="encabezado__contador" data-contador-carrito{% if cart.item_count == 0 %} hidden{% endif %}>{{ cart.item_count }}</span>
+        <span class="oculto-visual">productos</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+{% schema %}
+{
+  "name": "Encabezado",
+  "class": "seccion-encabezado",
+  "enabled_on": { "groups": ["header"] },
+  "settings": [
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Menú",
+      "default": "main-menu"
+    }
+  ]
+}
+{% endschema %}

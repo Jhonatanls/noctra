@@ -1,0 +1,18 @@
+{{ 'componente-ficha.css' | asset_url | stylesheet_tag }}
+
+<section class="seccion">
+  <div class="contenedor contenido-pagina">
+    <h1>{{ page.title | default: 'Guía de tallas' }}</h1>
+    {%- if page.content != blank -%}
+      <div class="contenido-pagina__texto">{{ page.content }}</div>
+    {%- endif -%}
+    {% render 'guia-tallas', id_prefijo: section.id %}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Guía de tallas",
+  "settings": []
+}
+{% endschema %}

@@ -1,0 +1,203 @@
+{{ 'componente-ficha.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign variante = product.selected_or_first_available_variant
+  assign id_formulario = 'formulario-producto-' | append: section.id
+  assign numero_whatsapp = settings.whatsapp_numero | remove: '+' | remove: ' ' | remove: '-'
+  assign url_producto = shop.url | append: product.url
+-%}
+
+<ficha-producto
+  class="ficha contenedor seccion"
+  data-seccion="{{ section.id }}"
+  data-url="{{ url_producto }}"
+  data-producto="{{ product.title | escape }}"
+  data-whatsapp="{{ numero_whatsapp }}"
+>
+  <div class="ficha__galeria">
+    <ul class="ficha__medios" aria-label="Fotos de {{ product.title | escape }}">
+      {%- for medio in product.media -%}
+        <li class="ficha__medio{% if forloop.first %} marco{% endif %}">
+          {%- case medio.media_type -%}
+            {%- when 'image' -%}
+              {%- liquid
+                assign alt_medio = medio.alt | default: product.title
+                if forloop.first
+                  assign carga = 'eager'
+                else
+                  assign carga = 'lazy'
+                endif
+              -%}
+              {{ medio | image_url: width: 1600 | image_tag: widths: '600, 900, 1200, 1600', sizes: '(min-width: 990px) 55vw, 100vw', loading: carga, alt: alt_medio }}
+            {%- when 'video' -%}
+              {{ medio | video_tag: controls: true, muted: true, playsinline: true, preload: 'none', image_size: '1200x' }}
+            {%- when 'external_video' -%}
+              {{ medio | external_video_tag }}
+            {%- else -%}
+              {{ medio | media_tag }}
+          {%- endcase -%}
+        </li>
+      {%- else -%}
+        <li class="ficha__medio">{{ 'product-1' | placeholder_svg_tag: 'ficha__placeholder' }}</li>
+      {%- endfor -%}
+    </ul>
+  </div>
+
+  <div class="ficha__info">
+    {%- for block in section.blocks -%}
+      {%- case block.type -%}
+        {%- when 'titulo' -%}
+          <h1 class="ficha__titulo" {{ block.shopify_attributes }}>{{ product.title }}</h1>
+          {% render 'ornamento' %}
+
+        {%- when 'precio' -%}
+          <p class="ficha__precio" {{ block.shopify_attributes }}>
+            <span class="precio" data-precio>{{ variante.price | money }}</span>
+            <s class="precio__anterior" data-precio-anterior{% unless variante.compare_at_price > variante.price %} hidden{% endunless %}>
+              {{- variante.compare_at_price | money -}}
+            </s>
+          </p>
+
+        {%- when 'selector' -%}
+          <div class="ficha__selector" {{ block.shopify_attributes }}>
+            {%- unless product.has_only_default_variant -%}
+              <div class="ficha__opciones" data-opciones hidden>
+                {%- for opcion in product.options_with_values -%}
+                  {%- liquid
+                    assign nombre_opcion = opcion.name | downcase
+                    assign es_talla = false
+                    if nombre_opcion == 'talla' or nombre_opcion == 'size' or nombre_opcion == 'tallas'
+                      assign es_talla = true
+                    endif
+                    assign indice_opcion = forloop.index0
+                  -%}
+                  <fieldset class="ficha__opcion" data-indice-opcion="{{ indice_opcion }}">
+                    <legend class="ficha__leyenda">
+                      {{ opcion.name }}{% if es_talla %} (EUR){% endif %}:
+                      <span data-valor-elegido>{{ opcion.selected_value }}</span>
+                    </legend>
+                    <div class="ficha__valores{% if es_talla %} ficha__valores--talla{% endif %}">
+                      {%- for valor in opcion.values -%}
+                        {%- assign nombre_valor = valor.name | default: valor -%}
+                        {%- assign id_valor = section.id | append: '-' | append: indice_opcion | append: '-' | append: forloop.index0 -%}
+                        <input
+                          class="ficha__radio oculto-visual"
+                          type="radio"
+                          id="{{ id_valor }}"
+                          name="opcion-{{ section.id }}-{{ indice_opcion }}"
+                          value="{{ nombre_valor | escape }}"
+                          {% if opcion.selected_value == nombre_valor %}checked{% endif %}
+                        >
+                        <label class="ficha__valor" for="{{ id_valor }}">
+                          <span>{{ nombre_valor }}</span>
+                          {%- if es_talla -%}<span class="ficha__cm" data-cm-para="{{ nombre_valor | escape }}"></span>{%- endif -%}
+                        </label>
+                      {%- endfor -%}
+                    </div>
+                  </fieldset>
+                {%- endfor -%}
+              </div>
+            {%- endunless -%}
+
+            {%- if block.settings.mostrar_guia -%}
+              <button type="button" class="enlace-boton ficha__abrir-guia" data-abrir-dialogo="guia-{{ section.id }}">¿Cuál es mi talla?</button>
+              <dialog class="dialogo" id="guia-{{ section.id }}" aria-labelledby="titulo-guia-{{ section.id }}">
+                <button type="button" class="enlace-boton dialogo__cerrar" data-cerrar-dialogo>
+                  <span class="oculto-visual">Cerrar</span>{% render 'icono', nombre: 'cerrar' %}
+                </button>
+                <h2 id="titulo-guia-{{ section.id }}">Guía de tallas</h2>
+                {% render 'guia-tallas', id_prefijo: section.id %}
+              </dialog>
+            {%- endif -%}
+          </div>
+
+        {%- when 'botones' -%}
+          <div class="ficha__compra" {{ block.shopify_attributes }}>
+            {%- form 'product', product, id: id_formulario, class: 'ficha__formulario' -%}
+              <label class="ficha__select-variantes" data-select-variantes>
+                <span>Elige una opción</span>
+                <select name="id">
+                  {%- for v in product.variants -%}
+                    <option value="{{ v.id }}"{% if v.id == variante.id %} selected{% endif %}{% unless v.available %} disabled{% endunless %}>
+                      {{ v.title }}{% unless v.available %} (agotado){% endunless %} &ndash; {{ v.price | money }}
+                    </option>
+                  {%- endfor -%}
+                </select>
+              </label>
+              <button type="submit" class="boton boton--ancho" data-boton-agregar{% unless variante.available %} disabled{% endunless %}>
+                {%- if variante.available -%}Agregar al carrito{%- else -%}Agotado{%- endif -%}
+              </button>
+            {%- endform -%}
+
+            {%- if numero_whatsapp != blank -%}
+              {%- capture mensaje_wa -%}Hola, quiero pedir {{ product.title }}{% unless product.has_only_default_variant %} ({{ variante.title }}){% endunless %}: {{ url_producto }}?variant={{ variante.id }}{%- endcapture -%}
+              <a
+                class="boton boton--secundario boton--ancho"
+                href="https://wa.me/{{ numero_whatsapp }}?text={{ mensaje_wa | url_encode }}"
+                target="_blank"
+                rel="noopener"
+                data-boton-whatsapp
+              >
+                {%- if variante.available -%}Pedir por WhatsApp{%- else -%}Avísame por WhatsApp{%- endif -%}
+              </a>
+            {%- endif -%}
+          </div>
+
+        {%- when 'descripcion' -%}
+          <div class="ficha__descripcion" {{ block.shopify_attributes }}>{{ product.description }}</div>
+
+        {%- when 'desplegable' -%}
+          <details class="ficha__desplegable" {{ block.shopify_attributes }}>
+            <summary>{{ block.settings.titulo }}</summary>
+            <div class="ficha__desplegable-contenido">{{ block.settings.contenido }}</div>
+          </details>
+
+        {%- when 'texto' -%}
+          <div class="ficha__texto" {{ block.shopify_attributes }}>{{ block.settings.texto }}</div>
+
+        {%- when '@app' -%}
+          <div class="ficha__app">{% render block %}</div>
+      {%- endcase -%}
+    {%- endfor -%}
+  </div>
+
+  <script type="application/json" data-variantes>{{ product.variants | json }}</script>
+</ficha-producto>
+
+<script type="application/ld+json">{{ product | structured_data }}</script>
+
+{% schema %}
+{
+  "name": "Ficha de producto",
+  "blocks": [
+    { "type": "@app" },
+    { "type": "titulo", "name": "Nombre", "limit": 1 },
+    { "type": "precio", "name": "Precio", "limit": 1 },
+    {
+      "type": "selector",
+      "name": "Opciones y tallas",
+      "limit": 1,
+      "settings": [
+        { "type": "checkbox", "id": "mostrar_guia", "label": "Mostrar guía de tallas", "default": true }
+      ]
+    },
+    { "type": "botones", "name": "Botones de compra", "limit": 1 },
+    { "type": "descripcion", "name": "Descripción", "limit": 1 },
+    {
+      "type": "desplegable",
+      "name": "Desplegable",
+      "settings": [
+        { "type": "text", "id": "titulo", "label": "Título", "default": "Envíos y cambios" },
+        { "type": "richtext", "id": "contenido", "label": "Contenido" }
+      ]
+    },
+    {
+      "type": "texto",
+      "name": "Texto",
+      "settings": [
+        { "type": "richtext", "id": "texto", "label": "Texto" }
+      ]
+    }
+  ]
+}
+{% endschema %}

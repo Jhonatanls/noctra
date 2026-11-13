@@ -1,0 +1,51 @@
+[
+  {
+    "name": "theme_info",
+    "theme_name": "Noctra",
+    "theme_version": "0.1.0",
+    "theme_author": "Equipo Noctra",
+    "theme_documentation_url": "https://shopify.dev/docs/storefronts/themes",
+    "theme_support_url": "https://help.shopify.com"
+  },
+  {
+    "name": "Marca",
+    "settings": [
+      { "type": "text", "id": "nombre_marca", "label": "Nombre de la marca", "default": "Noctra", "info": "Se usa como nombre accesible del logotipo y en textos." },
+      { "type": "image_picker", "id": "logo", "label": "Logo alternativo", "info": "Opcional. Si se deja vacío, se usa el logotipo vectorial de Noctra, que cambia de color con el modo." },
+      {
+        "type": "select",
+        "id": "modo_predeterminado",
+        "label": "Modo al entrar",
+        "options": [
+          { "value": "oscuro", "label": "Oscuro (decisión de marca)" },
+          { "value": "sistema", "label": "Seguir el modo del celular" }
+        ],
+        "default": "oscuro",
+        "info": "El cliente siempre puede cambiarlo con el interruptor."
+      },
+      { "type": "image_picker", "id": "favicon", "label": "Ícono del navegador" },
+      { "type": "text", "id": "eslogan", "label": "Eslogan", "default": "Viste la noche" }
+    ]
+  },
+  {
+    "name": "WhatsApp",
+    "settings": [
+      { "type": "text", "id": "whatsapp_numero", "label": "Número de WhatsApp Business", "info": "Con indicativo de país, solo números. Ejemplo: 573001234567. Si está vacío, no se muestran los botones." },
+      { "type": "text", "id": "whatsapp_mensaje", "label": "Mensaje inicial", "default": "Hola, quiero información sobre sus productos" }
+    ]
+  },
+  {
+    "name": "Ventas",
+    "settings": [
+      { "type": "number", "id": "envio_gratis_desde", "label": "Envío gratis desde (pesos)", "default": 150000, "info": "0 para ocultar la barra de envío gratis." },
+      { "type": "number", "id": "umbral_ultimas_unidades", "label": "Mostrar «Últimas unidades» con este inventario o menos", "default": 3 }
+    ]
+  },
+  {
+    "name": "Redes sociales",
+    "settings": [
+      { "type": "url", "id": "instagram_url", "label": "Instagram" },
+      { "type": "url", "id": "tiktok_url", "label": "TikTok" }
+    ]
+  }
+]

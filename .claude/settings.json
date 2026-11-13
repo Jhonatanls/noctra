@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "deny": [
+      "Bash(shopify theme publish:*)",
+      "Bash(shopify theme push --live:*)",
+      "Bash(shopify theme delete:*)",
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Bash(git push origin prod:*)",
+      "Bash(git push origin test:*)",
+      "Bash(git push -f:*)",
+      "Bash(git push --force:*)",
+      "Bash(git checkout prod)",
+      "Bash(git switch prod)",
+      "Bash(shopify theme push --allow-live:*)"
+    ],
+    "ask": [
+      "Bash(shopify theme push:*)",
+      "Bash(shopify app deploy:*)",
+      "Bash(git push:*)"
+    ],
+    "allow": [
+      "Bash(npm test)",
+      "Bash(npm run sync:combos)",
+      "Bash(shopify theme check:*)",
+      "Bash(shopify theme dev:*)"
+    ]
+  }
+}

@@ -1,0 +1,105 @@
+{{ 'componente-tarjeta.css' | asset_url | stylesheet_tag }}
+{{ 'componente-coleccion.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign orden_actual = collection.sort_by | default: collection.default_sort_by
+  assign hay_filtros_activos = false
+  for filtro in collection.filters
+    if filtro.active_values.size > 0 or filtro.min_value.value != blank or filtro.max_value.value != blank
+      assign hay_filtros_activos = true
+    endif
+  endfor
+-%}
+
+<section class="seccion">
+  <div class="contenedor">
+    <h1 class="coleccion__titulo">{{ collection.title }}</h1>
+    {%- if collection.description != blank -%}
+      <div class="coleccion__descripcion">{{ collection.description }}</div>
+    {%- endif -%}
+
+    <form class="filtros" method="get" action="{{ collection.url }}">
+      <div class="filtros__fila">
+        {%- for filtro in collection.filters -%}
+          <details class="filtros__grupo">
+            <summary class="filtros__titulo">{{ filtro.label }}</summary>
+            <div class="filtros__opciones">
+              {%- case filtro.type -%}
+                {%- when 'list', 'boolean' -%}
+                  {%- for valor in filtro.values -%}
+                    <label class="filtros__opcion">
+                      <input
+                        type="checkbox"
+                        name="{{ valor.param_name }}"
+                        value="{{ valor.value }}"
+                        {% if valor.active %}checked{% endif %}
+                        {% if valor.count == 0 and valor.active == false %}disabled{% endif %}
+                      >
+                      {{ valor.label }} <span class="filtros__conteo">({{ valor.count }})</span>
+                    </label>
+                  {%- endfor -%}
+                {%- when 'price_range' -%}
+                  {%- liquid
+                    assign minimo = filtro.min_value.value | divided_by: 100
+                    assign maximo = filtro.max_value.value | divided_by: 100
+                    assign tope = filtro.range_max | divided_by: 100
+                  -%}
+                  <div class="filtros__precio">
+                    <label>Desde
+                      <input type="number" inputmode="numeric" min="0" max="{{ tope }}" name="{{ filtro.min_value.param_name }}" {% if filtro.min_value.value != blank %}value="{{ minimo }}"{% endif %} placeholder="0">
+                    </label>
+                    <label>Hasta
+                      <input type="number" inputmode="numeric" min="0" max="{{ tope }}" name="{{ filtro.max_value.param_name }}" {% if filtro.max_value.value != blank %}value="{{ maximo }}"{% endif %} placeholder="{{ tope }}">
+                    </label>
+                  </div>
+              {%- endcase -%}
+            </div>
+          </details>
+        {%- endfor -%}
+
+        <label class="filtros__orden">
+          <span class="oculto-visual">Ordenar por</span>
+          <select name="sort_by">
+            {%- for opcion in collection.sort_options -%}
+              <option value="{{ opcion.value }}"{% if opcion.value == orden_actual %} selected{% endif %}>{{ opcion.name }}</option>
+            {%- endfor -%}
+          </select>
+        </label>
+
+        <button type="submit" class="boton boton--secundario">Aplicar</button>
+        {%- if hay_filtros_activos -%}
+          <a class="filtros__limpiar" href="{{ collection.url }}?sort_by={{ orden_actual }}">Quitar filtros</a>
+        {%- endif -%}
+      </div>
+    </form>
+
+    {%- paginate collection.products by 24 -%}
+      {%- if collection.products.size > 0 -%}
+        <p class="coleccion__conteo">{{ collection.products_count }} productos</p>
+        <ul class="rejilla-productos">
+          {%- for producto in collection.products -%}
+            {%- if forloop.index <= 2 -%}{%- assign carga = 'eager' -%}{%- else -%}{%- assign carga = 'lazy' -%}{%- endif -%}
+            <li>{% render 'tarjeta-producto', producto: producto, carga: carga %}</li>
+          {%- endfor -%}
+        </ul>
+        {%- if paginate.pages > 1 -%}
+          <nav class="paginacion" aria-label="Paginación">
+            {{ paginate | default_pagination: next: 'Siguiente', previous: 'Anterior' }}
+          </nav>
+        {%- endif -%}
+      {%- else -%}
+        <div class="coleccion__vacia">
+          <p>No encontramos productos con esos filtros.</p>
+          <a class="boton boton--secundario" href="{{ collection.url }}">Quitar filtros</a>
+        </div>
+      {%- endif -%}
+    {%- endpaginate -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Colección",
+  "settings": []
+}
+{% endschema %}

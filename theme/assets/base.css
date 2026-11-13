@@ -1,0 +1,256 @@
+/* Estilos globales (SPEC-001). Solo usa tokens de tokens.css. */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-padding-top: calc(var(--alto-encabezado) + var(--espacio-4));
+}
+
+body {
+  margin: 0;
+  background: var(--color-fondo);
+  color: var(--color-texto);
+  font-family: var(--fuente-texto);
+  font-size: var(--texto-m);
+  font-weight: var(--peso-normal);
+  line-height: var(--interlineado-texto);
+  -webkit-font-smoothing: antialiased;
+}
+
+img, video, svg { display: block; max-width: 100%; height: auto; }
+
+h1, h2, h3 {
+  font-family: var(--fuente-marca);
+  font-weight: var(--peso-normal);
+  line-height: var(--interlineado-titulo);
+  letter-spacing: var(--espaciado-marca);
+  margin: 0 0 var(--espacio-4);
+}
+h1 { font-size: var(--texto-2xl); }
+h2 { font-size: var(--texto-xl); }
+h3 { font-size: var(--texto-l); }
+
+p { margin: 0 0 var(--espacio-4); max-width: var(--ancho-texto); }
+
+a { color: inherit; text-underline-offset: 0.2em; text-decoration-thickness: var(--borde-fino); }
+a:hover { color: var(--color-acento); }
+
+:focus-visible {
+  outline: var(--anillo-foco) solid var(--color-oro);
+  outline-offset: var(--anillo-foco);
+}
+
+.contenedor {
+  width: 100%;
+  max-width: var(--ancho-max);
+  margin-inline: auto;
+  padding-inline: var(--espacio-4);
+}
+@media (min-width: 750px) { .contenedor { padding-inline: var(--espacio-8); } }
+
+.seccion { padding-block: var(--espacio-10); }
+@media (min-width: 990px) { .seccion { padding-block: var(--espacio-12); } }
+
+.oculto-visual {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.saltar {
+  position: absolute;
+  inset-inline-start: var(--espacio-4);
+  top: calc(-1 * var(--espacio-16));
+  padding: var(--espacio-2) var(--espacio-4);
+  background: var(--color-boton-fondo);
+  color: var(--color-boton-texto);
+  z-index: 100;
+}
+.saltar:focus { top: var(--espacio-2); }
+
+/* Botones */
+.boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--espacio-2);
+  min-height: var(--tactil-min);
+  padding: var(--espacio-3) var(--espacio-6);
+  border: var(--borde-fino) solid var(--color-oro);
+  border-radius: var(--radio-s);
+  background: var(--color-boton-fondo);
+  color: var(--color-boton-texto);
+  font: inherit;
+  font-size: var(--texto-s);
+  font-weight: var(--peso-medio);
+  letter-spacing: var(--espaciado-boton);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color var(--duracion-corta) var(--curva), color var(--duracion-corta) var(--curva);
+}
+.boton:hover { background: var(--color-oro); color: var(--color-boton-texto); }
+.boton[disabled], .boton[aria-disabled="true"] { opacity: 0.45; cursor: not-allowed; }
+.boton--secundario { background: transparent; color: var(--color-texto); border-color: var(--color-oro); }
+.boton--secundario:hover { background: var(--color-oro-suave); color: var(--color-texto); }
+.boton--ancho { width: 100%; }
+
+.enlace-boton {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+  min-height: var(--tactil-min);
+}
+
+/* Logotipo: el SVG se usa como máscara y toma el color del texto, así sirve en ambos modos */
+.logo {
+  display: inline-block;
+  height: 1em;
+  background: currentColor;
+  -webkit-mask: var(--logo-url) center / contain no-repeat;
+  mask: var(--logo-url) center / contain no-repeat;
+}
+@media (forced-colors: active) { .logo { background: CanvasText; } }
+
+/* Precios */
+.precio { color: var(--color-oro); font-weight: var(--peso-medio); }
+.precio__anterior { color: var(--color-texto-2); text-decoration: line-through; font-weight: var(--peso-normal); margin-inline-start: var(--espacio-2); }
+
+/* Sellos */
+.sello {
+  display: inline-block;
+  padding: var(--espacio-1) var(--espacio-2);
+  border: var(--borde-fino) solid currentColor;
+  border-radius: var(--radio-s);
+  font-size: var(--texto-xs);
+  line-height: 1.2;
+  background: var(--color-fondo);
+}
+.sello--combo { color: var(--color-boton-texto); background: var(--color-oro); border-color: var(--color-oro); }
+.sello--agotado { color: var(--color-texto-2); }
+
+/* Formularios */
+input, select, textarea {
+  font: inherit;
+  color: inherit;
+  background: var(--color-superficie);
+  border: var(--borde-fino) solid var(--color-borde);
+  border-radius: var(--radio-s);
+  min-height: var(--tactil-min);
+  padding: var(--espacio-2) var(--espacio-3);
+}
+label { font-size: var(--texto-s); }
+
+/* Eslogan */
+.eslogan {
+  font-family: var(--fuente-eslogan);
+  font-size: var(--texto-l);
+  letter-spacing: var(--espaciado-marca);
+  color: var(--color-texto-2);
+}
+
+/* Cuadrícula de productos */
+.rejilla-productos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--espacio-6) var(--espacio-3);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+@media (min-width: 990px) {
+  .rejilla-productos { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--espacio-10) var(--espacio-6); }
+}
+
+/* Diálogo */
+dialog.dialogo {
+  width: min(100% - var(--espacio-8), 40rem);
+  max-height: 85vh;
+  padding: var(--espacio-6);
+  border: var(--borde-fino) solid var(--color-oro);
+  outline: var(--borde-fino) solid var(--color-oro-suave);
+  outline-offset: calc(-1 * var(--espacio-2));
+  border-radius: var(--radio-m);
+  background: var(--color-superficie);
+  color: var(--color-texto);
+}
+dialog.dialogo::backdrop { background: var(--color-velo); }
+.dialogo__cerrar { float: inline-end; }
+
+/* WhatsApp flotante */
+.whatsapp-flotante {
+  border: var(--borde-fino) solid var(--color-oro);
+  position: fixed;
+  inset-inline-end: var(--espacio-4);
+  bottom: var(--espacio-4);
+  width: var(--boton-flotante);
+  height: var(--boton-flotante);
+  display: grid;
+  place-items: center;
+  border-radius: var(--radio-redondo);
+  background: var(--color-boton-fondo);
+  color: var(--color-boton-texto);
+  z-index: 40;
+}
+.whatsapp-flotante:hover { color: var(--color-boton-texto); opacity: 0.9; }
+.whatsapp-flotante svg { width: 1.6rem; height: 1.6rem; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+}
+
+/* Páginas de contenido */
+.contenido-pagina { max-width: var(--ancho-texto); }
+.contenido-pagina__texto { color: var(--color-texto-2); }
+
+/* Búsqueda */
+.busqueda { display: flex; gap: var(--espacio-2); margin-block: var(--espacio-6); }
+.busqueda input[type="search"] { flex: 1; min-width: 0; }
+
+/* Lista de colecciones */
+.lista-colecciones { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--espacio-6); }
+.lista-colecciones__enlace { text-decoration: none; display: grid; gap: var(--espacio-3); }
+.lista-colecciones__nombre { font-family: var(--fuente-marca); font-size: var(--texto-l); letter-spacing: var(--espaciado-marca); }
+@media (min-width: 750px) { .lista-colecciones { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+/* Ornamento: línea dorada con rombo central */
+.ornamento {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-3);
+  width: min(100%, 14rem);
+  color: var(--color-oro);
+}
+.ornamento::before, .ornamento::after {
+  content: "";
+  flex: 1;
+  height: var(--borde-fino);
+  background: currentColor;
+}
+.ornamento__rombo {
+  width: var(--espacio-2);
+  height: var(--espacio-2);
+  border: var(--borde-fino) solid currentColor;
+  transform: rotate(45deg);
+}
+
+/* Marco con esquinas doradas: acabado para medios destacados */
+.marco { position: relative; }
+.marco::before, .marco::after {
+  content: "";
+  position: absolute;
+  width: var(--espacio-5);
+  height: var(--espacio-5);
+  border: 0 solid var(--color-oro);
+  pointer-events: none;
+  z-index: 2;
+}
+.marco::before { top: var(--espacio-2); left: var(--espacio-2); border-top-width: var(--borde-fino); border-left-width: var(--borde-fino); }
+.marco::after { bottom: var(--espacio-2); right: var(--espacio-2); border-bottom-width: var(--borde-fino); border-right-width: var(--borde-fino); }

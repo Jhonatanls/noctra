@@ -1,0 +1,74 @@
+{{ 'componente-pie.css' | asset_url | stylesheet_tag }}
+
+<footer class="pie">
+  <div class="contenedor pie__sello" aria-hidden="true">
+    <span class="pie__linea"></span>
+    {% render 'logo', variante: 'isotipo', clase: 'pie__isotipo', decorativo: true %}
+    <span class="pie__linea"></span>
+  </div>
+  <div class="contenedor pie__rejilla">
+    <div class="pie__marca">
+      {% render 'logo', variante: 'wordmark', clase: 'pie__logotipo' %}
+      {%- if settings.eslogan != blank -%}
+        <p class="eslogan">{{ settings.eslogan }}</p>
+      {%- endif -%}
+    </div>
+
+    {%- if section.settings.menu.links.size > 0 -%}
+      <nav class="pie__nav" aria-label="{{ section.settings.menu.title | escape }}">
+        <ul class="pie__lista">
+          {%- for enlace in section.settings.menu.links -%}
+            <li><a href="{{ enlace.url }}">{{ enlace.title }}</a></li>
+          {%- endfor -%}
+        </ul>
+      </nav>
+    {%- endif -%}
+
+    {%- if settings.instagram_url != blank or settings.tiktok_url != blank -%}
+      <ul class="pie__lista pie__redes">
+        {%- if settings.instagram_url != blank -%}
+          <li><a href="{{ settings.instagram_url }}" target="_blank" rel="noopener">Instagram</a></li>
+        {%- endif -%}
+        {%- if settings.tiktok_url != blank -%}
+          <li><a href="{{ settings.tiktok_url }}" target="_blank" rel="noopener">TikTok</a></li>
+        {%- endif -%}
+      </ul>
+    {%- endif -%}
+  </div>
+
+  <div class="contenedor pie__base">
+    {%- if shop.enabled_payment_types.size > 0 -%}
+      <ul class="pie__pagos" aria-label="Medios de pago">
+        {%- for tipo in shop.enabled_payment_types -%}
+          <li>{{ tipo | payment_type_svg_tag: class: 'pie__pago' }}</li>
+        {%- endfor -%}
+      </ul>
+    {%- endif -%}
+    <p class="pie__legal">
+      &copy; {{ 'now' | date: '%Y' }} {{ settings.nombre_marca }}
+      {%- if section.settings.texto_legal != blank %}. {{ section.settings.texto_legal }}{% endif %}
+    </p>
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "Pie de página",
+  "class": "seccion-pie",
+  "enabled_on": { "groups": ["footer"] },
+  "settings": [
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Menú",
+      "default": "footer"
+    },
+    {
+      "type": "text",
+      "id": "texto_legal",
+      "label": "Texto legal",
+      "info": "Razón social y NIT cuando estén disponibles"
+    }
+  ]
+}
+{% endschema %}

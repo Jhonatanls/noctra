@@ -1,0 +1,38 @@
+{{ 'componente-anuncios.css' | asset_url | stylesheet_tag }}
+
+{%- if section.blocks.size > 0 -%}
+  <div class="anuncios">
+    <ul class="contenedor anuncios__lista">
+      {%- for block in section.blocks -%}
+        <li class="anuncios__item" {{ block.shopify_attributes }}>
+          {%- unless forloop.first -%}<span class="anuncios__rombo" aria-hidden="true"></span>{%- endunless -%}
+          {%- if block.settings.enlace != blank -%}
+            <a href="{{ block.settings.enlace }}">{{ block.settings.texto }}</a>
+          {%- else -%}
+            {{ block.settings.texto }}
+          {%- endif -%}
+        </li>
+      {%- endfor -%}
+    </ul>
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Barra de anuncios",
+  "class": "seccion-anuncios",
+  "enabled_on": { "groups": ["header"] },
+  "max_blocks": 4,
+  "blocks": [
+    {
+      "type": "mensaje",
+      "name": "Mensaje",
+      "settings": [
+        { "type": "text", "id": "texto", "label": "Texto", "default": "Envíos a toda Colombia" },
+        { "type": "url", "id": "enlace", "label": "Enlace" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "Barra de anuncios" }]
+}
+{% endschema %}

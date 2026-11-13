@@ -1,0 +1,106 @@
+{{ 'componente-carrito.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign numero_whatsapp = settings.whatsapp_numero | remove: '+' | remove: ' ' | remove: '-'
+  assign umbral_envio = settings.envio_gratis_desde | times: 100
+  assign falta_envio = umbral_envio | minus: cart.total_price
+  if umbral_envio > 0
+    assign progreso = cart.total_price | times: 100 | divided_by: umbral_envio
+    if progreso > 100
+      assign progreso = 100
+    endif
+  endif
+-%}
+
+<section class="seccion carrito">
+  <div class="contenedor">
+    <h1>Tu carrito</h1>
+
+    {%- if cart.item_count > 0 -%}
+      {%- if umbral_envio > 0 -%}
+        <div class="carrito__envio">
+          {%- if falta_envio > 0 -%}
+            <p>Te faltan <strong class="precio">{{ falta_envio | money }}</strong> para el envío gratis.</p>
+          {%- else -%}
+            <p>Tu pedido tiene envío gratis.</p>
+          {%- endif -%}
+          <div class="carrito__barra" role="progressbar" aria-label="Progreso al envío gratis" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ progreso }}">
+            <span class="carrito__barra-relleno" style="inline-size: {{ progreso }}%"></span>
+          </div>
+        </div>
+      {%- endif -%}
+
+      <form action="{{ routes.cart_url }}" method="post" class="carrito__formulario">
+        <ul class="carrito__lineas">
+          {%- for item in cart.items -%}
+            <li class="carrito__linea">
+              <a href="{{ item.url }}" class="carrito__foto">
+                {%- if item.image != blank -%}
+                  {%- assign alt_item = item.image.alt | default: item.product.title -%}
+                  {{ item.image | image_url: width: 240 | image_tag: widths: '120, 240', sizes: '120px', loading: 'lazy', alt: alt_item }}
+                {%- endif -%}
+              </a>
+              <div class="carrito__datos">
+                <a href="{{ item.url }}" class="carrito__nombre">{{ item.product.title }}</a>
+                {%- unless item.product.has_only_default_variant -%}
+                  <p class="carrito__variante">{{ item.variant.title }}</p>
+                {%- endunless -%}
+                {%- for asignacion in item.line_level_discount_allocations -%}
+                  <p class="carrito__descuento">{{ asignacion.discount_application.title }}: &minus;{{ asignacion.amount | money }}</p>
+                {%- endfor -%}
+                <label class="carrito__cantidad">
+                  <span class="oculto-visual">Cantidad de {{ item.product.title }}</span>
+                  <input type="number" name="updates[]" value="{{ item.quantity }}" min="0" inputmode="numeric">
+                </label>
+                <a class="carrito__quitar" href="{{ item.url_to_remove }}">Quitar</a>
+              </div>
+              <p class="carrito__precio">
+                {%- if item.original_line_price > item.final_line_price -%}
+                  <s class="precio__anterior">{{ item.original_line_price | money }}</s>
+                {%- endif -%}
+                <span class="precio">{{ item.final_line_price | money }}</span>
+              </p>
+            </li>
+          {%- endfor -%}
+        </ul>
+
+        <div class="carrito__resumen">
+          {%- for descuento in cart.cart_level_discount_applications -%}
+            <p class="carrito__descuento">{{ descuento.title }}: &minus;{{ descuento.total_allocated_amount | money }}</p>
+          {%- endfor -%}
+          {%- if cart.total_discount > 0 -%}
+            <p class="carrito__ahorro">Ahorras <span class="precio">{{ cart.total_discount | money }}</span></p>
+          {%- endif -%}
+          <p class="carrito__total">Total <span class="precio">{{ cart.total_price | money }}</span></p>
+          <p class="carrito__nota">El envío se calcula al finalizar la compra.</p>
+
+          <button type="submit" name="update" class="boton boton--secundario">Actualizar cantidades</button>
+          <button type="submit" name="checkout" class="boton boton--ancho">Finalizar compra</button>
+
+          {%- if numero_whatsapp != blank -%}
+            {%- capture mensaje_wa -%}
+Hola, quiero hacer este pedido:
+{% for item in cart.items %}• {{ item.product.title }}{% unless item.product.has_only_default_variant %}, {{ item.variant.title }}{% endunless %} × {{ item.quantity }} — {{ item.final_line_price | money_without_trailing_zeros | strip_html }}
+{% endfor %}{% if cart.total_discount > 0 %}Ahorro aplicado: {{ cart.total_discount | money_without_trailing_zeros | strip_html }}
+{% endif %}Total estimado: {{ cart.total_price | money_without_trailing_zeros | strip_html }}
+¿Me confirman disponibilidad y envío a mi ciudad?
+            {%- endcapture -%}
+            <a class="boton boton--secundario boton--ancho" href="https://wa.me/{{ numero_whatsapp }}?text={{ mensaje_wa | strip | url_encode }}" target="_blank" rel="noopener">
+              Comprar por WhatsApp
+            </a>
+          {%- endif -%}
+        </div>
+      </form>
+    {%- else -%}
+      <p>Tu carrito está vacío.</p>
+      <a class="boton" href="{{ routes.all_products_collection_url }}">Ver la colección</a>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Carrito",
+  "settings": []
+}
+{% endschema %}

@@ -1,0 +1,40 @@
+{{ 'componente-tarjeta.css' | asset_url | stylesheet_tag }}
+
+<section class="seccion">
+  <div class="contenedor">
+    <h1>Buscar</h1>
+    <form action="{{ routes.search_url }}" method="get" role="search" class="busqueda">
+      <label for="busqueda-{{ section.id }}" class="oculto-visual">Buscar productos</label>
+      <input id="busqueda-{{ section.id }}" type="search" name="q" value="{{ search.terms | escape }}" placeholder="Busca un modelo, color o talla">
+      <input type="hidden" name="type" value="product">
+      <button type="submit" class="boton">Buscar</button>
+    </form>
+
+    {%- if search.performed -%}
+      {%- paginate search.results by 24 -%}
+        {%- if search.results_count > 0 -%}
+          <p>{{ search.results_count }} resultados para “{{ search.terms | escape }}”</p>
+          <ul class="rejilla-productos">
+            {%- for resultado in search.results -%}
+              {%- if resultado.object_type == 'product' -%}
+                <li>{% render 'tarjeta-producto', producto: resultado %}</li>
+              {%- endif -%}
+            {%- endfor -%}
+          </ul>
+          {%- if paginate.pages > 1 -%}
+            <nav class="paginacion" aria-label="Paginación">{{ paginate | default_pagination: next: 'Siguiente', previous: 'Anterior' }}</nav>
+          {%- endif -%}
+        {%- else -%}
+          <p>No encontramos resultados para “{{ search.terms | escape }}”. Prueba con otra palabra o escríbenos por WhatsApp.</p>
+        {%- endif -%}
+      {%- endpaginate -%}
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Búsqueda",
+  "settings": []
+}
+{% endschema %}

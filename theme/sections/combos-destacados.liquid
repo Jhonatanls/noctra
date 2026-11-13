@@ -1,0 +1,58 @@
+{{ 'componente-combos.css' | asset_url | stylesheet_tag }}
+
+{%- comment -%}
+  Combos destacados en el inicio (SPEC-005, RF-32). Es una vitrina de marketing:
+  los precios aquí deben coincidir con los combos configurados en el motor de descuentos.
+{%- endcomment -%}
+<section class="seccion combos">
+  <div class="contenedor">
+    <div class="combos__cabecera">
+      {% render 'logo', variante: 'isotipo', clase: 'combos__isotipo', decorativo: true %}
+      <h2 class="combos__titulo">{{ section.settings.titulo }}</h2>
+      {%- if section.settings.texto != blank -%}
+        <p class="combos__intro">{{ section.settings.texto }}</p>
+      {%- endif -%}
+    </div>
+
+    <ul class="combos__lista">
+      {%- for block in section.blocks -%}
+        <li class="combo" {{ block.shopify_attributes }}>
+          {% render 'ornamento', clase: 'combo__ornamento' %}
+          <h3 class="combo__nombre">{{ block.settings.nombre }}</h3>
+          <p class="combo__detalle">{{ block.settings.detalle }}</p>
+          <p class="combo__precio precio">{{ block.settings.precio }}</p>
+          {%- if block.settings.nota != blank -%}
+            <p class="combo__nota">{{ block.settings.nota }}</p>
+          {%- endif -%}
+          {%- if block.settings.enlace != blank -%}
+            <a class="boton boton--secundario combo__boton" href="{{ block.settings.enlace }}">Armar mi combo</a>
+          {%- endif -%}
+        </li>
+      {%- endfor -%}
+    </ul>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Combos destacados",
+  "settings": [
+    { "type": "text", "id": "titulo", "label": "Título", "default": "Combos Noctra" },
+    { "type": "text", "id": "texto", "label": "Texto", "default": "Arma tu look y paga menos. El descuento se aplica solo en el carrito." }
+  ],
+  "blocks": [
+    {
+      "type": "combo",
+      "name": "Combo",
+      "settings": [
+        { "type": "text", "id": "nombre", "label": "Nombre", "default": "Look completo" },
+        { "type": "text", "id": "detalle", "label": "Qué incluye", "default": "2 tenis + 1 gorra" },
+        { "type": "text", "id": "precio", "label": "Precio", "default": "$350.000", "info": "Debe coincidir con el combo configurado en el motor de descuentos." },
+        { "type": "text", "id": "nota", "label": "Nota", "info": "Opcional. Ejemplo: vigencia o productos elegibles." },
+        { "type": "url", "id": "enlace", "label": "Enlace", "info": "Colección con los productos elegibles." }
+      ]
+    }
+  ],
+  "presets": [{ "name": "Combos destacados" }]
+}
+{% endschema %}
