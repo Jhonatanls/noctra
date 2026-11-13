@@ -3,7 +3,7 @@
 # Uso: shopify theme dev -e desarrollo
 
 [environments.desarrollo]
-store = "PENDIENTE-noctra-dev.myshopify.com"
+store = "d1kykj-dy.myshopify.com"
 path = "theme"
 
 [environments.preprod]
