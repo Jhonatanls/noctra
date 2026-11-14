@@ -20,8 +20,8 @@ Una spec en `borrador` puede tener un **prototipo de referencia** (código hecho
 | --- | --- | --- | --- | --- | --- |
 | [SPEC-001](SPEC-001-sistema-de-diseno.md) | Sistema de diseño de Noctra y modos | 1 | RF-34, RNF-03, RNF-04, RNF-05 | disenador-ui | en-revision |
 | [SPEC-002](SPEC-002-esqueleto-y-navegacion.md) | Esqueleto, encabezado, pie e inicio | 1 | RF-21, RF-32, RNF-01, RNF-02 | dev-tema-liquid | en-revision |
-| [SPEC-003](SPEC-003-catalogo.md) | Catálogo, filtros y búsqueda | 2 | RF-01, RF-02, RF-03; RNF-01, RNF-02, RNF-03, RNF-05, RNF-13, RNF-17 (parciales) | dev-tema-liquid | borrador (prototipo) |
-| [SPEC-004](SPEC-004-ficha-y-tallas.md) | Ficha de producto y guía de tallas | 2 | RF-04 a RF-07, RF-18, RF-21 (parcial); RNF-01 a RNF-03, RNF-05, RNF-09, RNF-10, RNF-13, RNF-14, RNF-17 (parciales) | dev-tema-liquid | borrador (prototipo) |
+| [SPEC-003](SPEC-003-catalogo.md) | Catálogo, filtros y búsqueda | 2 | RF-01, RF-02, RF-03; RNF-01, RNF-02, RNF-03, RNF-05, RNF-13, RNF-17 (parciales) | dev-tema-liquid | en-progreso |
+| [SPEC-004](SPEC-004-ficha-y-tallas.md) | Ficha de producto y guía de tallas | 2 | RF-04 a RF-07, RF-18, RF-21 (parcial); RNF-01 a RNF-03, RNF-05, RNF-09, RNF-10, RNF-13, RNF-14, RNF-17 (parciales) | dev-tema-liquid | aprobada |
 | [SPEC-005](SPEC-005-motor-de-combos.md) | Motor de combos | 3 | RF-08 a RF-11, RF-13 | dev-funciones | borrador (lógica implementada) |
 | [SPEC-006](SPEC-006-carrito-y-whatsapp.md) | Carrito y compra por WhatsApp | 3 | RF-10, RF-14, RF-16 | dev-tema-liquid | borrador (prototipo) |
 | [SPEC-007](SPEC-007-pagos-envios-checkout.md) | Pagos, envíos y checkout | 4 | RF-15, RF-17 a RF-20 | operaciones-shopify | borrador |

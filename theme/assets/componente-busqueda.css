@@ -1,0 +1,42 @@
+/* Búsqueda predictiva en el encabezado (SPEC-003). El panel cuelga del encabezado (sticky) a todo el ancho. */
+.busqueda-predictiva { display: contents; }
+.sugerencias {
+  position: absolute;
+  inset-inline: 0;
+  top: 100%;
+  background: var(--color-fondo);
+  border-block-end: var(--borde-fino) solid var(--color-oro-suave);
+}
+.sugerencias[hidden] { display: none; }
+.sugerencias__contenido { padding-block: var(--espacio-3) var(--espacio-4); }
+.sugerencias__formulario { display: flex; align-items: center; gap: var(--espacio-2); }
+.sugerencias__formulario input[type="search"] { flex: 1; min-width: 0; }
+.sugerencias__resultados { max-height: var(--alto-lista-sugerencias); overflow-y: auto; }
+.sugerencias__lista { list-style: none; margin: var(--espacio-3) 0 0; padding: 0; display: grid; gap: var(--espacio-1); }
+.sugerencia {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-3);
+  min-height: var(--tactil-min);
+  padding: var(--espacio-2);
+  text-decoration: none;
+  border: var(--borde-fino) solid transparent;
+}
+.sugerencia:hover, .sugerencia[aria-selected="true"] { border-color: var(--color-oro-suave); background: var(--color-superficie); color: var(--color-texto); }
+.sugerencia[aria-selected="true"] { border-color: var(--color-oro); }
+.sugerencia__foto { flex: none; width: var(--foto-sugerencia); aspect-ratio: 4 / 5; background: var(--color-superficie); }
+.sugerencia__foto img { width: 100%; height: 100%; object-fit: cover; }
+.sugerencia__texto { display: grid; gap: var(--espacio-1); min-width: 0; font-size: var(--texto-s); }
+.sugerencia__nombre { overflow-wrap: anywhere; }
+.sugerencia__tipo { color: var(--color-texto-2); font-size: var(--texto-xs); }
+.sugerencias__todos {
+  display: flex;
+  align-items: center;
+  min-height: var(--tactil-min);
+  margin-block-start: var(--espacio-2);
+  padding: var(--espacio-2);
+  font-size: var(--texto-s);
+  border: var(--borde-fino) solid transparent;
+}
+.sugerencias__todos[aria-selected="true"] { border-color: var(--color-oro); background: var(--color-superficie); }
+.sin-resultados { margin: var(--espacio-4) 0 0; color: var(--color-texto-2); }

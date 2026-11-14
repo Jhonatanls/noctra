@@ -135,6 +135,18 @@ a:hover { color: var(--color-acento); }
 }
 .sello--combo { color: var(--color-boton-texto); background: var(--color-oro); border-color: var(--color-oro); }
 .sello--agotado { color: var(--color-texto-2); }
+/* Gama alta: texto principal con filo y rombo de oro (el oro es acabado, no relleno) */
+.sello--premium { color: var(--color-texto); border-color: var(--color-oro); }
+.sello--premium::before {
+  content: "";
+  display: inline-block;
+  width: var(--espacio-1);
+  height: var(--espacio-1);
+  margin-inline-end: var(--espacio-1);
+  background: var(--color-oro);
+  transform: rotate(45deg);
+  vertical-align: middle;
+}
 
 /* Formularios */
 input, select, textarea {
