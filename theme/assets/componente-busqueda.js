@@ -78,7 +78,20 @@ class BusquedaPredictiva extends HTMLElement {
     } else if (evento.key === 'Enter' && this.activo >= 0 && opciones[this.activo]) {
       evento.preventDefault();
       window.location.href = opciones[this.activo].href;
+    } else if (evento.key === 'Escape' && this.lista.innerHTML.trim() !== '') {
+      // Primer Escape: cierra la lista y deja el foco en el campo (C18). El segundo cierra el buscador.
+      evento.preventDefault();
+      evento.stopPropagation();
+      this.vaciar();
     }
+  }
+
+  vaciar() {
+    this.lista.innerHTML = '';
+    this.ultimo = '';
+    this.campo.setAttribute('aria-expanded', 'false');
+    this.anuncio.textContent = '';
+    this.marcar(-1);
   }
 
   async buscar() {
@@ -88,10 +101,7 @@ class BusquedaPredictiva extends HTMLElement {
 
     if (this.peticion) this.peticion.abort();
     if (texto.length < 2) {
-      this.lista.innerHTML = '';
-      this.campo.setAttribute('aria-expanded', 'false');
-      this.anuncio.textContent = '';
-      this.marcar(-1);
+      this.vaciar();
       return;
     }
 
