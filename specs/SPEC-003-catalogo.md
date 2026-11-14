@@ -233,6 +233,40 @@ Cada tarea cabe en menos de un día. El orden importa: las tareas 1 y 2 desbloqu
 - **Pendiente para revisión de diseño/QA (C13):** en modo claro, el texto de `--color-boton-texto` sobre `--color-oro` (sello Combo) mide cerca de 4,3:1 (calculado a mano), por debajo de 4,5:1. Es un valor de tokens (disenador-ui); no se cambió aquí.
 - Gama: solo existe "Noctra Premium"; los demás productos van sin gama (decisión del 13 nov 2026, tercera ronda).
 
+### QA en la tienda de desarrollo, primera pasada (14 nov 2026)
+
+Con Playwright contra `shopify theme dev` y los productos cargados por el equipo (3 tenis y 1 gorra), a 360 y 1280 px en los dos modos. Theme Check sin errores (41 archivos) y 13 pruebas en verde.
+
+**Cumplen:**
+- C1: 2 columnas a 360 px y 4 a 1280 px. La paginación queda pendiente porque hay menos de 24 productos.
+- C3 y C4: los filtros actualizan la cuadrícula y la URL sin recargar.
+- C5: el panel abre desde abajo, el foco entra en "Cerrar", "Ver 3 productos" muestra el conteo, y Escape lo cierra y devuelve el foco a "Filtrar".
+- C6: con dos filtros activos aparecen "Filtrar (2)" y una ficha removible por filtro.
+- C7: el orden tiene exactamente las cuatro opciones.
+- C13: en los sellos "Nuevo" y "Noctra Premium" el contraste es 17,3:1 en los dos modos; el precio en oro da 6,95:1 en oscuro y 4,69:1 en claro. "Agotado", "Combo" y "Últimas unidades" no se pudieron medir porque ningún producto los muestra; usan los mismos tokens.
+- C16: las dos fotos llevan `loading="lazy"`. Falta confirmar en un celular táctil real que la segunda no se descargue.
+- C17: aparecen sugerencias de productos.
+- C18: flecha abajo resalta y Enter abre la ficha.
+- C20: con filtros sin resultados aparecen "No encontramos productos con esos filtros." y "Quitar filtros".
+- C22: no hay desborde horizontal a 360 px, tampoco con el panel abierto.
+- C30: los productos publicados el 13 nov muestran "Nuevo" y el sello sale de `published_at`.
+- La búsqueda sin resultados muestra el mensaje, en las sugerencias y en `/search`.
+
+**Corregido en esta pasada:**
+- C18: Escape con la lista abierta cerraba todo el buscador y mandaba el foco al ícono. Ahora el primer Escape vacía la lista y deja el foco en el campo, y el segundo cierra el buscador (`assets/componente-busqueda.js`).
+
+**Bloqueados por la configuración del admin (no por el código):**
+- C2, C27, C28 y C29: Search & Discovery solo muestra Disponibilidad y Precio. Faltan activar Talla, Color, Género y Gama (runbook `docs/operaciones/filtros-y-metacampos.md`). Los tenis usan la opción estándar de Shopify **"Talla del calzado"**, que es la que hay que activar como filtro "Talla".
+- C21: no existe la colección "En combo" (`/collections/en-combo` da 404) y ningún producto tiene la etiqueta `combo`. El código distingue la colección vacía ("Ver todo el catálogo"), pero falta verla en pantalla.
+- C8 a C12, C14, C15 y C26: hacen falta productos con pocas unidades, precio anterior, precios distintos por variante, o agotados por completo.
+
+**Pendientes:** Lighthouse móvil (C23), que se mide en la vista previa del tema Noctra y no en `theme dev`, porque el servidor local no representa el rendimiento real. Revisión de textos (tarea 18).
+
+**Hallazgos para otras specs:**
+- SPEC-004: `sections/main-product.liquid` reconoce la talla solo si la opción se llama "Talla", "Tallas" o "Size". Con "Talla del calzado" la ficha no la tratará como talla.
+- Cumplimiento (RNF-13): los productos de prueba usan nombres de modelos de una marca de terceros, y la gorra se llama "Amiri", que también es una marca de moda. Las fotos muestran logos de terceros. Hay que cambiarlos antes de cualquier publicación.
+- Ningún producto tiene "Tipo de producto"; las colecciones funcionan, pero el runbook asume "Tenis" y "Gorra".
+
 ## Preguntas para el equipo
 
 Siguen abiertas (ninguna bloquea la aprobación, salvo que la 4 se vuelva necesaria tras la tarea 1):
