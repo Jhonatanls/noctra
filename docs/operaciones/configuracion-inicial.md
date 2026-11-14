@@ -7,7 +7,7 @@ Objetivo: dejar lista la tienda de desarrollo para que los agentes puedan probar
 ## Requisitos previos
 
 - Cuenta de Shopify Partners (gratis) o una tienda en prueba.
-- Node.js 20 o superior y Shopify CLI instalados en el computador de desarrollo.
+- Node.js 22 o superior y Shopify CLI instalados en el computador de desarrollo.
 - Claude Code instalado.
 
 ## Pasos
