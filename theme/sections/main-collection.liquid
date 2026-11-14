@@ -90,7 +90,8 @@
                     endif
                   -%}
                   {%- if pintar -%}
-                    <details class="filtros__grupo" data-filtros-grupo>
+                    {%- assign etiqueta_filtro = filtro.label | downcase -%}
+                    <details class="filtros__grupo" data-filtros-grupo{% if etiqueta_filtro contains 'talla' %} data-filtro-talla{% endif %}>
                       <summary class="filtros__titulo">{{ filtro.label }}</summary>
                       <div class="filtros__opciones">
                         {%- case filtro.type -%}

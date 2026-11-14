@@ -30,7 +30,9 @@ class FiltrosColeccion extends HTMLElement {
 
     this.formulario.addEventListener('submit', (evento) => { evento.preventDefault(); this.actualizar(); });
     this.addEventListener('change', (evento) => {
-      if (evento.target.matches('input, select')) this.programar(evento.target.type === 'number' ? 400 : 0);
+      if (!evento.target.matches('input, select')) return;
+      this.exigirExistencias(evento.target);
+      this.programar(evento.target.type === 'number' ? 400 : 0);
     });
     this.addEventListener('input', (evento) => {
       if (evento.target.matches('input[type="number"]')) this.programar(600);
@@ -61,6 +63,18 @@ class FiltrosColeccion extends HTMLElement {
 
   cerrarGrupos() {
     this.querySelectorAll('[data-filtros-grupo][open]').forEach((grupo) => grupo.removeAttribute('open'));
+  }
+
+  // Search & Discovery filtra la talla sin mirar existencias: un tenis agotado en la 42 sale al
+  // filtrar por 42. Con "En existencia" el cruce es por variante y sí funciona (verificado el
+  // 14 nov 2026), así que al marcar una talla se activa "En existencia" si el cliente no eligió
+  // nada en Disponibilidad (C2).
+  exigirExistencias(campo) {
+    if (campo.type !== 'checkbox' || !campo.checked || !campo.closest('[data-filtro-talla]')) return;
+    const disponibilidad = Array.from(this.formulario.querySelectorAll('input[name="filter.v.availability"]'));
+    if (disponibilidad.some((opcion) => opcion.checked)) return;
+    const enExistencia = disponibilidad.find((opcion) => opcion.value === '1');
+    if (enExistencia) enExistencia.checked = true;
   }
 
   programar(retraso) {
