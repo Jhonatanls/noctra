@@ -1,6 +1,6 @@
 # SPEC-004: Ficha de producto y guía de tallas
 
-- **Estado:** borrador (prototipo de referencia en `sections/main-product.liquid`, `snippets/guia-tallas.liquid`, `sections/pagina-guia-tallas.liquid`, `assets/componente-ficha.css` y `assets/theme.js`)
+- **Estado:** Aprobada (prototipo de referencia en `sections/main-product.liquid`, `snippets/guia-tallas.liquid`, `sections/pagina-guia-tallas.liquid`, `assets/componente-ficha.css` y `assets/theme.js`)
 - **Etapa:** 2
 - **Requerimientos:** RF-04, RF-05, RF-06, RF-07, RF-18, RF-21 (parcial: WhatsApp en la ficha); RNF-01, RNF-02, RNF-03, RNF-05, RNF-09, RNF-10, RNF-13, RNF-14, RNF-17 (parciales, en lo que toca a la ficha)
 - **Responsable:** dev-tema-liquid

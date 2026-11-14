@@ -1,6 +1,6 @@
 # SPEC-003: Catálogo, filtros y búsqueda
 
-- **Estado:** borrador (prototipo de referencia en `sections/main-collection.liquid`, `snippets/tarjeta-producto.liquid`, `sections/main-search.liquid` y `assets/componente-coleccion.css`)
+- **Estado:** aprobada (prototipo de referencia en `sections/main-collection.liquid`, `snippets/tarjeta-producto.liquid`, `sections/main-search.liquid` y `assets/componente-coleccion.css`)
 - **Etapa:** 2
 - **Requerimientos:** RF-01, RF-02, RF-03; RNF-01, RNF-02, RNF-03, RNF-05, RNF-13, RNF-17 (parciales, en lo que toca a colección y búsqueda)
 - **Responsable:** dev-tema-liquid
