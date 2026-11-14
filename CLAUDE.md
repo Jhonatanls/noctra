@@ -38,7 +38,7 @@ Regla práctica: si algo se puede resolver con una función nativa de Shopify o 
 
 - **Shopify** (plan Basic al lanzar) con **tema propio Online Store 2.0** en Liquid, sin frameworks de CSS ni de JS. JavaScript con Web Components nativos, sin dependencias en el navegador.
 - **Shopify CLI** para desarrollo del tema y, en la etapa 3, para la app privada que aloja la Function de combos.
-- **Node.js 20+** solo para pruebas y scripts de apoyo (`packages/`).
+- **Node.js 22+** solo para pruebas y scripts de apoyo (`packages/`).
 - Git con tres ramas de ambiente: `dev` (tienda de desarrollo), `test` (pre-producción, tema no publicado en la tienda real) y `prod` (tema publicado, dominio propio). El trabajo se hace en ramas `spec/SPEC-00X-nombre-corto` o `fix/...` que salen de `dev`. CI/CD con GitHub Actions: `docs/operaciones/ramas-y-despliegue.md`.
 
 ```

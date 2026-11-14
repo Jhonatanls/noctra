@@ -21,7 +21,7 @@ Esta guía te lleva desde el archivo `noctra.zip` hasta tener la tienda corriend
 
 | Programa | Para qué | Cómo instalarlo |
 | --- | --- | --- |
-| Node.js 20 o superior (versión LTS) | Pruebas, Shopify CLI y los MCP | Descárgalo de nodejs.org |
+| Node.js 22 o superior (versión LTS) | Pruebas, Shopify CLI y los MCP | Descárgalo de nodejs.org |
 | Git | Guardar versiones y trabajar por ramas | git-scm.com |
 | Claude Code | El asistente que trabaja en el proyecto | macOS/Linux: `curl -fsSL https://claude.ai/install.sh \| bash` · Windows (PowerShell): `irm https://claude.ai/install.ps1 \| iex` |
 | Shopify CLI | Ver y subir el tema | `npm install -g @shopify/cli@latest` |

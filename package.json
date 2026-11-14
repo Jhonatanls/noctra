@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "description": "Tema de Shopify y lógica de combos de la tienda de Noctra",
-  "engines": { "node": ">=20" },
+  "engines": { "node": ">=22" },
   "scripts": {
     "test": "node --test packages/combos/test/*.test.js",
     "sync:combos": "node scripts/sync-combos.mjs",
