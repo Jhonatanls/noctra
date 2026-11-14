@@ -4,7 +4,7 @@
 
 | Rama | Ambiente | Dónde vive | Quién lo ve | Se actualiza |
 | --- | --- | --- | --- | --- |
-| `dev` | Desarrollo | Tema "Noctra · Dev" en la **tienda de desarrollo** (datos y pagos de prueba) | El equipo | Automático al unir un PR a `dev` |
+| `dev` | Desarrollo | Tema "Noctra", **publicado** en la **tienda de desarrollo** con contraseña (datos y pagos de prueba). Va publicado porque el admin solo ofrece las plantillas del tema publicado (por ejemplo, `gorra`) | El equipo | Automático al unir un PR a `dev` |
 | `test` | Pre-producción | Tema **no publicado** "Noctra · Pre-prod" en la **tienda real** | El equipo, con el enlace de vista previa | Automático al unir un PR a `test` |
 | `prod` | Producción | Tema **publicado** en la tienda real, en el dominio propio | Todos los clientes | Al unir un PR a `prod` **y** aprobar el despliegue en GitHub |
 
