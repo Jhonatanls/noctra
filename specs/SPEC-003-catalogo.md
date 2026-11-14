@@ -267,6 +267,28 @@ Con Playwright contra `shopify theme dev` y los productos cargados por el equipo
 - Cumplimiento (RNF-13): los productos de prueba usan nombres de modelos de una marca de terceros, y la gorra se llama "Amiri", que también es una marca de moda. Las fotos muestran logos de terceros. Hay que cambiarlos antes de cualquier publicación.
 - Ningún producto tiene "Tipo de producto"; las colecciones funcionan, pero el runbook asume "Tenis" y "Gorra".
 
+### QA, segunda pasada (14 nov 2026)
+
+El equipo configuró los filtros, el tipo de producto, la etiqueta `combo` y la colección "En combo".
+
+**Cumplen ahora:**
+- C8: el Air Force 1 muestra "Últimas unidades" y "Noctra Premium".
+- C10: un producto agotado con etiqueta `combo` y publicado hace 1 día muestra "Agotado" y "Combo", sin "Nuevo".
+- C13: contraste de los sellos en oscuro / claro. "Combo" 6,95 / 4,69; "Agotado" 7,48 / 6,14; "Nuevo" y "Noctra Premium" 17,3 en los dos modos.
+- C15: el producto con dos precios muestra "Desde $120.000".
+- C27 y C28 (parcial): los filtros Género (Hombre, Mujer) y Gama (Noctra Premium) aparecen con sus conteos.
+- C29: en Gorras no aparece Talla y sí aparecen Color, Precio y Disponibilidad.
+- Los Noctra Premium no están en "En combo".
+
+**Corregido en esta pasada (`snippets/tarjeta-producto.liquid`):**
+- El sello "Combo" no salía porque el equipo escribió la etiqueta como "Combo" y Liquid compara mayúsculas. Ahora las etiquetas se comparan en minúsculas.
+- El precio anterior se comparaba entre variantes distintas: el precio de comparación más bajo de todas contra el precio más bajo de todas. Con un precio de comparación menor que el de su propia variante, aparecía "Desde $120.000, antes $179.900". Ahora se usa el precio de comparación de la misma variante que da el precio mostrado, y solo si es mayor.
+
+**Bloqueados por los datos de prueba:**
+- Los tenis ya no tienen la opción "Talla", solo Color. Por eso desapareció el filtro Talla y no se pueden verificar C2 ni la parte de talla de C28. Los tenis tienen que llevar Color y Talla (ver `docs/operaciones/cargar-productos.md`).
+- El orden de los filtros es Color, Género, Gama, Precio, Disponibilidad. Con Talla debe quedar en primer lugar.
+- C14 necesita un producto con precio de comparación mayor que su precio.
+
 ## Preguntas para el equipo
 
 Siguen abiertas (ninguna bloquea la aprobación, salvo que la 4 se vuelva necesaria tras la tarea 1):
