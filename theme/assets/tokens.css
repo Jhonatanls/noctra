@@ -82,6 +82,9 @@
   --ancho-desplegable: 16rem;
   --alto-lista-sugerencias: 70dvh;
   --foto-sugerencia: 3.5rem;
+  --alto-barra-compra: 4.5rem;
+  --zoom-ampliado: 200%;
+  --ancho-valor-min: 3.5rem;
 
   /* Movimiento */
   --duracion-corta: 160ms;

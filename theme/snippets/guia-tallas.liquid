@@ -2,7 +2,12 @@
   Guía de tallas (RF-06, SPEC-004).
   Datos: metaobjeto guia_tallas (campos eur, cm, us). Si no existe, usa una tabla de
   referencia general marcada como provisional. Las medidas reales por horma las carga el equipo.
-  Parámetros: id_prefijo (string único en la página).
+  Una sola tabla para todos los tenis, ordenada por EUR.
+  Parámetros:
+    id_prefijo (string único en la página)
+    solo_datos (true: pinta solo el JSON con la tabla, para la ficha; así los centímetros y la
+      equivalencia funcionan aunque la guía esté apagada)
+    sin_datos (true: pinta la guía sin el JSON, cuando la ficha ya lo pintó aparte)
 {%- endcomment -%}
 {%- liquid
   assign entradas = shop.metaobjects.guia_tallas.values
@@ -10,8 +15,29 @@
   if entradas.size > 0
     assign usa_referencia = false
   endif
-  assign referencia = '36:22.5:4|37:23.2:5|38:23.8:5.5|39:24.5:6.5|40:25.2:7|41:25.8:8|42:26.5:8.5|43:27.2:9.5|44:27.8:10|45:28.5:11|46:29.2:12' | split: '|'
+  assign referencia = '36:22.5:4|37:23.2:5|38:23.8:5.5|39:24.5:6.5|40:25.2:7|41:25.8:8|42:26.5:8.5|43:27.2:9.5|44:27.8:10|45:28.5:11|46:29.2:12'
+
+  # Cada fila lleva una clave numérica de 4 dígitos al inicio para ordenar por EUR: clave:eur:cm:us
+  assign texto_filas = ''
+  if usa_referencia
+    assign filas_referencia = referencia | split: '|'
+    for fila in filas_referencia
+      assign partes = fila | split: ':'
+      assign clave = partes[0] | plus: 1000.0
+      assign texto_filas = texto_filas | append: clave | append: ':' | append: fila | append: '|'
+    endfor
+  else
+    for entrada in entradas
+      assign eur_texto = entrada.eur.value | append: ''
+      assign clave = eur_texto | replace: ',', '.' | plus: 1000.0
+      assign cm_texto = entrada.cm.value | append: '' | replace: ':', ''
+      assign us_texto = entrada.us.value | append: '' | replace: ':', ''
+      assign texto_filas = texto_filas | append: clave | append: ':' | append: eur_texto | append: ':' | append: cm_texto | append: ':' | append: us_texto | append: '|'
+    endfor
+  endif
+  assign filas = texto_filas | split: '|' | sort
 -%}
+{%- unless solo_datos -%}
 <div class="guia-tallas" id="{{ id_prefijo }}-guia">
   <p class="guia-tallas__clave">
     La forma más segura: busca la talla <strong>EUR</strong> en la etiqueta de un tenis que te quede bien y pide ese mismo número.
@@ -24,16 +50,10 @@
         <tr><th scope="col">EUR</th><th scope="col">Pie (cm)</th><th scope="col">US</th></tr>
       </thead>
       <tbody>
-        {%- if usa_referencia -%}
-          {%- for fila in referencia -%}
-            {%- assign partes = fila | split: ':' -%}
-            <tr><th scope="row">{{ partes[0] }}</th><td>{{ partes[1] | replace: '.', ',' }}</td><td>{{ partes[2] | replace: '.', ',' }}</td></tr>
-          {%- endfor -%}
-        {%- else -%}
-          {%- for entrada in entradas -%}
-            <tr><th scope="row">{{ entrada.eur.value }}</th><td>{{ entrada.cm.value | replace: '.', ',' }}</td><td>{{ entrada.us.value | replace: '.', ',' }}</td></tr>
-          {%- endfor -%}
-        {%- endif -%}
+        {%- for fila in filas -%}
+          {%- assign partes = fila | split: ':' -%}
+          <tr><th scope="row">{{ partes[1] }}</th><td>{{ partes[2] | replace: '.', ',' }}</td><td>{{ partes[3] | replace: '.', ',' }}</td></tr>
+        {%- endfor -%}
       </tbody>
     </table>
   </div>
@@ -50,18 +70,11 @@
     <li>Busca esa medida en la tabla. Si quedas entre dos tallas, elige la mayor.</li>
   </ol>
 
-  <script type="application/json" data-datos-guia-tallas>
-    [
-      {%- if usa_referencia -%}
-        {%- for fila in referencia -%}
-          {%- assign partes = fila | split: ':' -%}
-          {"eur": {{ partes[0] | json }}, "cm": {{ partes[1] | json }}, "us": {{ partes[2] | json }}}{% unless forloop.last %},{% endunless %}
-        {%- endfor -%}
-      {%- else -%}
-        {%- for entrada in entradas -%}
-          {"eur": {{ entrada.eur.value | append: '' | json }}, "cm": {{ entrada.cm.value | append: '' | json }}, "us": {{ entrada.us.value | append: '' | json }}}{% unless forloop.last %},{% endunless %}
-        {%- endfor -%}
-      {%- endif -%}
-    ]
-  </script>
+  {%- unless sin_datos -%}
+    {%- render 'guia-tallas-json', filas: filas -%}
+  {%- endunless -%}
 </div>
+{%- endunless -%}
+{%- if solo_datos -%}
+  {%- render 'guia-tallas-json', filas: filas -%}
+{%- endif -%}

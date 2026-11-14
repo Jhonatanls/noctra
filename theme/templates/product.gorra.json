@@ -1,0 +1,29 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-product",
+      "blocks": {
+        "titulo": { "type": "titulo" },
+        "precio": { "type": "precio" },
+        "cuotas": { "type": "cuotas" },
+        "selector": { "type": "selector", "settings": { "mostrar_guia": false } },
+        "talla": {
+          "type": "texto",
+          "settings": { "texto": "<p>Ajustable</p>" }
+        },
+        "botones": { "type": "botones" },
+        "combo": { "type": "combo" },
+        "descripcion": { "type": "descripcion" },
+        "envios": {
+          "type": "politicas",
+          "settings": {
+            "titulo": "Envíos y cambios",
+            "texto": "Consulta nuestras condiciones de envío y de cambios."
+          }
+        }
+      },
+      "block_order": ["titulo", "precio", "cuotas", "selector", "talla", "botones", "combo", "descripcion", "envios"]
+    }
+  },
+  "order": ["main"]
+}
