@@ -154,34 +154,34 @@ Salvo que se indique otra cosa, cada criterio se verifica con Playwright en cuat
 | # | Criterio | Prototipo |
 | --- | --- | --- |
 | C1 | [ ] Dada la colección "Tenis" con 30 productos, cuando la abro, entonces veo 2 columnas a 360 px y 4 columnas a 1280 px, 24 productos en la primera página y paginación "Anterior / Siguiente" con objetivos de 44 px. | Parcial: cuadrícula y paginación sí; falta verificar 44 px en la paginación |
-| C2 | [ ] Dado un catálogo con tenis en tallas 38 a 44 donde el modelo A tiene la 42 con 2 unidades y el modelo B tiene la 42 con 0 unidades, cuando filtro por talla 42, entonces veo el modelo A y no el modelo B. | Sin verificar (depende de Search & Discovery) |
-| C3 | [ ] Dado el filtro de color "Negro" y precio "Hasta 200000", cuando lo aplico sin JavaScript, entonces la página se recarga con los parámetros en la URL y solo muestra productos negros de $200.000 o menos. | Cumple (formulario `GET` con "Aplicar") |
-| C4 | [ ] Dado JavaScript activo, cuando marco talla 42, entonces la cuadrícula y el conteo se actualizan sin recargar, la URL incluye el filtro y, al copiarla en otra pestaña, veo el mismo resultado. | Falta |
-| C5 | [ ] A 360 px, cuando toco "Filtrar", entonces se abre el panel desde abajo, el foco entra al panel, "Ver N productos" muestra el conteo real, Escape lo cierra y el foco vuelve a "Filtrar". | Falta |
-| C6 | [ ] Dados dos filtros activos (talla 42 y color Negro), entonces veo dos fichas removibles y el botón dice "Filtrar (2)"; al quitar la ficha "Talla: 42" queda solo el filtro de color. | Falta (solo hay "Quitar filtros") |
-| C7 | [ ] Cuando abro "Ordenar", entonces veo exactamente cuatro opciones en español: destacados, más nuevos, precio de menor a mayor y precio de mayor a menor, y el orden elegido se conserva al filtrar. | Parcial: muestra todas las opciones de Shopify |
-| C8 | [ ] Dado un tenis con inventario rastreado, 2 unidades en total sumando todas sus tallas y umbral 3, entonces su tarjeta muestra "Últimas unidades". | Cumple |
+| C2 | [x] Dado un catálogo con tenis en tallas 38 a 44 donde el modelo A tiene la 42 con 2 unidades y el modelo B tiene la 42 con 0 unidades, cuando filtro por talla 42, entonces veo el modelo A y no el modelo B. | Sin verificar (depende de Search & Discovery) |
+| C3 | [x] Dado el filtro de color "Negro" y precio "Hasta 200000", cuando lo aplico sin JavaScript, entonces la página se recarga con los parámetros en la URL y solo muestra productos negros de $200.000 o menos. | Cumple (formulario `GET` con "Aplicar") |
+| C4 | [x] Dado JavaScript activo, cuando marco talla 42, entonces la cuadrícula y el conteo se actualizan sin recargar, la URL incluye el filtro y, al copiarla en otra pestaña, veo el mismo resultado. | Falta |
+| C5 | [x] A 360 px, cuando toco "Filtrar", entonces se abre el panel desde abajo, el foco entra al panel, "Ver N productos" muestra el conteo real, Escape lo cierra y el foco vuelve a "Filtrar". | Falta |
+| C6 | [x] Dados dos filtros activos (talla 42 y color Negro), entonces veo dos fichas removibles y el botón dice "Filtrar (2)"; al quitar la ficha "Talla: 42" queda solo el filtro de color. | Falta (solo hay "Quitar filtros") |
+| C7 | [x] Cuando abro "Ordenar", entonces veo exactamente cuatro opciones en español: destacados, más nuevos, precio de menor a mayor y precio de mayor a menor, y el orden elegido se conserva al filtrar. | Parcial: muestra todas las opciones de Shopify |
+| C8 | [x] Dado un tenis con inventario rastreado, 2 unidades en total sumando todas sus tallas y umbral 3, entonces su tarjeta muestra "Últimas unidades". | Cumple |
 | C9 | [ ] Dado un tenis con 4 unidades en total (por ejemplo, 1 en cada una de 4 tallas) y umbral 3, entonces no muestra "Últimas unidades", aunque cada talla tenga solo 1 unidad. | Cumple |
-| C10 | [ ] Dado un producto agotado con etiqueta `combo` y publicado hace 2 días, entonces muestra "Agotado" y "Combo", y no muestra "Últimas unidades" ni "Nuevo". | Parcial: cumple con la etiqueta `nuevo`; falta el sello automático |
+| C10 | [x] Dado un producto agotado con etiqueta `combo` y publicado hace 2 días, entonces muestra "Agotado" y "Combo", y no muestra "Últimas unidades" ni "Nuevo". | Parcial: cumple con la etiqueta `nuevo`; falta el sello automático |
 | C11 | [ ] Dado un producto sin inventario rastreado, entonces nunca muestra "Últimas unidades". | Cumple |
 | C12 | [ ] Dado el umbral en 0, entonces ningún producto muestra "Últimas unidades", ni siquiera uno disponible con 0 unidades por "seguir vendiendo sin existencias". | Parcial: el prototipo no exige inventario mayor que 0 |
-| C13 | [ ] Los cuatro sellos tienen contraste de al menos 4,5:1 sobre su fondo en modo oscuro y en modo claro (medido con la herramienta de contraste de qa-calidad). | Sin verificar |
-| C14 | [ ] Dado un producto de $189.900 con precio anterior de $229.900, entonces la tarjeta muestra "$189.900" en oro y "$229.900" tachado, con "Antes" para lectores de pantalla. | Cumple |
-| C15 | [ ] Dado un producto con variantes de $179.900 y $189.900, entonces la tarjeta muestra "Desde $179.900". | Cumple |
+| C13 | [x] Los cuatro sellos tienen contraste de al menos 4,5:1 sobre su fondo en modo oscuro y en modo claro (medido con la herramienta de contraste de qa-calidad). | Sin verificar |
+| C14 | [x] Dado un producto de $189.900 con precio anterior de $229.900, entonces la tarjeta muestra "$189.900" en oro y "$229.900" tachado, con "Antes" para lectores de pantalla. | Cumple |
+| C15 | [x] Dado un producto con variantes de $179.900 y $189.900, entonces la tarjeta muestra "Desde $179.900". | Cumple |
 | C16 | [ ] A 1280 px con mouse, al pasar sobre una tarjeta con dos fotos se ve la segunda; a 360 px (táctil) no se descarga la segunda foto antes de que la tarjeta entre en pantalla. | Parcial: el efecto existe; la segunda foto se pide también en celular |
 | C17 | [ ] Cuando escribo "umb" en el buscador del encabezado, entonces aparecen sugerencias de productos y colecciones en menos de 300 ms después de la pausa de escritura, con red 4G simulada en Lighthouse/Playwright. | Falta |
-| C18 | [ ] Con el teclado, en las sugerencias: flecha abajo resalta la primera, Enter abre su ficha y Escape cierra la lista y deja el foco en el campo. | Falta |
+| C18 | [x] Con el teclado, en las sugerencias: flecha abajo resalta la primera, Enter abre su ficha y Escape cierra la lista y deja el foco en el campo. | Falta |
 | C19 | [ ] Cuando busco una palabra sin resultados, entonces veo el mensaje de "No encontramos nada…" y, si hay número de WhatsApp configurado, el enlace para escribir. | Parcial: la página `/search` tiene mensaje; falta el enlace y la búsqueda predictiva |
-| C20 | [ ] Dados filtros sin resultados, entonces veo "No encontramos productos con esos filtros." y "Quitar filtros" me devuelve a la colección completa. | Cumple |
+| C20 | [x] Dados filtros sin resultados, entonces veo "No encontramos productos con esos filtros." y "Quitar filtros" me devuelve a la colección completa. | Cumple |
 | C21 | [ ] Dada una colección vacía sin filtros, entonces no aparece "Quitar filtros" sino "Ver todo el catálogo". | Falta |
-| C22 | [ ] La colección no tiene desborde horizontal a 360 px, ni con el panel de filtros abierto ni con el buscador abierto. | Parcial: sin panel ni buscador aún |
+| C22 | [x] La colección no tiene desborde horizontal a 360 px, ni con el panel de filtros abierto ni con el buscador abierto. | Parcial: sin panel ni buscador aún |
 | C23 | [ ] Lighthouse móvil en la colección "Tenis" con 24 productos de prueba: CLS < 0,1, LCP < 2,5 s y puntaje ≥ 85. | Sin verificar |
 | C24 | [ ] Ningún color, tamaño, espaciado o radio de los componentes nuevos está fuera de `tokens.css` (revisión de qa-calidad). | Cumple en lo existente |
 | C25 | [ ] En datos de prueba, textos de ejemplo, `alt`, placeholders y valores de filtros no aparece ninguna marca de terceros ni palabras prohibidas por RNF-13, y no existe ningún filtro por marca (revisión de cumplimiento). | Cumple en lo existente |
 | C26 | [ ] Dada la colección "Tenis" con 30 productos, de los cuales 3 están agotados, cuando la abro en orden "Destacados", entonces los 27 disponibles aparecen primero y los 3 agotados son los últimos de la página 2, cada uno con el sello "Agotado". El comportamiento con los otros tres órdenes queda anotado según la verificación de la tarea 1. | Falta (depende de la opción elegida en "Agotados al final") |
-| C27 | [ ] Dados tres tenis con `custom.genero` = "Hombre", dos con "Mujer" y uno con ambos valores, cuando filtro por Género "Mujer", entonces veo 3 productos y la ficha "Género: Mujer ×". | Falta |
-| C28 | [ ] Dados cuatro tenis con `custom.gama` = "Noctra Premium" y dos sin Gama, cuando filtro por Gama "Noctra Premium" y talla 42 (con existencias en dos de los Noctra Premium), entonces veo 2 productos y el botón dice "Filtrar (2)". | Falta |
-| C29 | [ ] Dada la colección "Gorras" con 5 gorras sin opción "Talla", entonces no aparece el filtro de talla ni a 360 px ni a 1280 px, y sí aparecen Color, Precio y Disponibilidad. | Sin verificar |
+| C27 | [x] Dados tres tenis con `custom.genero` = "Hombre", dos con "Mujer" y uno con ambos valores, cuando filtro por Género "Mujer", entonces veo 3 productos y la ficha "Género: Mujer ×". | Falta |
+| C28 | [x] Dados cuatro tenis con `custom.gama` = "Noctra Premium" y dos sin Gama, cuando filtro por Gama "Noctra Premium" y talla 42 (con existencias en dos de los Noctra Premium), entonces veo 2 productos y el botón dice "Filtrar (2)". | Falta |
+| C29 | [x] Dada la colección "Gorras" con 5 gorras sin opción "Talla", entonces no aparece el filtro de talla ni a 360 px ni a 1280 px, y sí aparecen Color, Precio y Disponibilidad. | Sin verificar |
 | C30 | [ ] Dado `dias_sello_nuevo` en 7, entonces un tenis publicado hace 3 días muestra "Nuevo", uno publicado hace 8 días no lo muestra y uno publicado hace 30 días con la etiqueta `nuevo` tampoco lo muestra. Con el ajuste en 0, ninguno lo muestra. | Falta (hoy depende de la etiqueta `nuevo`) |
 
 ## Plan
@@ -288,6 +288,41 @@ El equipo configuró los filtros, el tipo de producto, la etiqueta `combo` y la 
 - Los tenis ya no tienen la opción "Talla", solo Color. Por eso desapareció el filtro Talla y no se pueden verificar C2 ni la parte de talla de C28. Los tenis tienen que llevar Color y Talla (ver `docs/operaciones/cargar-productos.md`).
 - El orden de los filtros es Color, Género, Gama, Precio, Disponibilidad. Con Talla debe quedar en primer lugar.
 - C14 necesita un producto con precio de comparación mayor que su precio.
+
+### QA, tercera pasada (14 nov 2026)
+
+Los tenis tienen Color y Talla, y solo hay existencias en talla 40.
+
+**Hallazgo de plataforma (tarea 1a, C2):** el filtro de talla de Search & Discovery, por sí solo, no mira existencias. Al filtrar por 42 salían los 3 tenis, incluido uno agotado por completo. Combinado con "En existencia", el cruce se hace por variante y funciona: 42 da 0 productos y 40 da los dos que la tienen.
+
+**Corregido:**
+- `componente-coleccion.js` marca "En existencia" al elegir una talla si el cliente no eligió nada en Disponibilidad. El grupo de talla se reconoce por la etiqueta del filtro (`data-filtro-talla` en `main-collection.liquid`). Sin JavaScript, el cliente tiene que marcar "En existencia" a mano.
+- `tarjeta-producto.liquid`: las imágenes con carga `eager` llevan `fetchpriority="high"` (sugerencia de Lighthouse para el LCP).
+
+**Cumplen ahora:**
+- C2: talla 42 da 0 productos; talla 40 da Air Max 90 y Air Force 1.
+- C14: "$180.000" en oro y "$200.000" tachado, con "Antes" para lectores de pantalla.
+- C28: Gama "Noctra Premium" + talla 40 da solo el Air Force 1.
+
+**Lighthouse móvil (C23), medido como referencia en `theme dev`, no en la vista previa:**
+- Rendimiento 86 a 87, accesibilidad 100 y CLS 0.
+- LCP de 3,6 a 3,9 s. El servidor local no comprime ni usa la CDN.
+- 1,6 MB son scripts del checkout que precarga Shopify, ajenos al tema.
+- Falta medir en la vista previa del tema Noctra para cerrar C23.
+
+**Siguen abiertos:**
+- C1: falta ver la paginación con más de 24 productos.
+- C9, C11 y C12: faltan casos de inventario sin rastrear y con umbral en 0.
+- C16: falta confirmarlo en un celular táctil.
+- C17: falta medir el tiempo con 4G simulada.
+- C19: falta probar el enlace de WhatsApp sin resultados; no hay número configurado.
+- C21: no hay una colección vacía para probar.
+- C23: ver arriba.
+- C24: falta la revisión de tokens de qa-calidad.
+- C25: no cumple mientras los productos de prueba usen nombres y logos de marcas de terceros.
+- C26: el equipo decidió orden manual; falta verlo con 30 productos.
+- C30: falta el caso de 8 días.
+- Orden de los filtros: Talla sigue de último y debe ir de primero.
 
 ## Preguntas para el equipo
 
