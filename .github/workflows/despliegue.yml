@@ -40,7 +40,7 @@ jobs:
           EXTRA=""
           if [ "${{ github.ref_name }}" = "prod" ]; then EXTRA="--allow-live"; fi
           # settings_data.json guarda lo que el equipo configura en el editor: nunca se pisa desde Git.
-          shopify theme push --path theme --theme "$TEMA" --ignore "config/settings_data.json" $EXTRA
+          shopify theme push --path theme --theme "$TEMA" --ignore "config/settings_data.json" --ignore "AGENTS.md" $EXTRA
 
       - name: Etiquetar versión de producción
         if: github.ref_name == 'prod'
