@@ -37,7 +37,7 @@
   {
     "name": "Ventas",
     "settings": [
-      { "type": "number", "id": "envio_gratis_desde", "label": "Envío gratis desde (pesos)", "default": 150000, "info": "0 para ocultar la barra de envío gratis." },
+      { "type": "number", "id": "envio_gratis_desde", "label": "Envío gratis desde (pesos)", "default": 0, "info": "0 oculta la barra de envío gratis. Antes de activarla, publica las condiciones en la política de envíos." },
       { "type": "number", "id": "umbral_ultimas_unidades", "label": "Mostrar «Últimas unidades» con este inventario o menos", "default": 3 }
     ]
   },

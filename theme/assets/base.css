@@ -254,3 +254,16 @@ dialog.dialogo::backdrop { background: var(--color-velo); }
 }
 .marco::before { top: var(--espacio-2); left: var(--espacio-2); border-top-width: var(--borde-fino); border-left-width: var(--borde-fino); }
 .marco::after { bottom: var(--espacio-2); right: var(--espacio-2); border-bottom-width: var(--borde-fino); border-right-width: var(--borde-fino); }
+
+/* Notas legales cortas: IVA, aviso de datos, condiciones (cumplimiento, SPEC-002) */
+.nota-legal { font-size: var(--texto-xs); color: var(--color-texto-2); margin: 0; }
+.nota-legal a { color: inherit; }
+
+/* Avisos que solo ve el equipo en el editor de Shopify (request.design_mode) */
+.aviso-editor {
+  font-size: var(--texto-xs);
+  color: var(--color-error);
+  border: var(--borde-fino) solid var(--color-error);
+  padding: var(--espacio-2) var(--espacio-3);
+  margin: 0;
+}

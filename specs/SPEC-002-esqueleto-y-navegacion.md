@@ -89,3 +89,11 @@ Sin JavaScript, con "reducir movimiento" o con la casilla de animación apagada,
 ## Notas y decisiones
 
 - Se usa `<details>` para el menú móvil: funciona sin JS y es accesible por teclado.
+- **13 nov 2026, correcciones de cumplimiento (rama `fix/cumplimiento-etapa-1`).** Las hizo `cumplimiento` en su revisión:
+  - El pie muestra un bloque legal fijo con las políticas del admin (`shop.policies`) y ya no depende del menú. En el editor aparece un aviso si faltan las políticas o el texto legal (razón social, NIT, domicilio y contacto).
+  - Combos destacados: el campo "Nota" pasa a "Vigencia y condiciones" y hay un ajuste nuevo de página de términos. En el editor aparece un aviso si falta alguno. El texto "Arma tu look y paga menos" cambia por "Combos de precio fijo…" y el botón cambia a "Ver productos del combo".
+  - Se quita de la barra de anuncios "Paga a cuotas con Addi o Sistecrédito". El equipo lo vuelve a poner en el editor cuando esos medios estén activos, con "sujeto a aprobación".
+  - "Envío gratis desde" queda en 0 (oculto) por defecto. El carrito enlaza a la política de envíos.
+  - "IVA incluido" aparece en la ficha y en el carrito cuando el admin tiene los impuestos incluidos en el precio.
+  - Se agrega el aviso de tratamiento de datos (`snippets/aviso-datos-whatsapp.liquid`) junto a los botones de WhatsApp de la ficha y el carrito. Esto toca los prototipos de SPEC-004 y SPEC-006. Para producto agotado, el botón dice "Preguntar disponibilidad por WhatsApp".
+  - Pendiente del equipo antes de publicar: textos legales con revisión de una persona, razón social y NIT, combos definitivos con sus términos, umbral y cobertura de envío, y régimen de IVA.

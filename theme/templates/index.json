@@ -28,7 +28,7 @@
       "type": "combos-destacados",
       "settings": {
         "titulo": "Combos Noctra",
-        "texto": "Arma tu look y paga menos. El descuento se aplica solo en el carrito."
+        "texto": "Combos de precio fijo. El descuento se aplica solo en el carrito."
       },
       "blocks": {
         "look": {

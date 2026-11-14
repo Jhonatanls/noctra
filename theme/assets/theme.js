@@ -190,7 +190,7 @@ class FichaProducto extends HTMLElement {
       ? `Hola, quiero pedir ${producto}${detalle}: ${enlace}`
       : `Hola, avísenme cuando llegue ${producto}${detalle}: ${enlace}`;
     boton.href = `https://wa.me/${numero}?text=${encodeURIComponent(mensaje)}`;
-    boton.textContent = variante.available ? 'Pedir por WhatsApp' : 'Avísame por WhatsApp';
+    boton.textContent = variante.available ? 'Pedir por WhatsApp' : 'Preguntar disponibilidad por WhatsApp';
   }
 
   // Muestra los centímetros de pie debajo de cada talla EUR (RF-05)

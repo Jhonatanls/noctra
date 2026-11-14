@@ -24,6 +24,9 @@
           {%- else -%}
             <p>Tu pedido tiene envío gratis.</p>
           {%- endif -%}
+          {%- if shop.shipping_policy -%}
+            <p class="nota-legal"><a href="{{ shop.shipping_policy.url }}">Consulta las condiciones de envío</a></p>
+          {%- endif -%}
           <div class="carrito__barra" role="progressbar" aria-label="Progreso al envío gratis" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ progreso }}">
             <span class="carrito__barra-relleno" style="inline-size: {{ progreso }}%"></span>
           </div>
@@ -72,7 +75,7 @@
             <p class="carrito__ahorro">Ahorras <span class="precio">{{ cart.total_discount | money }}</span></p>
           {%- endif -%}
           <p class="carrito__total">Total <span class="precio">{{ cart.total_price | money }}</span></p>
-          <p class="carrito__nota">El envío se calcula al finalizar la compra.</p>
+          <p class="carrito__nota">{% if cart.taxes_included %}IVA incluido. {% endif %}El envío se calcula al finalizar la compra.</p>
 
           <button type="submit" name="update" class="boton boton--secundario">Actualizar cantidades</button>
           <button type="submit" name="checkout" class="boton boton--ancho">Finalizar compra</button>
@@ -88,6 +91,7 @@ Hola, quiero hacer este pedido:
             <a class="boton boton--secundario boton--ancho" href="https://wa.me/{{ numero_whatsapp }}?text={{ mensaje_wa | strip | url_encode }}" target="_blank" rel="noopener">
               Comprar por WhatsApp
             </a>
+            {% render 'aviso-datos-whatsapp' %}
           {%- endif -%}
         </div>
       </form>

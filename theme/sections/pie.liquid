@@ -24,6 +24,22 @@
       </nav>
     {%- endif -%}
 
+    {%- comment -%}
+      Enlaces legales fijos (Ley 1581 de 2012 y Ley 1480 de 2011): salen de las políticas
+      cargadas en el admin (Configuración → Políticas), así no dependen del menú.
+    {%- endcomment -%}
+    {%- if shop.policies.size > 0 -%}
+      <nav class="pie__nav" aria-label="Información legal">
+        <ul class="pie__lista">
+          {%- for politica in shop.policies -%}
+            <li><a href="{{ politica.url }}">{{ politica.title }}</a></li>
+          {%- endfor -%}
+        </ul>
+      </nav>
+    {%- elsif request.design_mode -%}
+      <p class="aviso-editor">Faltan las políticas legales. Cárgalas en Configuración → Políticas para que aparezcan aquí.</p>
+    {%- endif -%}
+
     {%- if settings.instagram_url != blank or settings.tiktok_url != blank -%}
       <ul class="pie__lista pie__redes">
         {%- if settings.instagram_url != blank -%}
@@ -48,6 +64,9 @@
       &copy; {{ 'now' | date: '%Y' }} {{ settings.nombre_marca }}
       {%- if section.settings.texto_legal != blank %}. {{ section.settings.texto_legal }}{% endif %}
     </p>
+    {%- if request.design_mode and section.settings.texto_legal == blank -%}
+      <p class="aviso-editor">Falta el texto legal: razón social, NIT, domicilio y contacto. Es obligatorio antes de publicar.</p>
+    {%- endif -%}
   </div>
 </footer>
 
@@ -67,7 +86,7 @@
       "type": "text",
       "id": "texto_legal",
       "label": "Texto legal",
-      "info": "Razón social y NIT cuando estén disponibles"
+      "info": "Obligatorio antes de publicar: razón social, NIT, domicilio y contacto."
     }
   ]
 }

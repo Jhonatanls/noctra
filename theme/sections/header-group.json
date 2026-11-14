@@ -11,12 +11,6 @@
             "texto": "Envíos a toda Colombia"
           }
         },
-        "cuotas": {
-          "type": "mensaje",
-          "settings": {
-            "texto": "Paga a cuotas con Addi o Sistecrédito"
-          }
-        },
         "combos": {
           "type": "mensaje",
           "settings": {
@@ -26,7 +20,6 @@
       },
       "block_order": [
         "envios",
-        "cuotas",
         "combos"
       ]
     },

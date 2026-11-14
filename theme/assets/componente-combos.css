@@ -33,3 +33,4 @@
 .combo__precio { font-size: var(--texto-2xl); font-weight: var(--peso-normal); margin: 0; line-height: 1.1; }
 .combo__nota { font-size: var(--texto-xs); color: var(--color-texto-2); margin: 0; }
 .combo__boton { margin-block-start: var(--espacio-2); }
+.combos__terminos { margin-block-start: var(--espacio-6); text-align: center; max-width: none; }
