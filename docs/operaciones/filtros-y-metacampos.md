@@ -8,10 +8,10 @@ No crees en Search & Discovery ningún filtro cuya fuente sea **Proveedor (Vendo
 
 ## Decisiones del equipo antes de empezar
 
-1. **Nombre visible de la gama media.** Hoy se usa "Media". Si prefieren otro texto, cámbienlo en la definición del metacampo (paso 2) y en todos los productos antes de cargar el catálogo.
+1. **Gama:** solo existe el valor "Noctra Premium". Los demás tenis dejan la Gama **vacía**: no llevan sello ni nombre de gama.
 2. **Agotados al final:** depende de la verificación de la tarea 1 de la spec (ver la sección "Agotados al final" más abajo). Si no existe ajuste nativo, el equipo debe elegir entre orden manual, una app de pago o dejarlos en su lugar (pregunta 4 de la spec).
 
-(Decididas el 13 nov 2026: Género Hombre/Mujer con unisex = los dos valores; Gama = "Noctra Premium" y "Media"; los Noctra Premium nunca van en combo.)
+(Decididas el 13 nov 2026: Género Hombre/Mujer con unisex = los dos valores; Gama = solo "Noctra Premium", los demás vacíos; los Noctra Premium nunca van en combo.)
 
 ## Requisitos previos
 
@@ -42,10 +42,9 @@ Fuente: https://help.shopify.com/en/manual/custom-data/metafields/metafield-defi
 2. **Nombre**: `Gama`.
 3. **Espacio de nombres y clave**: `custom.gama`.
 4. **Tipo**: **Texto de una línea**, dejando **Un valor** (no lista: cada producto tiene una sola gama).
-5. **Validación**: valores permitidos `Noctra Premium` y `Media` (mismo aviso del paso 6 anterior: verificar en pantalla).
+5. **Validación**: un solo valor permitido, `Noctra Premium` (mismo aviso del paso 6 anterior: verificar en pantalla). El campo **no es obligatorio**: los tenis que no son Premium lo dejan vacío.
 6. Activa **Tiendas** (Storefronts).
-7. **Activa "Usar como condición en colecciones"**: se necesita en la Parte 4 para que "En combo" excluya los Noctra Premium.
-8. **Guardar**.
+7. **Guardar**.
 
 ### Cómo probar
 
@@ -63,7 +62,7 @@ Abre cualquier producto: abajo, en la sección "Metafields", deben aparecer **G�
 1. Admin → **Productos** → abre el producto.
 2. Baja a la sección **Metafields**.
 3. **Género**: agrega `Hombre`, `Mujer` o **los dos** si es unisex. No existe el valor "Unisex".
-4. **Gama**: `Noctra Premium` o `Media`.
+4. **Gama**: escribe `Noctra Premium` solo si el tenis es de esa gama. Si no, **déjalo vacío**.
 5. **Guardar**.
 6. Regla de negocio: a los productos **Noctra Premium nunca** se les pone la etiqueta `combo`.
 
@@ -76,7 +75,7 @@ Fuentes: https://help.shopify.com/en/manual/products/import-export/using-csv y h
    - `Género (product.metafields.custom.genero)`
    - `Gama (product.metafields.custom.gama)`
 3. Se llenan solo en la **primera fila** de cada producto.
-4. Valores: `Hombre`, `Mujer`, `Noctra Premium`, `Media`. Para unisex escribe `Hombre; Mujer` (punto y coma y espacio, como lo documenta Shopify para otras listas). **(verificar: la ayuda oficial no documenta el formato de `list.single_line_text_field`. Antes de cargar el catálogo real, exporta un producto unisex ya llenado desde el formulario y copia el formato exacto que Shopify escribe en esa columna. Si es distinto, corrige la plantilla.)**
+4. Valores: Género `Hombre`, `Mujer` o los dos; Gama `Noctra Premium` o **vacío**. Para unisex escribe `Hombre; Mujer` (punto y coma y espacio, como lo documenta Shopify para otras listas). **(verificar: la ayuda oficial no documenta el formato de `list.single_line_text_field`. Antes de cargar el catálogo real, exporta un producto unisex ya llenado desde el formulario y copia el formato exacto que Shopify escribe en esa columna. Si es distinto, corrige la plantilla.)**
 5. Admin → **Productos** → **Importar**, sube el CSV y revisa la vista previa.
 
 ### Cómo probar
@@ -132,18 +131,18 @@ Admin → **Productos** → **Colecciones** → **Agregar colección**. En "Prod
 | --- | --- |
 | Tenis | Tipo de producto es igual a `Tenis` |
 | Gorras | Tipo de producto es igual a `Gorras` |
-| En combo | Etiqueta incluye `combo` **y** Gama es igual a `Media` |
+| En combo | Etiqueta incluye `combo` |
 
 (Los textos exactos de los operadores: verificar en pantalla. La ayuda confirma "includes" y "does not include" para etiquetas, y "is equal to" para metacampos de texto de una línea.)
 
-### Por qué "En combo" lleva la condición de Gama
+### Por qué "En combo" no lleva condición de Gama
 
-Los Noctra Premium no participan en combos. La ayuda oficial indica que para metacampos solo existe "es igual a" (no "no es igual a"), y que las exclusiones solo admiten categoría, etiqueta, tipo y proveedor, no metacampos. Por eso no se puede escribir "Gama distinta de Noctra Premium". La forma de excluirlos es pedir **Gama es igual a Media**.
+Los Noctra Premium no participan en combos. Shopify no permite excluir productos por metacampo en una colección automática (solo admite "es igual a" y las exclusiones son por categoría, etiqueta, tipo y proveedor). Como los tenis que no son Premium tienen la Gama vacía, tampoco se puede pedir "Gama es igual a…". Por eso "En combo" se arma solo con la etiqueta `combo`, con dos protecciones:
 
-- Requiere que `custom.gama` tenga activado "Usar como condición en colecciones" (Parte 1).
-- Consecuencia: si algún día hay una tercera gama, no entrará a "En combo" hasta cambiar esta condición.
-- Segunda defensa: no pongas la etiqueta `combo` a ningún Noctra Premium (`cargar-productos.md`). El sello de combo en la tarjeta y la lógica de descuento de SPEC-005 deben ignorar los Premium; eso lo cubre la spec, no este runbook.
-- Si la condición de metacampo no aparece en la lista, en lugar de eso agrega una etiqueta `noctra-premium` a los Premium y usa en "En combo" una **exclusión por etiqueta** o la condición "Etiqueta no incluye `noctra-premium`". **(verificar en pantalla)**
+1. **Regla de carga:** a un Noctra Premium **nunca** se le pone la etiqueta `combo` (checklist de `cargar-productos.md`).
+2. **Protección real, en el motor de combos (SPEC-005):** el descuento ignora a los Premium aunque tengan la etiqueta por error. El tema tampoco les muestra el sello de combo.
+
+Riesgo que queda: un Premium mal etiquetado aparecería en la colección "En combo", aunque sin descuento. Revisa esa colección después de cada carga.
 
 ### Cómo probar
 

@@ -52,7 +52,7 @@ No cubre: filtro por combo (se resuelve con la colección automática "En combo"
 | --- | --- | --- |
 | Colecciones "Tenis", "Gorras" (automáticas por tipo de producto) y "En combo" (por etiqueta `combo`) | Admin | Equipo, con `docs/operaciones/configuracion-inicial.md` |
 | Metacampo de producto **`custom.genero`**: nombre visible "Género", tipo lista de texto de una línea (`list.single_line_text_field`) con valores permitidos "Hombre" y "Mujer" | Admin → Configuración → Datos personalizados → Productos | Equipo, con runbook de `operaciones-shopify` |
-| Metacampo de producto **`custom.gama`**: nombre visible "Gama", tipo texto de una línea (`single_line_text_field`) con valores permitidos "Noctra Premium" y "Media" | Admin → Configuración → Datos personalizados → Productos | Equipo, con runbook de `operaciones-shopify` |
+| Metacampo de producto **`custom.gama`**: nombre visible "Gama", tipo texto de una línea (`single_line_text_field`) con un solo valor permitido, "Noctra Premium"; los demás productos lo dejan vacío | Admin → Configuración → Datos personalizados → Productos | Equipo, con runbook de `operaciones-shopify` |
 | Valor de Género y Gama en cada producto (formulario del producto o CSV/importación masiva) | Admin | Equipo |
 | Filtros (Talla, Color, Género, Gama, Precio, Disponibilidad), sus nombres en español y su orden | Admin, app Search & Discovery (oficial de Shopify) | Equipo, con runbook de `operaciones-shopify` |
 | Agotados al final de la colección | Ajuste nativo si existe (a verificar, tarea 1); si no, la alternativa que apruebe el equipo | Equipo (admin) o dev-tema-liquid, según la verificación |
@@ -91,7 +91,7 @@ El filtro de talla debe devolver solo productos que tengan **esa talla con exist
 ### Género y Gama
 
 - **Género** (`custom.genero`): valores "Hombre" y "Mujer". Es una lista para que un modelo pueda llevar los dos valores si el equipo decide que hay modelos unisex (pregunta abierta 1); así ese modelo aparece al filtrar por cualquiera de los dos, sin crear un tercer valor.
-- **Gama** (`custom.gama`): valores "Noctra Premium" y "Media", uno por producto.
+- **Gama** (`custom.gama`): un solo valor, "Noctra Premium". Los productos que no son Premium lo dejan vacío y no llevan sello de gama. El filtro muestra una sola casilla, "Noctra Premium".
 - Un producto sin valor en el metacampo no aparece al filtrar por ese metacampo, pero sí en la colección sin filtros. El runbook pide llenar ambos campos en todos los productos.
 - Que Search & Discovery acepte estos tipos de metacampo como filtro se confirma en la tarea 1 (a verificar con `shopify-dev`). Si no acepta la lista, se usa texto de una línea y se resuelve lo unisex según la respuesta del equipo.
 
@@ -140,7 +140,7 @@ Los sellos son texto (no imagen), legibles en ambos modos con contraste AA, y el
 ## Datos y configuración
 
 - Etiquetas de producto: `combo`, `grupo-tenis`, `grupo-gorras` (SPEC-005, `docs/operaciones/cargar-productos.md`). La etiqueta `nuevo` deja de usarse.
-- Metacampos de producto: `custom.genero` (lista de texto, valores "Hombre", "Mujer") y `custom.gama` (texto, valores "Noctra Premium", "Media"). Los nombres de espacio y clave son una sugerencia: si el runbook usa otros, el tema no los lee directamente (los filtros llegan por `collection.filters`) y basta con anotarlo aquí.
+- Metacampos de producto: `custom.genero` (lista de texto, valores "Hombre", "Mujer") y `custom.gama` (texto, un solo valor "Noctra Premium"; vacío en los demás). Los nombres de espacio y clave son una sugerencia: si el runbook usa otros, el tema no los lee directamente (los filtros llegan por `collection.filters`) y basta con anotarlo aquí.
 - Opción de variante "Talla" con valores EUR solo en tenis. Las gorras no llevan opción "Talla".
 - Filtros en Search & Discovery, en este orden: Talla (opción de variante), Color (opción de variante), Género (metacampo), Gama (metacampo), Precio, Disponibilidad.
 - Ajuste del tema `umbral_ultimas_unidades` (número, por defecto 3; 0 apaga el sello).
@@ -180,7 +180,7 @@ Salvo que se indique otra cosa, cada criterio se verifica con Playwright en cuat
 | C25 | [ ] En datos de prueba, textos de ejemplo, `alt`, placeholders y valores de filtros no aparece ninguna marca de terceros ni palabras prohibidas por RNF-13, y no existe ningún filtro por marca (revisión de cumplimiento). | Cumple en lo existente |
 | C26 | [ ] Dada la colección "Tenis" con 30 productos, de los cuales 3 están agotados, cuando la abro en orden "Destacados", entonces los 27 disponibles aparecen primero y los 3 agotados son los últimos de la página 2, cada uno con el sello "Agotado". El comportamiento con los otros tres órdenes queda anotado según la verificación de la tarea 1. | Falta (depende de la opción elegida en "Agotados al final") |
 | C27 | [ ] Dados tres tenis con `custom.genero` = "Hombre", dos con "Mujer" y uno con ambos valores, cuando filtro por Género "Mujer", entonces veo 3 productos y la ficha "Género: Mujer ×". | Falta |
-| C28 | [ ] Dados cuatro tenis con `custom.gama` = "Noctra Premium" y dos con "Media", cuando filtro por Gama "Noctra Premium" y talla 42 (con existencias en dos de los Noctra Premium), entonces veo 2 productos y el botón dice "Filtrar (2)". | Falta |
+| C28 | [ ] Dados cuatro tenis con `custom.gama` = "Noctra Premium" y dos sin Gama, cuando filtro por Gama "Noctra Premium" y talla 42 (con existencias en dos de los Noctra Premium), entonces veo 2 productos y el botón dice "Filtrar (2)". | Falta |
 | C29 | [ ] Dada la colección "Gorras" con 5 gorras sin opción "Talla", entonces no aparece el filtro de talla ni a 360 px ni a 1280 px, y sí aparecen Color, Precio y Disponibilidad. | Sin verificar |
 | C30 | [ ] Dado `dias_sello_nuevo` en 7, entonces un tenis publicado hace 3 días muestra "Nuevo", uno publicado hace 8 días no lo muestra y uno publicado hace 30 días con la etiqueta `nuevo` tampoco lo muestra. Con el ajuste en 0, ninguno lo muestra. | Falta (hoy depende de la etiqueta `nuevo`) |
 
@@ -231,7 +231,7 @@ Cada tarea cabe en menos de un día. El orden importa: las tareas 1 y 2 desbloqu
   - (a) Talla disponible (C2): la documentación de Search & Discovery no explica cómo interactúa el filtro de opción con la disponibilidad. **A verificar en la tienda.** El tema no activa "en existencia" automáticamente al elegir talla; si la prueba falla, se agrega.
 - Decisiones de implementación: sin JavaScript el panel de filtros es un `<dialog open>` en línea con botón "Aplicar"; con JavaScript en celular se cierra y se abre como hoja modal; en escritorio queda en línea con desplegables. Las fichas de filtros activos son enlaces (`url_to_remove`) y recargan la página; el cambio de casillas, precio y orden sí actualiza sin recargar. Los textos del orden ("Destacados", "Más nuevos", "Precio: de menor a mayor", "Precio: de mayor a menor") están en la sección.
 - **Pendiente para revisión de diseño/QA (C13):** en modo claro, el texto de `--color-boton-texto` sobre `--color-oro` (sello Combo) mide cerca de 4,3:1 (calculado a mano), por debajo de 4,5:1. Es un valor de tokens (disenador-ui); no se cambió aquí.
-- Respuestas pendientes del equipo: el nombre visible de la gama media se mantiene como "Media".
+- Gama: solo existe "Noctra Premium"; los demás productos van sin gama (decisión del 13 nov 2026, tercera ronda).
 
 ## Preguntas para el equipo
 
@@ -265,3 +265,9 @@ Registro de las respuestas a la versión anterior de las preguntas. Ya están in
    - Criterio nuevo **C31:** [ ] Dado un tenis con `custom.gama` = "Noctra Premium" y la etiqueta `combo`, cuando abro la colección "Tenis", entonces su tarjeta muestra el sello "Noctra Premium" y no muestra el sello de combo.
 - **13 nov 2026, contraste del sello de combo (C13).** En modo claro, `--color-boton-texto` (#F3F3F1) sobre `--color-oro` (#8C6E3A) medía 4,29:1, por debajo de AA. El oro claro pasa a **#856837**: 4,69:1 sobre el fondo y 5,21:1 sobre la superficie. Se actualizaron `tokens.css`, CLAUDE.md y SPEC-001.
 - **13 nov 2026, colección "En combo".** La ayuda de Shopify no permite excluir productos por metacampo en colecciones automáticas. La condición queda como "etiqueta `combo` Y Gama = Media" (ver `docs/operaciones/filtros-y-metacampos.md`). Pendiente que el equipo la confirme.
+
+### Respuestas del equipo, tercera ronda (13 nov 2026)
+
+1. **Gama:** solo existe el valor **"Noctra Premium"**. Los demás tenis dejan la Gama **vacía**: no llevan sello ni nombre de gama. El filtro "Gama" muestra una sola casilla. No hace falta nombre para la gama media.
+2. **Colección "En combo":** queda automática **solo por la etiqueta `combo`**. Ya no se puede usar "Gama = Media" porque esa gama no tiene valor. Protecciones: la regla de carga (los Premium nunca llevan `combo`) y la exclusión en el motor de combos de SPEC-005. El riesgo que queda: un Premium mal etiquetado se vería en esa colección, pero sin descuento.
+3. **Agotados al final (tarea 4):** se elige **dejarlos en su posición con el sello "Agotado"**. El orden manual ("Destacados") se usa solo para poner adelante los productos que el equipo quiere impulsar. Se revisa con una app cuando crezca el catálogo. C26 se ajusta: los agotados conservan su posición y muestran el sello. La tarea 15 no aplica.

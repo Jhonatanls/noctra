@@ -15,13 +15,13 @@ Los productos **no se programan**: se cargan en el admin de Shopify y el tema lo
 5. **Costo por artículo**: lo que te cuesta. Shopify calcula el margen; no lo ve el cliente.
 6. **Inventario**: activa "Hacer seguimiento de la cantidad" y SKU por variante.
 7. **Variantes**:
-   - **Tenis:** agrega la opción **Talla** con los números EUR (38, 39, 40…) y, si aplica, **Color**. Pon la cantidad de cada talla. Si una talla queda en 0, el tema la muestra tachada con "Avísame por WhatsApp".
+   - **Tenis:** agrega la opción **Talla** con los números EUR (38, 39, 40…) y, si aplica, **Color**. Pon la cantidad de cada talla. Si una talla queda en 0, el tema la muestra tachada con "Preguntar disponibilidad por WhatsApp".
    - **Gorras:** **no agregues la opción "Talla"** (son de talla única o ajustable). Usa solo la opción **Color** (o una sola variante si hay un único color). Así el filtro de talla no aparece en la colección "Gorras".
    - Con varios colores, asigna a cada variante su foto: así al elegir el color cambia la imagen.
 8. **Organización del producto**:
    - **Tipo de producto**: `Tenis` o `Gorras` (alimenta las colecciones automáticas).
    - **Etiquetas**: `grupo-tenis` o `grupo-gorras` (obligatoria para que entre a los combos) y `combo` si participa en combos. **Los productos Noctra Premium nunca llevan la etiqueta `combo`.** La etiqueta `nuevo` ya no se usa: el sello "Nuevo" sale solo durante 7 días desde que se publica el producto.
-   - **Metacampos** (sección "Metafields" del producto): **Género** (Hombre, Mujer, o los dos si es unisex) y **Gama** (Noctra Premium o Media). Son obligatorios en todos los productos, o no aparecerán al filtrar. Cómo se crean: `docs/operaciones/filtros-y-metacampos.md`.
+   - **Metacampos** (sección "Metafields" del producto): **Género** (Hombre, Mujer, o los dos si es unisex) y **Gama** (`Noctra Premium` solo si lo es; si no, vacío). Género es obligatorio en todos los productos, o no aparecerán al filtrar por género. Cómo se crean: `docs/operaciones/filtros-y-metacampos.md`.
 9. **Publicación**: marca los canales Tienda online y Facebook e Instagram (para el catálogo de redes y WhatsApp).
 10. **SEO** (abajo): título y descripción cortos para Google.
 11. **Estado**: `Borrador` mientras lo revisas; `Activo` para que aparezca en la tienda.
@@ -44,6 +44,6 @@ El precio individual de cada producto se pone en su ficha. Los combos (2 tenis +
 - [ ] Fotos propias, sin logos ni marcas de terceros.
 - [ ] Todas las tallas con su cantidad y SKU.
 - [ ] Etiqueta `grupo-tenis` o `grupo-gorras` (y `combo` solo si no es Noctra Premium).
-- [ ] Género y Gama llenos.
+- [ ] Género lleno; Gama = `Noctra Premium` solo si lo es.
 - [ ] Gorras sin opción "Talla".
 - [ ] Vista previa revisada en el celular.
