@@ -2,7 +2,7 @@
   "mcpServers": {
     "shopify-dev": {
       "command": "npx",
-      "args": ["-y", "@shopify/dev-mcp@latest"],
+      "args": ["-y", "@shopify/dev-mcp@1.18.0"],
       "env": {
         "LIQUID": "true",
         "LIQUID_VALIDATION_MODE": "partial",
@@ -11,7 +11,7 @@
     },
     "playwright": {
       "command": "npx",
-      "args": ["-y", "@playwright/mcp@latest"]
+      "args": ["-y", "@playwright/mcp@0.0.85"]
     },
     "notion": {
       "type": "http",
