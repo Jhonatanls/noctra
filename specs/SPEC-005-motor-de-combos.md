@@ -92,3 +92,8 @@ Recomendación: **A** para cumplir RF-09 ("sin tocar código") con poco desarrol
 - [ ] Verificar API de Discount Functions con `shopify-dev` y crear la app y la extensión.
 - [ ] Definir con el equipo la opción A, B o C y crear el metaobjeto.
 - [ ] Colección automática "En combo" (productos con etiqueta `combo`).
+
+
+## Decisiones del equipo (13 nov 2026)
+
+- **Los productos Noctra Premium (gama alta) nunca cuentan para un combo.** Un producto con el metacampo `custom.gama` = "Noctra Premium" queda excluido de todos los grupos de combo, aunque tenga la etiqueta `grupo-tenis` o `combo`. La exclusión va en la lógica pura (`packages/combos`) y en la Shopify Function, con pruebas, para que no dependa de que el equipo se acuerde de quitar etiquetas. Se implementa al aprobar esta spec. Por ahora no hay cambios de código.

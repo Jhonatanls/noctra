@@ -256,3 +256,11 @@ Registro de las respuestas a la versión anterior de las preguntas. Ya están in
    - Revisión de `cumplimiento` antes de publicar: esta política es de cambio por talla. No reemplaza el derecho de retracto (Ley 1480, art. 47) ni la garantía legal por defectos, en la que el envío no lo paga el cliente.
 5. **IVA:** la empresa es **responsable de IVA** y los precios se cargan **con IVA incluido**. La ficha y el carrito muestran "IVA incluido." (el admin debe tener activado "Todos los precios incluyen impuestos").
 6. **Cuotas:** el objetivo es lanzar con **Addi y Sistecrédito activos**. El mensaje de cuotas (RF-18) entra en esta spec, pero se muestra solo cuando el equipo lo active en la configuración del tema, después de confirmar que la pasarela está activa (hallazgo I2 de cumplimiento).
+
+### Respuestas del equipo, segunda ronda (13 nov 2026)
+
+1. **Colores de gorras:** cada color es una **variante del mismo producto**. La ficha de gorra muestra el selector de Color (C16).
+2. **Talla de gorras:** la ficha de la gorra dice **"Ajustable"**. Como todas las gorras son ajustables, es un texto del bloque de la plantilla de gorra, editable en el editor, con "Ajustable" por defecto. No hace falta un metacampo por producto.
+   - Criterio nuevo **C25:** [ ] Dada una gorra con dos colores, cuando abro su ficha a 360 px, entonces veo el selector de Color, el texto "Ajustable" y ningún selector de talla ni enlace a la guía.
+3. **Noctra Premium:** los tenis de gama alta muestran el sello **"Noctra Premium"** en la ficha y **no muestran** el bloque "Arma tu combo" (RF-08) ni el sello de combo (ver SPEC-003 y SPEC-005).
+   - Criterio nuevo **C26:** [ ] Dado un tenis con `custom.gama` = "Noctra Premium", cuando abro su ficha, entonces veo el sello "Noctra Premium" y no veo el sello de combo ni el bloque de combo.

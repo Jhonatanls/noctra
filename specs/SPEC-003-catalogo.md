@@ -239,3 +239,12 @@ Registro de las respuestas a la versión anterior de las preguntas. Ya están in
 3. **Sello "Nuevo":** **automático durante 7 días** desde la publicación del producto. La etiqueta `nuevo` deja de ser necesaria.
 4. **"Últimas unidades":** se cuenta sobre el **total del producto** (todas las tallas) y arranca con **3** o menos.
 5. **Gorras:** **talla única o ajustable**. La colección "Gorras" no muestra filtro de talla.
+
+### Respuestas del equipo, segunda ronda (13 nov 2026)
+
+1. **Unisex:** los modelos unisex llevan **los dos valores** de Género (Hombre y Mujer) y aparecen en ambos filtros. No hay valor "Unisex". Esto confirma el criterio C27.
+2. **Gama alta = "Noctra Premium":** la gama alta se muestra al cliente como **Noctra Premium**.
+   - Valores de `custom.gama`: "Noctra Premium" y "Media". El nombre visible de la gama media queda pendiente; mientras tanto se usa "Media".
+   - La tarjeta de producto muestra el sello **"Noctra Premium"** en los productos de esa gama. Usa el estilo de sello existente (oro como acabado) y no se suma a "Nuevo" si ya hay dos sellos.
+   - **Los productos Noctra Premium no participan en combos** (ver SPEC-005). Aunque lleven la etiqueta `combo`, no deben aparecer en la colección "En combo" ni llevar el sello de combo.
+   - Criterio nuevo **C31:** [ ] Dado un tenis con `custom.gama` = "Noctra Premium" y la etiqueta `combo`, cuando abro la colección "Tenis", entonces su tarjeta muestra el sello "Noctra Premium" y no muestra el sello de combo.
