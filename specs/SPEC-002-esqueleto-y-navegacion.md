@@ -97,3 +97,11 @@ Sin JavaScript, con "reducir movimiento" o con la casilla de animación apagada,
   - "IVA incluido" aparece en la ficha y en el carrito cuando el admin tiene los impuestos incluidos en el precio.
   - Se agrega el aviso de tratamiento de datos (`snippets/aviso-datos-whatsapp.liquid`) junto a los botones de WhatsApp de la ficha y el carrito. Esto toca los prototipos de SPEC-004 y SPEC-006. Para producto agotado, el botón dice "Preguntar disponibilidad por WhatsApp".
   - Pendiente del equipo antes de publicar: textos legales con revisión de una persona, razón social y NIT, combos definitivos con sus términos, umbral y cobertura de envío, y régimen de IVA.
+- **14 nov 2026, QA en la tienda de desarrollo (qa-calidad, servidor local `shopify theme dev`).** Se cortó a mitad porque el servidor local empezó a responder 401 (sesión de la CLI vencida).
+  - Cumple: Theme Check sin infracciones (43 archivos), 13 pruebas en verde, y navegación a 360 px sin errores de Liquid, sin errores de consola del tema y sin desborde. Se revisaron inicio, colecciones, catálogo, ficha, carrito, página de guía de tallas, búsqueda con y sin resultados, 404 y las tres políticas. El criterio de navegación sigue sin marcar hasta repetirlo con el servidor estable.
+  - Sin verificar:
+    - Lighthouse del inicio: el servidor cayó antes de medir.
+    - Imagen y video de portada: no hay ninguno configurado; la portada muestra solo el logo animado.
+    - Botón flotante de WhatsApp con número: el número no está en el `settings_data.json` del tema que se sirve. Probablemente quedó guardado en el editor del tema publicado.
+    - Animación en un Android de gama media: requiere un celular real.
+  - Bloqueo de despliegue: desde el PR #11 falla el despliegue a la tienda de desarrollo. El tema Noctra está publicado allí y el flujo solo permite subir al tema publicado desde `prod`. Lo decide el equipo; ver la conversación del 14 nov.

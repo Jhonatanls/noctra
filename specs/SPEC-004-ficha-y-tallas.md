@@ -286,3 +286,24 @@ Registro de las respuestas a la versión anterior de las preguntas. Ya están in
    - Criterio nuevo **C26:** [x] Dada una gorra con dos colores, cuando abro su ficha a 360 px, entonces veo el selector de Color, el texto "Ajustable" y ningún selector de talla ni enlace a la guía.
 3. **Noctra Premium:** los tenis de gama alta muestran el sello **"Noctra Premium"** en la ficha y **no muestran** el bloque "Arma tu combo" (RF-08) ni el sello de combo (ver SPEC-003 y SPEC-005).
    - Criterio nuevo **C27:** [x] Dado un tenis con `custom.gama` = "Noctra Premium", cuando abro su ficha, entonces veo el sello "Noctra Premium" y no veo el sello de combo ni el bloque de combo.
+
+### QA, 14 nov 2026 (qa-calidad)
+
+La revisión en vivo quedó incompleta porque el servidor local se cayó (401, sesión de la CLI vencida). Ningún criterio cambia de estado hasta repetir la prueba en el navegador.
+
+- **Verificado por lectura del código** (falta confirmarlo en vivo):
+  - C5: "IVA incluido." depende de `cart.taxes_included`.
+  - C11: el aviso de datos va bajo el botón y enlaza a `shop.privacy_policy.url`. La política de privacidad está publicada.
+  - C13: con la página `guia-de-tallas` creada se pinta el enlace sin JavaScript. La página responde 200.
+  - C14: el orden es aclaración EUR, tabla, nota provisional solo sin entradas y pasos. Las entradas se ordenan como texto, lo que funciona mientras las tallas EUR tengan dos dígitos.
+  - C15, C16 y C26: sin opción de talla EUR con varios valores no hay selector ni guía.
+  - C18: los bloques de cuotas solo se pintan con `mostrar_cuotas`.
+  - C23: usa `{{ product | structured_data }}`, el JSON-LD nativo de Shopify. La prueba de resultados enriquecidos de Google no se puede correr con la tienda protegida con contraseña: queda para la vista previa en la tienda real (etapa 6).
+  - C24: el desplegable solo aparece con política de envío o de reembolso, y en `templates/product*.json` y la sección no hay plazos, cobertura ni quién paga. Las políticas ya están publicadas, falta verlo en vivo.
+- **C25 cumple:** `componente-ficha.css` no tiene colores, fuentes ni medidas fuera de los tokens. Solo hay dos `@media` en px, que son puntos de corte.
+- **Bloqueos de datos:**
+  - El tenis de prueba con 6 medios no aparece en la tienda: los publicados tienen 1 o 3 fotos y ninguno tiene video. Puede estar en borrador o sin el canal Tienda online. C1 y C22 quedan pendientes.
+  - El número de WhatsApp no llega al tema servido, así que C9, C10, C11 y C17 con número real quedan pendientes.
+  - Los títulos y handles de los productos de prueba contienen nombres de marcas de terceros. Hay que cambiarlos (regla 1, RNF-13).
+- **Despliegue:** la plantilla `gorra` aún no existe en la tienda porque el despliegue a `dev` falla desde el PR #11 (el tema Noctra está publicado en la tienda de desarrollo).
+- **Observación:** el enlace dice "Política de cambios y devoluciones" y la política del admin se llama "Política de reembolso". Queda para contenido-copy.
