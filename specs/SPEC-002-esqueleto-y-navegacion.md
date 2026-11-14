@@ -67,7 +67,7 @@ Sin JavaScript, con "reducir movimiento" o con la casilla de animación apagada,
 ## Criterios de aceptación
 
 - [x] `shopify theme check` sin errores sobre el tema.
-- [ ] `shopify theme dev` levanta el tema y navega inicio, colección, producto, carrito, página, búsqueda y 404.
+- [x] `shopify theme dev` levanta el tema y navega inicio, colección, producto, carrito, página, búsqueda y 404.
 - [x] El nombre de la marca no aparece escrito en duro en ningún archivo de código; el logo sale siempre del snippet `logo`.
 - [x] Sin número de WhatsApp configurado, no aparece el botón flotante.
 - [x] El menú de celular abre y cierra sin JavaScript.
@@ -84,7 +84,7 @@ Sin JavaScript, con "reducir movimiento" o con la casilla de animación apagada,
 - [x] Secciones: encabezado, pie, portada, colección destacada.
 - [x] Plantillas mínimas y sus secciones principales.
 - [x] Snippet de WhatsApp flotante.
-- [ ] Conectar a la tienda de desarrollo y probar con productos de ejemplo del equipo.
+- [x] Conectar a la tienda de desarrollo y probar con productos de ejemplo del equipo.
 
 ## Notas y decisiones
 
@@ -105,3 +105,9 @@ Sin JavaScript, con "reducir movimiento" o con la casilla de animación apagada,
     - Botón flotante de WhatsApp con número: el número no está en el `settings_data.json` del tema que se sirve. Probablemente quedó guardado en el editor del tema publicado.
     - Animación en un Android de gama media: requiere un celular real.
   - Bloqueo de despliegue: desde el PR #11 falla el despliegue a la tienda de desarrollo. El tema Noctra está publicado allí y el flujo solo permite subir al tema publicado desde `prod`. Lo decide el equipo; ver la conversación del 14 nov.
+- **14 nov 2026, QA en vivo sobre el tema publicado de la tienda de desarrollo (qa-calidad).**
+  - Navegación a 360 y 1280 px en los dos modos: sin errores, sin desborde y un solo `h1` por página. El interruptor de modo recuerda la preferencia.
+  - Botón flotante de WhatsApp con el número real y el mensaje codificado.
+  - Lighthouse móvil del inicio: 88 de rendimiento (mediana de 2 corridas), LCP 1,85 s (el eslogan), CLS 0, TBT 420 ms. Accesibilidad 100, SEO 92 (falta la meta descripción de la tienda; se llena en el admin, en Preferencias). El criterio sigue sin marcar porque pide medir con una imagen de portada real, y hoy no hay ni imagen ni video.
+  - El TBT de 380–470 ms deja poco margen sobre 85: revisar qué scripts pesan cuando se agreguen apps.
+  - El anuncio "Envíos a toda Colombia" de `sections/header-group.json` es contenido del editor y queda para revisión de `cumplimiento` cuando se confirme la cobertura.

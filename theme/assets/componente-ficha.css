@@ -41,7 +41,8 @@
 .ficha__radio:checked + .ficha__valor { border-color: var(--color-oro); background: var(--color-superficie); box-shadow: inset 0 0 0 var(--borde-fino) var(--color-oro); }
 .ficha__radio:focus-visible + .ficha__valor { outline: var(--anillo-foco) solid var(--color-acento); outline-offset: var(--anillo-foco); }
 .ficha__valor--agotado { color: var(--color-texto-2); text-decoration: line-through; }
-.ficha__abrir-guia { font-size: var(--texto-s); }
+/* Objetivo táctil de 44 px aunque el texto sea pequeño (RNF-05, C20). */
+.ficha__abrir-guia { font-size: var(--texto-s); display: inline-flex; align-items: center; min-block-size: var(--tactil-min); }
 
 .ficha__select-variantes { display: grid; gap: var(--espacio-2); margin-block-end: var(--espacio-3); }
 .ficha__compra { display: grid; gap: var(--espacio-3); }
@@ -153,6 +154,7 @@ dialog.ficha__zoom {
 
 /* Envíos y cambios, cuotas */
 .ficha__politicas { margin: var(--espacio-2) 0 0; padding-inline-start: var(--espacio-5); display: grid; gap: var(--espacio-1); }
+.ficha__politicas a { display: inline-flex; align-items: center; min-block-size: var(--tactil-min); }
 .ficha__cuotas-nota { margin-block-start: calc(-1 * var(--espacio-2)); }
 
 /* Barra fija de compra (celular) */
