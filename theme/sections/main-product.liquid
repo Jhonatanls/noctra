@@ -5,6 +5,57 @@
   assign id_formulario = 'formulario-producto-' | append: section.id
   assign numero_whatsapp = settings.whatsapp_numero | remove: '+' | remove: ' ' | remove: '-'
   assign url_producto = shop.url | append: product.url
+
+  # Gama alta (Noctra Premium): lleva su sello y no lleva sello ni bloque de combo
+  assign gama = product.metafields.custom.gama.value
+  assign es_gama_alta = false
+  if settings.gama_premium_valor != blank and gama == settings.gama_premium_valor
+    assign es_gama_alta = true
+  endif
+  assign etiquetas = product.tags | join: '|' | downcase | split: '|'
+
+  # Opción de talla EUR: se llama Talla (o Size / Tallas), tiene más de un valor y algún valor es numérico.
+  # Una opción de un solo valor nunca se pinta como selector.
+  assign tiene_talla_eur = false
+  for opcion in product.options_with_values
+    assign nombre_opcion = opcion.name | downcase
+    if nombre_opcion == 'talla' or nombre_opcion == 'size' or nombre_opcion == 'tallas'
+      if opcion.values.size > 1
+        for valor in opcion.values
+          assign nombre_valor = valor.name | default: valor
+          assign numero_valor = nombre_valor | plus: 0
+          if numero_valor > 0
+            assign tiene_talla_eur = true
+          endif
+        endfor
+      endif
+    endif
+  endfor
+
+  # Detalle de la variante para el mensaje de WhatsApp: talla primero, luego las demás opciones con más de un valor
+  assign detalle_wa = ''
+  if product.variants.size > 1
+    for opcion in product.options_with_values
+      assign nombre_opcion = opcion.name | downcase
+      if opcion.values.size > 1
+        if nombre_opcion == 'talla' or nombre_opcion == 'size' or nombre_opcion == 'tallas'
+          assign detalle_wa = detalle_wa | append: variante.options[forloop.index0] | append: ' / '
+        endif
+      endif
+    endfor
+    for opcion in product.options_with_values
+      assign nombre_opcion = opcion.name | downcase
+      if opcion.values.size > 1
+        unless nombre_opcion == 'talla' or nombre_opcion == 'size' or nombre_opcion == 'tallas'
+          assign detalle_wa = detalle_wa | append: variante.options[forloop.index0] | append: ' / '
+        endunless
+      endif
+    endfor
+    assign detalle_wa = detalle_wa | remove_last: ' / '
+  endif
+
+  assign en_cuotas = false
+  assign total_medios = product.media.size
 -%}
 
 <ficha-producto
@@ -15,20 +66,18 @@
   data-whatsapp="{{ numero_whatsapp }}"
 >
   <div class="ficha__galeria">
-    <ul class="ficha__medios" aria-label="Fotos de {{ product.title | escape }}">
+    <ul class="ficha__medios" aria-label="Fotos de {{ product.title | escape }}" data-medios>
       {%- for medio in product.media -%}
-        <li class="ficha__medio{% if forloop.first %} marco{% endif %}">
+        <li class="ficha__medio{% if forloop.first %} marco{% endif %}"
+          {%- if medio.media_type == 'image' %} data-zoom-src="{{ medio | image_url: width: 2048 }}" data-zoom-alt="{{ medio.alt | default: product.title | escape }}"{% endif %}>
           {%- case medio.media_type -%}
             {%- when 'image' -%}
-              {%- liquid
-                assign alt_medio = medio.alt | default: product.title
-                if forloop.first
-                  assign carga = 'eager'
-                else
-                  assign carga = 'lazy'
-                endif
-              -%}
-              {{ medio | image_url: width: 1600 | image_tag: widths: '600, 900, 1200, 1600', sizes: '(min-width: 990px) 55vw, 100vw', loading: carga, alt: alt_medio }}
+              {%- assign alt_medio = medio.alt | default: product.title -%}
+              {%- if forloop.first -%}
+                {{ medio | image_url: width: 1600 | image_tag: widths: '600, 900, 1200, 1600', sizes: '(min-width: 990px) 58vw, 100vw', loading: 'eager', fetchpriority: 'high', alt: alt_medio }}
+              {%- else -%}
+                {{ medio | image_url: width: 1600 | image_tag: widths: '600, 900, 1200, 1600', sizes: '(min-width: 990px) 58vw, 100vw', loading: 'lazy', alt: alt_medio }}
+              {%- endif -%}
             {%- when 'video' -%}
               {{ medio | video_tag: controls: true, muted: true, playsinline: true, preload: 'none', image_size: '1200x' }}
             {%- when 'external_video' -%}
@@ -41,28 +90,45 @@
         <li class="ficha__medio">{{ 'product-1' | placeholder_svg_tag: 'ficha__placeholder' }}</li>
       {%- endfor -%}
     </ul>
+    {%- if total_medios > 1 -%}
+      <p class="ficha__contador" data-contador role="status" hidden>1 de {{ total_medios }}</p>
+    {%- endif -%}
   </div>
 
   <div class="ficha__info">
     {%- for block in section.blocks -%}
+      {%- if block.type != '@app' and block.type != 'cuotas' -%}
+        {%- assign en_cuotas = false -%}
+      {%- endif -%}
       {%- case block.type -%}
         {%- when 'titulo' -%}
-          <h1 class="ficha__titulo" {{ block.shopify_attributes }}>{{ product.title }}</h1>
+          <div class="ficha__cabecera" {{ block.shopify_attributes }}>
+            {%- if es_gama_alta -%}
+              <p class="ficha__sellos"><span class="sello sello--premium">{{ gama }}</span></p>
+            {%- elsif etiquetas contains 'combo' -%}
+              <p class="ficha__sellos"><span class="sello sello--combo">Combo</span></p>
+            {%- endif -%}
+            <h1 class="ficha__titulo">{{ product.title }}</h1>
+          </div>
           {% render 'ornamento' %}
 
         {%- when 'precio' -%}
           <p class="ficha__precio" {{ block.shopify_attributes }}>
             <span class="precio" data-precio>{{ variante.price | money }}</span>
             <s class="precio__anterior" data-precio-anterior{% unless variante.compare_at_price > variante.price %} hidden{% endunless %}>
-              {{- variante.compare_at_price | money -}}
+              <span class="oculto-visual">Antes </span><span data-precio-anterior-valor>{{ variante.compare_at_price | money }}</span>
             </s>
           </p>
           {%- if cart.taxes_included -%}
             <p class="nota-legal">IVA incluido.</p>
           {%- endif -%}
 
+        {%- when 'cuotas' -%}
+          {%- assign en_cuotas = true -%}
+          <div class="ficha__cuotas-ancla" {{ block.shopify_attributes }}></div>
+
         {%- when 'selector' -%}
-          <div class="ficha__selector" {{ block.shopify_attributes }}>
+          <div class="ficha__selector" id="selector-{{ section.id }}" {{ block.shopify_attributes }}>
             {%- unless product.has_only_default_variant -%}
               <div class="ficha__opciones" data-opciones hidden>
                 {%- for opcion in product.options_with_values -%}
@@ -72,14 +138,28 @@
                     if nombre_opcion == 'talla' or nombre_opcion == 'size' or nombre_opcion == 'tallas'
                       assign es_talla = true
                     endif
+                    assign es_talla_eur = false
+                    if es_talla and tiene_talla_eur
+                      assign es_talla_eur = true
+                    endif
+                    assign es_unica = false
+                    if opcion.values.size < 2
+                      assign es_unica = true
+                    endif
                     assign indice_opcion = forloop.index0
                   -%}
-                  <fieldset class="ficha__opcion" data-indice-opcion="{{ indice_opcion }}">
+                  <fieldset
+                    class="ficha__opcion"
+                    data-indice-opcion="{{ indice_opcion }}"
+                    data-agotado="{% if es_talla %}agotada{% else %}agotado{% endif %}"
+                    {% if es_talla %}data-talla{% endif %}
+                    {% if es_unica %}data-unica hidden{% endif %}
+                  >
                     <legend class="ficha__leyenda">
-                      {{ opcion.name }}{% if es_talla %} (EUR){% endif %}:
+                      {{ opcion.name }}{% if es_talla_eur %} (EUR){% endif %}:
                       <span data-valor-elegido>{{ opcion.selected_value }}</span>
                     </legend>
-                    <div class="ficha__valores{% if es_talla %} ficha__valores--talla{% endif %}">
+                    <div class="ficha__valores{% if es_talla_eur %} ficha__valores--talla{% endif %}">
                       {%- for valor in opcion.values -%}
                         {%- assign nombre_valor = valor.name | default: valor -%}
                         {%- assign id_valor = section.id | append: '-' | append: indice_opcion | append: '-' | append: forloop.index0 -%}
@@ -93,7 +173,7 @@
                         >
                         <label class="ficha__valor" for="{{ id_valor }}">
                           <span>{{ nombre_valor }}</span>
-                          {%- if es_talla -%}<span class="ficha__cm" data-cm-para="{{ nombre_valor | escape }}"></span>{%- endif -%}
+                          {%- if es_talla_eur -%}<span class="ficha__cm" data-cm-para="{{ nombre_valor | escape }}"></span>{%- endif -%}
                         </label>
                       {%- endfor -%}
                     </div>
@@ -102,15 +182,30 @@
               </div>
             {%- endunless -%}
 
-            {%- if block.settings.mostrar_guia -%}
-              <button type="button" class="enlace-boton ficha__abrir-guia" data-abrir-dialogo="guia-{{ section.id }}">¿Cuál es mi talla?</button>
-              <dialog class="dialogo" id="guia-{{ section.id }}" aria-labelledby="titulo-guia-{{ section.id }}">
-                <button type="button" class="enlace-boton dialogo__cerrar" data-cerrar-dialogo>
-                  <span class="oculto-visual">Cerrar</span>{% render 'icono', nombre: 'cerrar' %}
-                </button>
-                <h2 id="titulo-guia-{{ section.id }}">Guía de tallas</h2>
-                {% render 'guia-tallas', id_prefijo: section.id %}
-              </dialog>
+            {%- if tiene_talla_eur -%}
+              <p class="ficha__equivalencia" data-equivalencia aria-live="polite"></p>
+              {% render 'guia-tallas', solo_datos: true %}
+
+              {%- if block.settings.mostrar_guia -%}
+                {%- liquid
+                  assign pagina_guia = block.settings.pagina_guia
+                  if pagina_guia == blank
+                    assign pagina_guia = pages['guia-de-tallas']
+                  endif
+                -%}
+                {%- if pagina_guia != blank -%}
+                  <a href="{{ pagina_guia.url }}" class="enlace-boton ficha__abrir-guia" data-abrir-dialogo="guia-{{ section.id }}">¿Cuál es mi talla?</a>
+                {%- else -%}
+                  <button type="button" class="enlace-boton ficha__abrir-guia" data-abrir-dialogo="guia-{{ section.id }}" data-requiere-js hidden>¿Cuál es mi talla?</button>
+                {%- endif -%}
+                <dialog class="dialogo" id="guia-{{ section.id }}" aria-labelledby="titulo-guia-{{ section.id }}">
+                  <button type="button" class="enlace-boton dialogo__cerrar" data-cerrar-dialogo>
+                    <span class="oculto-visual">Cerrar</span>{% render 'icono', nombre: 'cerrar' %}
+                  </button>
+                  <h2 id="titulo-guia-{{ section.id }}">Guía de tallas</h2>
+                  {% render 'guia-tallas', id_prefijo: section.id, sin_datos: true %}
+                </dialog>
+              {%- endif -%}
             {%- endif -%}
           </div>
 
@@ -133,7 +228,10 @@
             {%- endform -%}
 
             {%- if numero_whatsapp != blank -%}
-              {%- capture mensaje_wa -%}Hola, quiero pedir {{ product.title }}{% unless product.has_only_default_variant %} ({{ variante.title }}){% endunless %}: {{ url_producto }}?variant={{ variante.id }}{%- endcapture -%}
+              {%- capture mensaje_wa -%}
+                {%- if variante.available -%}Hola, quiero pedir {% else %}Hola, avísenme cuando llegue {% endif -%}
+                {{ product.title }}{% if detalle_wa != blank %} ({{ detalle_wa }}){% endif %}: {{ url_producto }}?variant={{ variante.id }}
+              {%- endcapture -%}
               <a
                 class="boton boton--secundario boton--ancho"
                 href="https://wa.me/{{ numero_whatsapp }}?text={{ mensaje_wa | url_encode }}"
@@ -147,8 +245,31 @@
             {%- endif -%}
           </div>
 
+        {%- when 'combo' -%}
+          {%- unless es_gama_alta -%}
+            <div class="ficha__combo" data-espacio-combo {{ block.shopify_attributes }}></div>
+          {%- endunless -%}
+
         {%- when 'descripcion' -%}
           <div class="ficha__descripcion" {{ block.shopify_attributes }}>{{ product.description }}</div>
+
+        {%- when 'politicas' -%}
+          {%- if shop.shipping_policy != blank or shop.refund_policy != blank -%}
+            <details class="ficha__desplegable" {{ block.shopify_attributes }}>
+              <summary>{{ block.settings.titulo }}</summary>
+              <div class="ficha__desplegable-contenido">
+                <p>{{ block.settings.texto }}</p>
+                <ul class="ficha__politicas">
+                  {%- if shop.shipping_policy != blank -%}
+                    <li><a href="{{ shop.shipping_policy.url }}">Política de envíos</a></li>
+                  {%- endif -%}
+                  {%- if shop.refund_policy != blank -%}
+                    <li><a href="{{ shop.refund_policy.url }}">Política de cambios y devoluciones</a></li>
+                  {%- endif -%}
+                </ul>
+              </div>
+            </details>
+          {%- endif -%}
 
         {%- when 'desplegable' -%}
           <details class="ficha__desplegable" {{ block.shopify_attributes }}>
@@ -160,10 +281,42 @@
           <div class="ficha__texto" {{ block.shopify_attributes }}>{{ block.settings.texto }}</div>
 
         {%- when '@app' -%}
-          <div class="ficha__app">{% render block %}</div>
+          {%- if en_cuotas -%}
+            {%- if settings.mostrar_cuotas -%}
+              <div class="ficha__app ficha__app--cuotas">{% render block %}</div>
+              {%- assign siguiente = section.blocks[forloop.index] -%}
+              {%- unless siguiente.type == '@app' -%}
+                <p class="nota-legal ficha__cuotas-nota">Sujeto a aprobación.</p>
+              {%- endunless -%}
+            {%- endif -%}
+          {%- else -%}
+            <div class="ficha__app">{% render block %}</div>
+          {%- endif -%}
       {%- endcase -%}
     {%- endfor -%}
   </div>
+
+  {%- if product.media.size > 0 -%}
+    <dialog class="dialogo ficha__zoom" id="zoom-{{ section.id }}" aria-label="Foto ampliada" data-zoom-dialogo>
+      <button type="button" class="enlace-boton dialogo__cerrar ficha__zoom-cerrar" data-cerrar-dialogo>
+        <span class="oculto-visual">Cerrar</span>{% render 'icono', nombre: 'cerrar' %}
+      </button>
+      <img class="ficha__zoom-imagen" alt="" width="2048" height="2560" data-zoom-imagen>
+    </dialog>
+  {%- endif -%}
+
+  {%- if section.settings.barra_fija -%}
+    <div class="ficha__barra" role="group" aria-label="Compra rápida" data-barra hidden>
+      <div class="ficha__barra-datos">
+        <p class="ficha__barra-nombre">{{ product.title }}</p>
+        <p class="ficha__barra-detalle">
+          <span data-barra-seleccion></span>
+          <span class="precio" data-barra-precio>{{ variante.price | money }}</span>
+        </p>
+      </div>
+      <button type="submit" form="{{ id_formulario }}" class="boton" data-barra-boton>Agregar al carrito</button>
+    </div>
+  {%- endif -%}
 
   <script type="application/json" data-variantes>{{ product.variants | json }}</script>
 </ficha-producto>
@@ -173,25 +326,55 @@
 {% schema %}
 {
   "name": "Ficha de producto",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "barra_fija",
+      "label": "Mostrar barra fija de compra en celular",
+      "default": true,
+      "info": "Aparece abajo cuando el botón de compra sale de la pantalla."
+    }
+  ],
   "blocks": [
     { "type": "@app" },
     { "type": "titulo", "name": "Nombre", "limit": 1 },
     { "type": "precio", "name": "Precio", "limit": 1 },
     {
+      "type": "cuotas",
+      "name": "Mensaje de cuotas",
+      "limit": 1
+    },
+    {
       "type": "selector",
       "name": "Opciones y tallas",
       "limit": 1,
       "settings": [
-        { "type": "checkbox", "id": "mostrar_guia", "label": "Mostrar guía de tallas", "default": true }
+        { "type": "checkbox", "id": "mostrar_guia", "label": "Mostrar guía de tallas", "default": true },
+        {
+          "type": "page",
+          "id": "pagina_guia",
+          "label": "Página de guía de tallas",
+          "info": "A donde lleva «¿Cuál es mi talla?» si el navegador no usa JavaScript. Si la dejas vacía se usa la página con dirección guia-de-tallas."
+        }
       ]
     },
     { "type": "botones", "name": "Botones de compra", "limit": 1 },
+    { "type": "combo", "name": "Arma tu combo (reservado)", "limit": 1 },
     { "type": "descripcion", "name": "Descripción", "limit": 1 },
+    {
+      "type": "politicas",
+      "name": "Envíos y cambios",
+      "limit": 1,
+      "settings": [
+        { "type": "text", "id": "titulo", "label": "Título", "default": "Envíos y cambios" },
+        { "type": "text", "id": "texto", "label": "Texto", "default": "Consulta nuestras condiciones de envío y de cambios." }
+      ]
+    },
     {
       "type": "desplegable",
       "name": "Desplegable",
       "settings": [
-        { "type": "text", "id": "titulo", "label": "Título", "default": "Envíos y cambios" },
+        { "type": "text", "id": "titulo", "label": "Título", "default": "Más información" },
         { "type": "richtext", "id": "contenido", "label": "Contenido" }
       ]
     },

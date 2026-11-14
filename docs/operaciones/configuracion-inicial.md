@@ -24,7 +24,7 @@ Objetivo: dejar lista la tienda de desarrollo para que los agentes puedan probar
    - Campos: `eur` (texto de una línea), `cm` (número decimal), `us` (texto de una línea).
    - Activa el acceso de la tienda online (Storefront) para que el tema pueda leerlo.
    - Crea una entrada por talla con las **medidas reales** de las hormas que venden.
-7. **Página de guía de tallas** (Tienda online → Páginas): crea "Guía de tallas" y elige la plantilla `page.guia-tallas`.
+7. **Página de guía de tallas** (Tienda online → Páginas): crea "Guía de tallas" y elige la plantilla `page.guia-tallas` (dirección `guia-de-tallas`: a esa página lleva «¿Cuál es mi talla?» cuando el navegador no usa JavaScript; también se puede elegir en el bloque «Opciones y tallas» de la ficha).
 8. **Ajustes del tema** (Personalizar → Configuración del tema): nombre de la marca, número de WhatsApp con indicativo (573…), umbral de envío gratis y redes.
 9. **Filtros y metacampos** (app Search & Discovery): sigue el runbook `docs/operaciones/filtros-y-metacampos.md`. Filtros en este orden: Talla, Color, Género, Gama, Precio y Disponibilidad. No se crea filtro por marca.
 

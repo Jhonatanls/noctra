@@ -17,7 +17,9 @@ Los productos **no se programan**: se cargan en el admin de Shopify y el tema lo
 7. **Variantes**:
    - **Tenis:** agrega la opción **Talla** con los números EUR (38, 39, 40…) y, si aplica, **Color**. Pon la cantidad de cada talla. Si una talla queda en 0, el tema la muestra tachada con "Preguntar disponibilidad por WhatsApp".
    - **Gorras:** **no agregues la opción "Talla"** (son de talla única o ajustable). Usa solo la opción **Color** (o una sola variante si hay un único color). Así el filtro de talla no aparece en la colección "Gorras".
+   - Si una gorra llega con una opción "Talla" de un solo valor (por ejemplo, "Única"), la ficha no la muestra, pero quítala igual para mantener los datos limpios.
    - Con varios colores, asigna a cada variante su foto: así al elegir el color cambia la imagen.
+   - **Plantilla de la ficha (solo gorras):** en la ficha de cada gorra, en **Plantilla de tema**, elige `gorra`. Esa plantilla no muestra selector de talla ni guía de tallas, muestra el selector de **Color** y el texto "Ajustable" (se cambia en el editor del tema: Productos → plantilla `gorra` → bloque "Texto"). Los tenis dejan la plantilla `Producto predeterminado`.
 8. **Organización del producto**:
    - **Tipo de producto**: `Tenis` o `Gorras` (alimenta las colecciones automáticas).
    - **Etiquetas**: `grupo-tenis` o `grupo-gorras` (obligatoria para que entre a los combos) y `combo` si participa en combos. **Los productos Noctra Premium nunca llevan la etiqueta `combo`.** La etiqueta `nuevo` ya no se usa: el sello "Nuevo" sale solo durante 7 días desde que se publica el producto.
@@ -45,5 +47,5 @@ El precio individual de cada producto se pone en su ficha. Los combos (2 tenis +
 - [ ] Todas las tallas con su cantidad y SKU.
 - [ ] Etiqueta `grupo-tenis` o `grupo-gorras` (y `combo` solo si no es Noctra Premium).
 - [ ] Género lleno; Gama = `Noctra Premium` solo si lo es.
-- [ ] Gorras sin opción "Talla".
+- [ ] Gorras sin opción "Talla" y con la plantilla de tema `gorra`.
 - [ ] Vista previa revisada en el celular.

@@ -1,0 +1,13 @@
+{%- comment -%}
+  JSON de la guía de tallas (una sola tabla, ya ordenada por EUR). Lo lee ficha-producto para
+  mostrar los centímetros y la equivalencia de la talla elegida.
+  Parámetros: filas (arreglo de textos "clave:eur:cm:us")
+{%- endcomment -%}
+<script type="application/json" data-datos-guia-tallas>
+  [
+    {%- for fila in filas -%}
+      {%- assign partes = fila | split: ':' -%}
+      {"eur": {{ partes[1] | json }}, "cm": {{ partes[2] | json }}, "us": {{ partes[3] | json }}}{% unless forloop.last %},{% endunless %}
+    {%- endfor -%}
+  ]
+</script>

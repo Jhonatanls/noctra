@@ -5,18 +5,20 @@
       "blocks": {
         "titulo": { "type": "titulo" },
         "precio": { "type": "precio" },
+        "cuotas": { "type": "cuotas" },
         "selector": { "type": "selector", "settings": { "mostrar_guia": true } },
         "botones": { "type": "botones" },
+        "combo": { "type": "combo" },
         "descripcion": { "type": "descripcion" },
         "envios": {
-          "type": "desplegable",
+          "type": "politicas",
           "settings": {
             "titulo": "Envíos y cambios",
-            "contenido": "<p>Enviamos a toda Colombia. Si la talla no te queda, te la cambiamos.</p>"
+            "texto": "Consulta nuestras condiciones de envío y de cambios."
           }
         }
       },
-      "block_order": ["titulo", "precio", "selector", "botones", "descripcion", "envios"]
+      "block_order": ["titulo", "precio", "cuotas", "selector", "botones", "combo", "descripcion", "envios"]
     }
   },
   "order": ["main"]

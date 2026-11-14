@@ -12,7 +12,7 @@
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
 }
-.ficha__medio { scroll-snap-align: start; background: var(--color-superficie); aspect-ratio: 4 / 5; border: var(--borde-fino) solid var(--color-oro-suave); }
+.ficha__medio { position: relative; scroll-snap-align: start; background: var(--color-superficie); aspect-ratio: 4 / 5; border: var(--borde-fino) solid var(--color-oro-suave); }
 .ficha__medio img, .ficha__medio video { width: 100%; height: 100%; object-fit: cover; }
 
 .ficha__info { display: grid; gap: var(--espacio-5); align-content: start; }
@@ -25,7 +25,7 @@
 .ficha__leyenda { font-size: var(--texto-s); color: var(--color-texto-2); margin-block-end: var(--espacio-2); }
 .ficha__valores { display: flex; flex-wrap: wrap; gap: var(--espacio-2); }
 .ficha__valor {
-  min-width: 3.5rem;
+  min-width: var(--ancho-valor-min);
   min-height: var(--tactil-min);
   padding: var(--espacio-2) var(--espacio-3);
   display: grid;
@@ -78,4 +78,114 @@
   .ficha { grid-template-columns: 7fr 5fr; gap: var(--espacio-12); align-items: start; }
   .ficha__medios { margin: 0; grid-auto-flow: row; grid-auto-columns: auto; overflow: visible; gap: var(--espacio-3); }
   .ficha__info { position: sticky; top: calc(var(--alto-encabezado) + var(--espacio-6)); }
+  .ficha__contador { display: none; }
+}
+
+/* Cabecera: sello, nombre */
+.ficha__cabecera { display: grid; gap: var(--espacio-3); justify-items: start; }
+.ficha__sellos { margin: 0; }
+.ficha__combo:empty, .ficha__cuotas-ancla:empty { display: none; }
+
+/* Galería: indicador, zoom */
+.ficha__galeria { position: relative; }
+.ficha__contador {
+  position: absolute;
+  inset-block-end: var(--espacio-3);
+  inset-inline-end: var(--espacio-3);
+  margin: 0;
+  padding: var(--espacio-1) var(--espacio-3);
+  background: var(--color-velo-imagen);
+  color: var(--color-sobre-imagen);
+  font-size: var(--texto-xs);
+  border-radius: var(--radio-m);
+  pointer-events: none;
+}
+.ficha__contador[hidden] { display: none; }
+.ficha__zoom-boton {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: zoom-in;
+}
+.ficha__zoom-boton:focus-visible { outline: var(--anillo-foco) solid var(--color-oro); outline-offset: calc(-1 * var(--anillo-foco)); }
+dialog.ficha__zoom {
+  inset: 0;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  border-radius: 0;
+  overflow: auto;
+  background: var(--color-fondo);
+  touch-action: pan-x pan-y pinch-zoom;
+}
+.ficha__zoom-cerrar {
+  position: fixed;
+  inset-block-start: var(--espacio-3);
+  inset-inline-end: var(--espacio-3);
+  z-index: 1;
+  min-width: var(--tactil-min);
+  display: grid;
+  place-items: center;
+  background: var(--color-superficie);
+  border: var(--borde-fino) solid var(--color-oro);
+  color: var(--color-texto);
+  float: none;
+}
+.ficha__zoom-imagen { display: block; width: 100%; height: 100%; object-fit: contain; }
+@media (hover: hover) and (pointer: fine) {
+  .ficha__zoom-imagen { cursor: zoom-in; }
+  .ficha__zoom-imagen--ampliada { width: var(--zoom-ampliado); height: auto; max-width: none; cursor: zoom-out; }
+}
+
+/* Selector */
+.ficha__opcion[hidden], .ficha__select-variantes[hidden], .ficha__opciones[hidden] { display: none; }
+.ficha__equivalencia { margin: 0 0 var(--espacio-2); font-size: var(--texto-s); color: var(--color-texto-2); }
+.ficha__equivalencia:empty { display: none; }
+.ficha__abrir-guia[hidden] { display: none; }
+
+/* Envíos y cambios, cuotas */
+.ficha__politicas { margin: var(--espacio-2) 0 0; padding-inline-start: var(--espacio-5); display: grid; gap: var(--espacio-1); }
+.ficha__cuotas-nota { margin-block-start: calc(-1 * var(--espacio-2)); }
+
+/* Barra fija de compra (celular) */
+.ficha__barra { display: none; }
+@media (max-width: 989px) {
+  .ficha__barra {
+    position: fixed;
+    inset-inline: 0;
+    inset-block-end: 0;
+    z-index: 39;
+    display: flex;
+    align-items: center;
+    gap: var(--espacio-3);
+    padding: var(--espacio-3) var(--espacio-4);
+    background: var(--color-superficie);
+    border-block-start: var(--borde-fino) solid var(--color-oro-suave);
+    transform: translateY(100%);
+    visibility: hidden;
+    transition: transform var(--duracion-media) var(--curva), visibility var(--duracion-media);
+  }
+  .ficha__barra[hidden] { display: none; }
+  .ficha__barra--visible { transform: none; visibility: visible; }
+  .ficha__barra-datos { flex: 1; min-width: 0; }
+  .ficha__barra-nombre, .ficha__barra-detalle { margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .ficha__barra-nombre { font-size: var(--texto-s); font-weight: var(--peso-medio); }
+  .ficha__barra-detalle { font-size: var(--texto-xs); color: var(--color-texto-2); }
+  .ficha__barra-detalle { display: flex; gap: var(--espacio-2); }
+  .ficha__barra-detalle [data-barra-seleccion] { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  .ficha__barra-detalle .precio { flex: none; }
+  .ficha__barra .boton { flex: none; padding-inline: var(--espacio-4); white-space: nowrap; }
+  html[data-barra-compra] .whatsapp-flotante { bottom: calc(var(--alto-barra, var(--alto-barra-compra)) + var(--espacio-4)); }
+  html[data-barra-compra] body { padding-block-end: var(--alto-barra, var(--alto-barra-compra)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ficha__barra { transition: none; }
 }

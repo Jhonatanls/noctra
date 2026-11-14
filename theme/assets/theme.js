@@ -1,7 +1,8 @@
 // Comportamiento progresivo del tema de Noctra (SPEC-001, SPEC-002, SPEC-004). Sin dependencias.
 
 const formatoCOP = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 });
-const pesos = (centavos) => formatoCOP.format(Math.round(centavos / 100));
+// Intl pone un espacio duro entre "$" y el número ("$ 180.000"); la tienda escribe "$180.000", como el filtro money de Liquid.
+const pesos = (centavos) => formatoCOP.format(Math.round(centavos / 100)).replace(/\$\s+/u, '$');
 
 /* Modo claro / oscuro (RF-34) */
 function modoActual() {
@@ -23,7 +24,13 @@ document.addEventListener('click', (evento) => {
 document.addEventListener('click', (evento) => {
   const abrir = evento.target.closest('[data-abrir-dialogo]');
   if (abrir) {
-    document.getElementById(abrir.dataset.abrirDialogo)?.showModal?.();
+    const dialogo = document.getElementById(abrir.dataset.abrirDialogo);
+    // Sin soporte de <dialog>, el enlace sigue su camino (página de guía de tallas)
+    if (dialogo && typeof dialogo.showModal === 'function') {
+      evento.preventDefault();
+      dialogo.abridor = abrir;
+      dialogo.showModal();
+    }
     return;
   }
   if (evento.target.closest('[data-cerrar-dialogo]')) {
@@ -37,6 +44,12 @@ document.addEventListener('click', (evento) => {
     if (fuera) evento.target.close();
   }
 });
+
+// Al cerrar un diálogo el foco vuelve al elemento que lo abrió (el navegador lo hace; esto lo asegura)
+document.addEventListener('close', (evento) => {
+  const dialogo = evento.target;
+  if (dialogo instanceof HTMLDialogElement && dialogo.abridor?.isConnected) dialogo.abridor.focus({ preventScroll: true });
+}, true);
 
 const reducirMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -92,10 +105,18 @@ if (!customElements.get('portada-noctra')) customElements.define('portada-noctra
 /* Ficha de producto (SPEC-004) */
 class FichaProducto extends HTMLElement {
   connectedCallback() {
+    this.iniciarGaleria();
+    this.iniciarZoom();
+    this.querySelectorAll('[data-requiere-js]').forEach((el) => { el.hidden = false; });
+
     this.variantes = JSON.parse(this.querySelector('[data-variantes]')?.textContent || '[]');
     this.opciones = this.querySelector('[data-opciones]');
     this.select = this.querySelector('select[name="id"]');
-    if (!this.opciones || !this.select || this.variantes.length === 0) return;
+    this.tabla = this.leerGuia();
+    if (!this.opciones || !this.select || this.variantes.length === 0) {
+      this.iniciarBarra();
+      return;
+    }
 
     // Con JS: botones de opciones en vez del select de respaldo
     this.opciones.hidden = false;
@@ -104,13 +125,139 @@ class FichaProducto extends HTMLElement {
 
     this.pintarCentimetros();
     this.opciones.addEventListener('change', () => this.actualizar(true));
+    this.iniciarBarra();
     this.actualizar(false);
   }
 
+  disconnectedCallback() {
+    window.removeEventListener('scroll', this.alMoverBarra);
+    window.removeEventListener('resize', this.alMoverBarra);
+    this.observadorMedios?.disconnect();
+    if (this.alVolver) window.removeEventListener('popstate', this.alVolver);
+    document.documentElement.removeAttribute('data-barra-compra');
+    document.documentElement.style.removeProperty('--alto-barra');
+  }
+
+  /* Galería: indicador "N de total" */
+  iniciarGaleria() {
+    const medios = this.querySelector('[data-medios]');
+    const contador = this.querySelector('[data-contador]');
+    if (!medios || !contador) return;
+    const items = [...medios.children];
+    contador.hidden = false;
+    this.observadorMedios = new IntersectionObserver((entradas) => {
+      const visible = entradas.filter((e) => e.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+      if (visible) contador.textContent = `${items.indexOf(visible.target) + 1} de ${items.length}`;
+    }, { root: medios, threshold: [0.6, 0.9] });
+    items.forEach((item) => this.observadorMedios.observe(item));
+  }
+
+  /* Zoom: diálogo a pantalla completa. Pellizco nativo en celular; clic alterna 2× en escritorio */
+  iniciarZoom() {
+    const dialogo = this.querySelector('[data-zoom-dialogo]');
+    const imagen = this.querySelector('[data-zoom-imagen]');
+    if (!dialogo || !imagen || typeof dialogo.showModal !== 'function') return;
+    const punteroFino = window.matchMedia('(pointer: fine)').matches;
+
+    this.querySelectorAll('[data-zoom-src]').forEach((item, i) => {
+      const boton = document.createElement('button');
+      boton.type = 'button';
+      boton.className = 'ficha__zoom-boton';
+      boton.setAttribute('aria-label', `Ampliar foto ${i + 1}`);
+      boton.addEventListener('click', () => {
+        imagen.src = item.dataset.zoomSrc;
+        imagen.alt = item.dataset.zoomAlt || '';
+        imagen.classList.remove('ficha__zoom-imagen--ampliada');
+        dialogo.abridor = boton;
+        dialogo.showModal();
+        // El gesto de volver cierra el zoom
+        window.history.pushState({ zoom: true }, '');
+      });
+      item.append(boton);
+    });
+
+    imagen.addEventListener('click', () => {
+      if (punteroFino) imagen.classList.toggle('ficha__zoom-imagen--ampliada');
+    });
+    dialogo.addEventListener('close', () => {
+      imagen.removeAttribute('src');
+      if (window.history.state?.zoom) window.history.back();
+    });
+    this.alVolver = () => { if (dialogo.open) dialogo.close(); };
+    window.addEventListener('popstate', this.alVolver);
+  }
+
+  /* Barra fija de compra (celular) */
+  iniciarBarra() {
+    this.barra = this.querySelector('[data-barra]');
+    const botonCompra = this.querySelector('[data-boton-agregar]');
+    if (!this.barra || !botonCompra) return;
+    this.barra.hidden = false;
+    this.barraBoton = this.barra.querySelector('[data-barra-boton]');
+    this.barraBoton.addEventListener('click', () => {
+      if (this.barraBoton.type !== 'button') return;
+      const destino = this.querySelector('.ficha__selector');
+      destino?.scrollIntoView({ behavior: reducirMovimiento ? 'auto' : 'smooth', block: 'center' });
+      this.querySelector('.ficha__radio:checked')?.focus({ preventScroll: true });
+    });
+    // Se revisa al hacer scroll (no con IntersectionObserver): un salto largo se saltaría el botón sin avisar
+    this.pendienteBarra = false;
+    this.alMoverBarra = () => {
+      if (this.pendienteBarra) return;
+      this.pendienteBarra = true;
+      requestAnimationFrame(() => { this.pendienteBarra = false; this.revisarBarra(botonCompra); });
+    };
+    window.addEventListener('scroll', this.alMoverBarra, { passive: true });
+    window.addEventListener('resize', this.alMoverBarra, { passive: true });
+    this.revisarBarra(botonCompra);
+  }
+
+  // La barra aparece cuando el botón de compra ya quedó arriba, fuera de la pantalla
+  revisarBarra(botonCompra) {
+    const caja = botonCompra.getBoundingClientRect();
+    const mostrar = caja.bottom < 0;
+    this.barra.classList.toggle('ficha__barra--visible', mostrar);
+    const raiz = document.documentElement;
+    if (mostrar) {
+      raiz.style.setProperty('--alto-barra', `${this.barra.offsetHeight}px`);
+      raiz.setAttribute('data-barra-compra', '');
+    } else {
+      raiz.removeAttribute('data-barra-compra');
+    }
+  }
+
+  pintarBarra(variante, elegidos) {
+    if (!this.barra) return;
+    const seleccion = this.barra.querySelector('[data-barra-seleccion]');
+    const precio = this.barra.querySelector('[data-barra-precio]');
+    const visibles = elegidos.filter((valor, i) => valor && !this.fieldsets[i]?.hasAttribute('data-unica'));
+    if (seleccion) seleccion.textContent = visibles.join(' / ');
+    if (precio && variante) precio.textContent = pesos(variante.price);
+
+    const boton = this.barraBoton;
+    const hayTalla = this.fieldsets.some((f) => f.hasAttribute('data-talla') && !f.hasAttribute('data-unica'));
+    const hayElegible = this.fieldsets.some((f) => !f.hasAttribute('data-unica'));
+    if (variante?.available) {
+      boton.type = 'submit';
+      boton.disabled = false;
+      boton.textContent = 'Agregar al carrito';
+    } else if (hayElegible && this.variantes.some((v) => v.available)) {
+      boton.type = 'button';
+      boton.disabled = false;
+      boton.textContent = hayTalla ? 'Elegir talla' : 'Elegir opción';
+    } else {
+      boton.type = 'submit';
+      boton.disabled = true;
+      boton.textContent = 'Agotado';
+    }
+  }
+
+  get fieldsets() {
+    return [...this.opciones.querySelectorAll('fieldset')];
+  }
+
   elegidos() {
-    return [...this.opciones.querySelectorAll('fieldset')].map(
-      (fieldset) => fieldset.querySelector('input:checked')?.value ?? null
-    );
+    return this.fieldsets.map((fieldset) => fieldset.querySelector('input:checked')?.value ?? null);
   }
 
   actualizar(cambiarUrl) {
@@ -118,14 +265,17 @@ class FichaProducto extends HTMLElement {
     const variante = this.variantes.find((v) => v.options.every((valor, i) => valor === elegidos[i]));
 
     this.marcarDisponibilidad(elegidos);
-    this.opciones.querySelectorAll('fieldset').forEach((fieldset, i) => {
+    this.fieldsets.forEach((fieldset, i) => {
       const destino = fieldset.querySelector('[data-valor-elegido]');
       if (destino) destino.textContent = elegidos[i] ?? '';
     });
+    this.pintarEquivalencia(elegidos);
 
     const botonAgregar = this.querySelector('[data-boton-agregar]');
     if (!variante) {
       if (botonAgregar) { botonAgregar.disabled = true; botonAgregar.textContent = 'Combinación no disponible'; }
+      this.pintarWhatsApp(null, elegidos);
+      this.pintarBarra(null, elegidos);
       return;
     }
 
@@ -136,7 +286,8 @@ class FichaProducto extends HTMLElement {
       botonAgregar.disabled = !variante.available;
       botonAgregar.textContent = variante.available ? 'Agregar al carrito' : 'Agotado';
     }
-    this.pintarWhatsApp(variante);
+    this.pintarWhatsApp(variante, elegidos);
+    this.pintarBarra(variante, elegidos);
 
     if (cambiarUrl) {
       const url = new URL(window.location.href);
@@ -147,7 +298,8 @@ class FichaProducto extends HTMLElement {
 
   // Una opción está disponible si existe una variante disponible con ese valor y los demás elegidos (RF-07)
   marcarDisponibilidad(elegidos) {
-    this.opciones.querySelectorAll('fieldset').forEach((fieldset, i) => {
+    this.fieldsets.forEach((fieldset, i) => {
+      const palabra = fieldset.dataset.agotado || 'agotado';
       fieldset.querySelectorAll('input[type="radio"]').forEach((input) => {
         const prueba = [...elegidos];
         prueba[i] = input.value;
@@ -155,11 +307,12 @@ class FichaProducto extends HTMLElement {
         const etiqueta = fieldset.querySelector(`label[for="${input.id}"]`);
         if (!etiqueta) return;
         etiqueta.classList.toggle('ficha__valor--agotado', !disponible);
-        let aviso = etiqueta.querySelector('.oculto-visual');
+        let aviso = etiqueta.querySelector('[data-aviso-agotado]');
         if (!disponible && !aviso) {
           aviso = document.createElement('span');
           aviso.className = 'oculto-visual';
-          aviso.textContent = ', agotada';
+          aviso.dataset.avisoAgotado = '';
+          aviso.textContent = `, ${palabra}`;
           etiqueta.append(aviso);
         } else if (disponible && aviso) {
           aviso.remove();
@@ -175,35 +328,77 @@ class FichaProducto extends HTMLElement {
     if (anterior) {
       const rebajado = variante.compare_at_price && variante.compare_at_price > variante.price;
       anterior.hidden = !rebajado;
-      if (rebajado) anterior.textContent = pesos(variante.compare_at_price);
+      const valor = anterior.querySelector('[data-precio-anterior-valor]');
+      if (rebajado && valor) valor.textContent = pesos(variante.compare_at_price);
     }
   }
 
-  pintarWhatsApp(variante) {
+  // Detalle para el mensaje: talla primero y luego las demás opciones con más de un valor
+  detalleElegido(elegidos) {
+    const partes = this.fieldsets
+      .map((fieldset, i) => ({ talla: fieldset.hasAttribute('data-talla'), unica: fieldset.hasAttribute('data-unica'), valor: elegidos[i] }))
+      .filter((o) => !o.unica && o.valor);
+    return [...partes.filter((o) => o.talla), ...partes.filter((o) => !o.talla)].map((o) => o.valor).join(' / ');
+  }
+
+  pintarWhatsApp(variante, elegidos) {
     const boton = this.querySelector('[data-boton-whatsapp]');
     const numero = this.dataset.whatsapp;
     if (!boton || !numero) return;
     const producto = this.dataset.producto;
-    const enlace = `${this.dataset.url}?variant=${variante.id}`;
-    const detalle = variante.title && variante.title !== 'Default Title' ? ` (${variante.title})` : '';
-    const mensaje = variante.available
-      ? `Hola, quiero pedir ${producto}${detalle}: ${enlace}`
-      : `Hola, avísenme cuando llegue ${producto}${detalle}: ${enlace}`;
+    let mensaje;
+    let texto = 'Pedir por WhatsApp';
+    if (!variante) {
+      // Combinación que no existe: se pregunta por el producto sin variante
+      mensaje = `Hola, quiero información sobre ${producto}: ${this.dataset.url}`;
+      texto = 'Preguntar por WhatsApp';
+    } else {
+      const detalle = this.variantes.length > 1 ? this.detalleElegido(elegidos) : '';
+      const sufijo = detalle ? ` (${detalle})` : '';
+      const enlace = `${this.dataset.url}?variant=${variante.id}`;
+      if (variante.available) {
+        mensaje = `Hola, quiero pedir ${producto}${sufijo}: ${enlace}`;
+      } else {
+        mensaje = `Hola, avísenme cuando llegue ${producto}${sufijo}: ${enlace}`;
+        texto = 'Preguntar disponibilidad por WhatsApp';
+      }
+    }
     boton.href = `https://wa.me/${numero}?text=${encodeURIComponent(mensaje)}`;
-    boton.textContent = variante.available ? 'Pedir por WhatsApp' : 'Preguntar disponibilidad por WhatsApp';
+    boton.textContent = texto;
+  }
+
+  leerGuia() {
+    const datos = this.querySelector('[data-datos-guia-tallas]') || document.querySelector('[data-datos-guia-tallas]');
+    if (!datos) return new Map();
+    try {
+      const tabla = JSON.parse(datos.textContent);
+      return new Map(tabla.map((fila) => [String(fila.eur).trim(), fila]));
+    } catch (_) {
+      return new Map();
+    }
   }
 
   // Muestra los centímetros de pie debajo de cada talla EUR (RF-05)
   pintarCentimetros() {
-    const datos = this.querySelector('[data-datos-guia-tallas]') || document.querySelector('[data-datos-guia-tallas]');
-    if (!datos) return;
-    let tabla = [];
-    try { tabla = JSON.parse(datos.textContent); } catch (_) { return; }
-    const porEur = new Map(tabla.map((fila) => [String(fila.eur).trim(), String(fila.cm).replace('.', ',')]));
     this.querySelectorAll('[data-cm-para]').forEach((destino) => {
-      const cm = porEur.get(destino.dataset.cmPara.trim());
-      if (cm) destino.textContent = `${cm} cm`;
+      const fila = this.tabla.get(destino.dataset.cmPara.trim());
+      if (fila?.cm) destino.textContent = `${String(fila.cm).replace('.', ',')} cm`;
     });
+  }
+
+  // Línea de equivalencia de la talla elegida: "Talla 42 EUR · 26,5 cm de pie · US 8,5"
+  pintarEquivalencia(elegidos) {
+    const destino = this.querySelector('[data-equivalencia]');
+    if (!destino) return;
+    const indice = this.fieldsets.findIndex((f) => f.hasAttribute('data-talla') && f.querySelector('[data-cm-para]'));
+    if (indice < 0 || !elegidos[indice]) { destino.textContent = ''; return; }
+    const fila = this.tabla.get(elegidos[indice].trim());
+    if (!fila) { destino.textContent = 'Consulta la guía de tallas'; return; }
+    const coma = (valor) => String(valor).replace('.', ',');
+    const partes = [`Talla ${elegidos[indice]} EUR`];
+    if (fila.cm) partes.push(`${coma(fila.cm)} cm de pie`);
+    if (fila.us) partes.push(`US ${coma(fila.us)}`);
+    destino.textContent = partes.join(' · ');
   }
 }
 
