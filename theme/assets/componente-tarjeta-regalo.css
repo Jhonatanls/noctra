@@ -1,0 +1,31 @@
+/* Tarjeta de regalo (templates/gift_card.liquid) */
+.regalo {
+  max-width: var(--ancho-texto);
+  margin-inline: auto;
+  padding-block: var(--espacio-12);
+  display: grid;
+  gap: var(--espacio-4);
+  justify-items: center;
+  text-align: center;
+}
+.regalo__marca { color: var(--color-texto); }
+.regalo__logotipo { height: var(--espacio-10); width: auto; }
+.regalo__titulo { margin: 0; }
+.regalo__estado { color: var(--color-error); margin: 0; }
+.regalo__saldo { display: grid; gap: var(--espacio-2); margin: 0; }
+.regalo__saldo .precio { font-size: var(--texto-2xl); }
+.regalo__codigo {
+  width: 100%;
+  padding: var(--espacio-4);
+  border: var(--borde-fino) solid var(--color-oro-suave);
+  border-radius: var(--radio-m);
+  background: var(--color-superficie);
+}
+.regalo__codigo-valor {
+  margin: var(--espacio-2) 0 0;
+  max-width: none;
+  font-size: var(--texto-l);
+  letter-spacing: 0.1em;
+  user-select: all;
+  overflow-wrap: anywhere;
+}

@@ -1,0 +1,65 @@
+{%- comment -%}
+  Tarjeta de regalo. Shopify exige esta plantilla en todo tema y no deja borrarla.
+  Es la página que recibe quien obtiene una tarjeta de regalo por correo.
+  Va con layout propio, sin encabezado ni pie, igual que el checkout.
+{%- endcomment -%}
+{%- layout none -%}
+<!doctype html>
+<html lang="{{ request.locale.iso_code }}" data-modo-base="{{ settings.modo_predeterminado | default: 'oscuro' }}">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="dark light">
+    <meta name="robots" content="noindex">
+    <title>Tu tarjeta de regalo &ndash; {{ shop.name }}</title>
+    <link rel="icon" type="image/png" href="{{ 'favicon.png' | asset_url }}">
+
+    {% render 'fuentes' %}
+
+    {{ 'tokens.css' | asset_url | stylesheet_tag }}
+    {{ 'base.css' | asset_url | stylesheet_tag }}
+    {{ 'componente-tarjeta-regalo.css' | asset_url | stylesheet_tag }}
+
+    {{ content_for_header }}
+  </head>
+
+  <body>
+    <main class="contenedor regalo">
+      <a class="regalo__marca" href="{{ routes.root_url }}">
+        {% render 'logo', variante: 'wordmark', clase: 'regalo__logotipo' %}
+      </a>
+      {% render 'ornamento' %}
+
+      <h1 class="regalo__titulo">Tu tarjeta de regalo</h1>
+
+      {%- if gift_card.expired or gift_card.enabled == false -%}
+        <p class="regalo__estado">
+          {%- if gift_card.expired -%}
+            Esta tarjeta venció el {{ gift_card.expires_on | date: '%d/%m/%Y' }}.
+          {%- else -%}
+            Esta tarjeta está desactivada.
+          {%- endif -%}
+        </p>
+      {%- endif -%}
+
+      <p class="regalo__saldo">
+        Saldo disponible
+        <strong class="precio">{{ gift_card.balance | money }}</strong>
+      </p>
+      {%- if gift_card.balance != gift_card.initial_value -%}
+        <p class="nota-legal">Valor inicial: {{ gift_card.initial_value | money }}</p>
+      {%- endif -%}
+
+      <div class="regalo__codigo">
+        <p class="nota-legal">Código para usar al finalizar la compra</p>
+        <p class="regalo__codigo-valor">{{ gift_card.code | format_code }}</p>
+      </div>
+
+      {%- if gift_card.expires_on and gift_card.expired == false -%}
+        <p class="nota-legal">Válida hasta el {{ gift_card.expires_on | date: '%d/%m/%Y' }}.</p>
+      {%- endif -%}
+
+      <a class="boton boton--ancho" href="{{ routes.root_url }}">Ir a la tienda</a>
+    </main>
+  </body>
+</html>
