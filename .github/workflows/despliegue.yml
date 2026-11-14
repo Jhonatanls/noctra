@@ -1,5 +1,5 @@
 # Despliegue continuo de Noctra.
-#   dev  -> tema "Noctra · Dev" en la tienda de desarrollo
+#   dev  -> tema Noctra en la tienda de desarrollo (va publicado: es una tienda de prueba con contraseña)
 #   test -> tema no publicado "Noctra · Pre-prod" en la tienda real (vista previa)
 #   prod -> tema publicado en la tienda real (dominio propio). Requiere aprobación manual.
 # Las credenciales viven en GitHub Environments (dev, test, prod), nunca en el repositorio.
@@ -38,7 +38,9 @@ jobs:
           TEMA: ${{ vars.SHOPIFY_THEME_ID }}
         run: |
           EXTRA=""
-          if [ "${{ github.ref_name }}" = "prod" ]; then EXTRA="--allow-live"; fi
+          # dev: en la tienda de desarrollo el tema Noctra va publicado, porque el admin solo ofrece
+          # las plantillas del tema publicado (por ejemplo, product.gorra). test nunca sube a un tema publicado.
+          if [ "${{ github.ref_name }}" = "prod" ] || [ "${{ github.ref_name }}" = "dev" ]; then EXTRA="--allow-live"; fi
           # settings_data.json guarda lo que el equipo configura en el editor: nunca se pisa desde Git.
           shopify theme push --path theme --theme "$TEMA" --ignore "config/settings_data.json" --ignore "AGENTS.md" $EXTRA
 
