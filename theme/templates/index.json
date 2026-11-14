@@ -13,7 +13,8 @@
       "settings": {
         "titulo": "Tenis",
         "cantidad": 8,
-        "mostrar_enlace": true
+        "mostrar_enlace": true,
+        "coleccion": "tenis"
       }
     },
     "gorras": {
@@ -21,7 +22,8 @@
       "settings": {
         "titulo": "Gorras",
         "cantidad": 4,
-        "mostrar_enlace": true
+        "mostrar_enlace": true,
+        "coleccion": "gorras"
       }
     },
     "combos": {
