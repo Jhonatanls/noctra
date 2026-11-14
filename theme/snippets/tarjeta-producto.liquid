@@ -45,6 +45,19 @@
     endif
   endif
 
+  # Las etiquetas se comparan en minúsculas: en el admin pueden quedar como "Combo" o "combo".
+  assign etiquetas = producto.tags | join: '|' | downcase | split: '|'
+
+  # Precio anterior: el de la misma variante que da el precio mostrado (la más barata),
+  # y solo si es mayor que su precio. Así no se mezclan precios de variantes distintas.
+  assign precio_anterior = 0
+  for v in producto.variants
+    if v.price == producto.price and v.compare_at_price > v.price
+      assign precio_anterior = v.compare_at_price
+      break
+    endif
+  endfor
+
   assign sellos = ''
   if producto.available == false
     assign sellos = sellos | append: 'agotado,'
@@ -53,7 +66,7 @@
   endif
   if es_gama_alta
     assign sellos = sellos | append: 'premium,'
-  elsif producto.tags contains 'combo'
+  elsif etiquetas contains 'combo'
     assign sellos = sellos | append: 'combo,'
   endif
   if es_nuevo
@@ -94,8 +107,8 @@
   <p class="tarjeta__precio">
     {%- if producto.price_varies -%}Desde {% endif -%}
     <span class="precio">{{ producto.price | money }}</span>
-    {%- if producto.compare_at_price > producto.price -%}
-      <s class="precio__anterior"><span class="oculto-visual">Antes</span>{{ producto.compare_at_price | money }}</s>
+    {%- if precio_anterior > 0 -%}
+      <s class="precio__anterior"><span class="oculto-visual">Antes</span>{{ precio_anterior | money }}</s>
     {%- endif -%}
   </p>
 </article>
