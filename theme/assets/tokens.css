@@ -78,6 +78,10 @@
   --alto-encabezado: 4rem;
   --tactil-min: 2.75rem;
   --boton-flotante: 3.5rem;
+  --alto-panel-filtros: 90dvh;
+  --ancho-desplegable: 16rem;
+  --alto-lista-sugerencias: 70dvh;
+  --foto-sugerencia: 3.5rem;
 
   /* Movimiento */
   --duracion-corta: 160ms;
@@ -93,8 +97,8 @@
   --color-texto: #0E0F11;
   --color-texto-2: #575B62;
   --color-acento: #4A4E55;
-  --color-oro: #8C6E3A;
-  --color-oro-suave: rgb(140 110 58 / 0.35);
+  --color-oro: #856837;
+  --color-oro-suave: rgb(133 104 55 / 0.35);
   --color-boton-fondo: #0E0F11;
   --color-boton-texto: #F3F3F1;
   --color-exito: #3E7350;
@@ -112,8 +116,8 @@
     --color-texto: #0E0F11;
     --color-texto-2: #575B62;
     --color-acento: #4A4E55;
-    --color-oro: #8C6E3A;
-    --color-oro-suave: rgb(140 110 58 / 0.35);
+    --color-oro: #856837;
+    --color-oro-suave: rgb(133 104 55 / 0.35);
     --color-boton-fondo: #0E0F11;
     --color-boton-texto: #F3F3F1;
     --color-exito: #3E7350;

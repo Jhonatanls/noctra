@@ -38,7 +38,9 @@
     "name": "Ventas",
     "settings": [
       { "type": "number", "id": "envio_gratis_desde", "label": "Envío gratis desde (pesos)", "default": 0, "info": "0 oculta la barra de envío gratis. Antes de activarla, publica las condiciones en la política de envíos." },
-      { "type": "number", "id": "umbral_ultimas_unidades", "label": "Mostrar «Últimas unidades» con este inventario o menos", "default": 3 }
+      { "type": "number", "id": "umbral_ultimas_unidades", "label": "Mostrar «Últimas unidades» con este inventario o menos", "default": 3, "info": "Se cuenta sobre el inventario total del producto (todas las tallas). 0 apaga el sello." },
+      { "type": "number", "id": "dias_sello_nuevo", "label": "Días que un producto muestra el sello «Nuevo»", "default": 7, "info": "Cuenta desde que el producto se publicó en la tienda. 0 apaga el sello." },
+      { "type": "text", "id": "gama_premium_valor", "label": "Valor de Gama que lleva el sello de gama alta", "default": "Noctra Premium", "info": "Debe coincidir exactamente con el valor del metacampo Gama. Los productos con este valor muestran este sello y no muestran el de combo." }
     ]
   },
   {

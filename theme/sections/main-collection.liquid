@@ -1,14 +1,31 @@
 {{ 'componente-tarjeta.css' | asset_url | stylesheet_tag }}
 {{ 'componente-coleccion.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'componente-coleccion.js' | asset_url }}" defer></script>
 
 {%- liquid
   assign orden_actual = collection.sort_by | default: collection.default_sort_by
-  assign hay_filtros_activos = false
+  assign filtros_activos = 0
   for filtro in collection.filters
-    if filtro.active_values.size > 0 or filtro.min_value.value != blank or filtro.max_value.value != blank
-      assign hay_filtros_activos = true
+    if filtro.type == 'price_range'
+      if filtro.min_value.value != blank or filtro.max_value.value != blank
+        assign filtros_activos = filtros_activos | plus: 1
+      endif
+    else
+      assign filtros_activos = filtros_activos | plus: filtro.active_values.size
     endif
   endfor
+  assign hay_filtros_activos = false
+  if filtros_activos > 0
+    assign hay_filtros_activos = true
+  endif
+  assign mostrar_filtros = false
+  if collection.filters.size > 0 and collection.products_count > 0
+    assign mostrar_filtros = true
+  elsif hay_filtros_activos
+    assign mostrar_filtros = true
+  endif
+  assign ordenes = 'manual,created-descending,price-ascending,price-descending' | split: ','
+  assign por_pagina = section.settings.productos_por_pagina | default: 24
 -%}
 
 <section class="seccion">
@@ -18,81 +35,182 @@
       <div class="coleccion__descripcion">{{ collection.description }}</div>
     {%- endif -%}
 
-    <form class="filtros" method="get" action="{{ collection.url }}">
-      <div class="filtros__fila">
-        {%- for filtro in collection.filters -%}
-          <details class="filtros__grupo">
-            <summary class="filtros__titulo">{{ filtro.label }}</summary>
-            <div class="filtros__opciones">
-              {%- case filtro.type -%}
-                {%- when 'list', 'boolean' -%}
-                  {%- for valor in filtro.values -%}
-                    <label class="filtros__opcion">
-                      <input
-                        type="checkbox"
-                        name="{{ valor.param_name }}"
-                        value="{{ valor.value }}"
-                        {% if valor.active %}checked{% endif %}
-                        {% if valor.count == 0 and valor.active == false %}disabled{% endif %}
-                      >
-                      {{ valor.label }} <span class="filtros__conteo">({{ valor.count }})</span>
-                    </label>
+    {%- paginate collection.products by por_pagina -%}
+      <filtros-coleccion class="filtros-coleccion" data-seccion="{{ section.id }}">
+        {%- if mostrar_filtros -%}
+          <div class="filtros__barra">
+            <button type="button" class="boton boton--secundario filtros__abrir" data-abrir-filtros aria-haspopup="dialog" aria-controls="filtros-panel-{{ section.id }}">
+              <span data-filtrar-etiqueta>Filtrar{% if filtros_activos > 0 %} ({{ filtros_activos }}){% endif %}</span>
+            </button>
+            <label class="filtros__orden">
+              <span class="oculto-visual">Ordenar por</span>
+              <select name="sort_by" form="filtros-form-{{ section.id }}">
+                {%- for valor_orden in ordenes -%}
+                  {%- for opcion in collection.sort_options -%}
+                    {%- if opcion.value == valor_orden -%}
+                      <option value="{{ opcion.value }}"{% if opcion.value == orden_actual %} selected{% endif %}>
+                        {%- case valor_orden -%}
+                          {%- when 'manual' -%}Destacados
+                          {%- when 'created-descending' -%}Más nuevos
+                          {%- when 'price-ascending' -%}Precio: de menor a mayor
+                          {%- when 'price-descending' -%}Precio: de mayor a menor
+                        {%- endcase -%}
+                      </option>
+                    {%- endif -%}
                   {%- endfor -%}
-                {%- when 'price_range' -%}
-                  {%- liquid
-                    assign minimo = filtro.min_value.value | divided_by: 100
-                    assign maximo = filtro.max_value.value | divided_by: 100
-                    assign tope = filtro.range_max | divided_by: 100
-                  -%}
-                  <div class="filtros__precio">
-                    <label>Desde
-                      <input type="number" inputmode="numeric" min="0" max="{{ tope }}" name="{{ filtro.min_value.param_name }}" {% if filtro.min_value.value != blank %}value="{{ minimo }}"{% endif %} placeholder="0">
-                    </label>
-                    <label>Hasta
-                      <input type="number" inputmode="numeric" min="0" max="{{ tope }}" name="{{ filtro.max_value.param_name }}" {% if filtro.max_value.value != blank %}value="{{ maximo }}"{% endif %} placeholder="{{ tope }}">
-                    </label>
-                  </div>
-              {%- endcase -%}
+                {%- endfor -%}
+              </select>
+            </label>
+          </div>
+
+          {%- comment -%}
+            Sin JavaScript el panel queda abierto y en línea (formulario GET real).
+            Con JavaScript, en celular se cierra y se abre como hoja inferior modal.
+          {%- endcomment -%}
+          <dialog class="filtros__panel" id="filtros-panel-{{ section.id }}" aria-labelledby="filtros-titulo-{{ section.id }}" open>
+            <div class="filtros__cabecera">
+              <h2 class="filtros__encabezado" id="filtros-titulo-{{ section.id }}">Filtros</h2>
+              <button type="button" class="enlace-boton" data-cerrar-filtros>Cerrar</button>
             </div>
-          </details>
-        {%- endfor -%}
+            <form class="filtros" id="filtros-form-{{ section.id }}" method="get" action="{{ collection.url }}" data-filtros-form>
+              <div class="filtros__fila">
+                {%- for filtro in collection.filters -%}
+                  {%- liquid
+                    assign pintar = false
+                    if filtro.type == 'price_range'
+                      if filtro.range_max > 0
+                        assign pintar = true
+                      endif
+                    else
+                      for valor in filtro.values
+                        if valor.count > 0 or valor.active
+                          assign pintar = true
+                        endif
+                      endfor
+                    endif
+                  -%}
+                  {%- if pintar -%}
+                    <details class="filtros__grupo" data-filtros-grupo>
+                      <summary class="filtros__titulo">{{ filtro.label }}</summary>
+                      <div class="filtros__opciones">
+                        {%- case filtro.type -%}
+                          {%- when 'list', 'boolean' -%}
+                            {%- for valor in filtro.values -%}
+                              <label class="filtros__opcion">
+                                <input
+                                  type="checkbox"
+                                  name="{{ valor.param_name }}"
+                                  value="{{ valor.value }}"
+                                  {% if valor.active %}checked{% endif %}
+                                  {% if valor.count == 0 and valor.active == false %}disabled{% endif %}
+                                >
+                                {{ valor.label }} <span class="filtros__conteo">({{ valor.count }})</span>
+                              </label>
+                            {%- endfor -%}
+                          {%- when 'price_range' -%}
+                            {%- liquid
+                              assign minimo = filtro.min_value.value | divided_by: 100
+                              assign maximo = filtro.max_value.value | divided_by: 100
+                              assign tope = filtro.range_max | divided_by: 100
+                            -%}
+                            <div class="filtros__precio">
+                              <label>Desde
+                                <input type="number" inputmode="numeric" min="0" max="{{ tope }}" name="{{ filtro.min_value.param_name }}" {% if filtro.min_value.value != blank %}value="{{ minimo }}"{% endif %} placeholder="0">
+                              </label>
+                              <label>Hasta
+                                <input type="number" inputmode="numeric" min="0" max="{{ tope }}" name="{{ filtro.max_value.param_name }}" {% if filtro.max_value.value != blank %}value="{{ maximo }}"{% endif %} placeholder="{{ tope }}">
+                              </label>
+                            </div>
+                        {%- endcase -%}
+                      </div>
+                    </details>
+                  {%- endif -%}
+                {%- endfor -%}
+              </div>
 
-        <label class="filtros__orden">
-          <span class="oculto-visual">Ordenar por</span>
-          <select name="sort_by">
-            {%- for opcion in collection.sort_options -%}
-              <option value="{{ opcion.value }}"{% if opcion.value == orden_actual %} selected{% endif %}>{{ opcion.name }}</option>
-            {%- endfor -%}
-          </select>
-        </label>
-
-        <button type="submit" class="boton boton--secundario">Aplicar</button>
-        {%- if hay_filtros_activos -%}
-          <a class="filtros__limpiar" href="{{ collection.url }}?sort_by={{ orden_actual }}">Quitar filtros</a>
+              <div class="filtros__acciones">
+                <button type="submit" class="boton" data-aplicar>Aplicar</button>
+                <button type="button" class="boton filtros__ver" data-ver data-cerrar-filtros>
+                  Ver <span data-ver-conteo>{{ collection.products_count }}</span> {% if collection.products_count == 1 %}producto{% else %}productos{% endif %}
+                </button>
+                <span data-limpiar>
+                  {%- if hay_filtros_activos -%}
+                    <a class="filtros__limpiar" href="{{ collection.url }}?sort_by={{ orden_actual }}">Quitar filtros</a>
+                  {%- endif -%}
+                </span>
+              </div>
+            </form>
+          </dialog>
         {%- endif -%}
-      </div>
-    </form>
 
-    {%- paginate collection.products by 24 -%}
-      {%- if collection.products.size > 0 -%}
-        <p class="coleccion__conteo">{{ collection.products_count }} productos</p>
-        <ul class="rejilla-productos">
-          {%- for producto in collection.products -%}
-            {%- if forloop.index <= 2 -%}{%- assign carga = 'eager' -%}{%- else -%}{%- assign carga = 'lazy' -%}{%- endif -%}
-            <li>{% render 'tarjeta-producto', producto: producto, carga: carga %}</li>
-          {%- endfor -%}
-        </ul>
-        {%- if paginate.pages > 1 -%}
-          <nav class="paginacion" aria-label="Paginación">
-            {{ paginate | default_pagination: next: 'Siguiente', previous: 'Anterior' }}
-          </nav>
-        {%- endif -%}
-      {%- else -%}
-        <div class="coleccion__vacia">
-          <p>No encontramos productos con esos filtros.</p>
-          <a class="boton boton--secundario" href="{{ collection.url }}">Quitar filtros</a>
+        <p class="oculto-visual" role="status" aria-live="polite" data-anuncio></p>
+
+        <div class="coleccion__resultados" data-resultados>
+          {%- if hay_filtros_activos -%}
+            <ul class="fichas" aria-label="Filtros activos">
+              {%- for filtro in collection.filters -%}
+                {%- if filtro.type == 'price_range' -%}
+                  {%- if filtro.min_value.value != blank or filtro.max_value.value != blank -%}
+                    <li>
+                      <a class="ficha" href="{{ filtro.url_to_remove }}">
+                        <span class="ficha__texto">
+                          {{ filtro.label }}:
+                          {% if filtro.min_value.value != blank and filtro.max_value.value != blank -%}
+                            {{ filtro.min_value.value | money_without_trailing_zeros }} a {{ filtro.max_value.value | money_without_trailing_zeros }}
+                          {%- elsif filtro.min_value.value != blank -%}
+                            desde {{ filtro.min_value.value | money_without_trailing_zeros }}
+                          {%- else -%}
+                            hasta {{ filtro.max_value.value | money_without_trailing_zeros }}
+                          {%- endif %}
+                        </span>
+                        <span class="ficha__cruz" aria-hidden="true">×</span>
+                        <span class="oculto-visual">Quitar filtro</span>
+                      </a>
+                    </li>
+                  {%- endif -%}
+                {%- else -%}
+                  {%- for valor in filtro.active_values -%}
+                    <li>
+                      <a class="ficha" href="{{ valor.url_to_remove }}">
+                        <span class="ficha__texto">{{ filtro.label }}: {{ valor.label }}</span>
+                        <span class="ficha__cruz" aria-hidden="true">×</span>
+                        <span class="oculto-visual">Quitar filtro</span>
+                      </a>
+                    </li>
+                  {%- endfor -%}
+                {%- endif -%}
+              {%- endfor -%}
+            </ul>
+          {%- endif -%}
+
+          {%- if collection.products.size > 0 -%}
+            <p class="coleccion__conteo" data-conteo="{{ collection.products_count }}">
+              {{ collection.products_count }} {% if collection.products_count == 1 %}producto{% else %}productos{% endif %}
+            </p>
+            <ul class="rejilla-productos">
+              {%- for producto in collection.products -%}
+                {%- if forloop.index <= 2 -%}{%- assign carga = 'eager' -%}{%- else -%}{%- assign carga = 'lazy' -%}{%- endif -%}
+                <li>{% render 'tarjeta-producto', producto: producto, carga: carga, nivel: 2, segunda_foto: section.settings.mostrar_segunda_foto %}</li>
+              {%- endfor -%}
+            </ul>
+            {%- if paginate.pages > 1 -%}
+              <nav class="paginacion" aria-label="Paginación">
+                {{ paginate | default_pagination: next: 'Siguiente', previous: 'Anterior' }}
+              </nav>
+            {%- endif -%}
+          {%- elsif hay_filtros_activos -%}
+            <div class="coleccion__vacia" data-conteo="0">
+              <p>No encontramos productos con esos filtros.</p>
+              <a class="boton boton--secundario" href="{{ collection.url }}?sort_by={{ orden_actual }}">Quitar filtros</a>
+            </div>
+          {%- else -%}
+            <div class="coleccion__vacia" data-conteo="0">
+              <p>Pronto tendremos productos aquí.</p>
+              <a class="boton boton--secundario" href="{{ routes.all_products_collection_url }}">Ver todo el catálogo</a>
+            </div>
+          {%- endif -%}
         </div>
-      {%- endif -%}
+      </filtros-coleccion>
     {%- endpaginate -%}
   </div>
 </section>
@@ -100,6 +218,23 @@
 {% schema %}
 {
   "name": "Colección",
-  "settings": []
+  "settings": [
+    {
+      "type": "range",
+      "id": "productos_por_pagina",
+      "label": "Productos por página",
+      "min": 12,
+      "max": 48,
+      "step": 4,
+      "default": 24
+    },
+    {
+      "type": "checkbox",
+      "id": "mostrar_segunda_foto",
+      "label": "Mostrar segunda foto al pasar el mouse",
+      "default": true,
+      "info": "Solo en dispositivos con mouse. En el celular no se descarga."
+    }
+  ]
 }
 {% endschema %}

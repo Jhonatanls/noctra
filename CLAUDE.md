@@ -87,7 +87,7 @@ Paleta **Noir y plata**, derivada del logo. La tienda **siempre inicia en modo o
 | `--color-texto` | #F2F3F5 | #0E0F11 | Texto principal y logotipo |
 | `--color-texto-2` | #9EA2A9 | #575B62 | Texto secundario |
 | `--color-acento` | #C9CCD1 (plata) | #4A4E55 (plata oscura) | Isotipo |
-| `--color-oro` | #B8975A | #8C6E3A | Acabados: filos de botones, ornamentos, marcos, precios, sello de combo, foco |
+| `--color-oro` | #B8975A | #856837 | Acabados: filos de botones, ornamentos, marcos, precios, sello de combo, foco |
 | `--color-oro-suave` | oro al 35 % | oro al 35 % | Filos finos: encabezado, tarjetas, divisores |
 | `--color-boton-fondo` / `--color-boton-texto` | #F2F3F5 / #0E0F11 | #0E0F11 / #F3F3F1 | Botón principal |
 | `--color-exito` / `--color-error` | #6FA37F / #E07A6E | #3E7350 / #A4443A | Estados |

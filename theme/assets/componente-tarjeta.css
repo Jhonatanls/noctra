@@ -38,9 +38,12 @@
   .tarjeta__enlace:hover .tarjeta__medio { border-color: var(--color-oro); }
 }
 .tarjeta__imagen { width: 100%; height: 100%; object-fit: cover; }
-.tarjeta__imagen--segunda { position: absolute; inset: 0; opacity: 0; transition: opacity var(--duracion-media) var(--curva); }
-@media (hover: hover) {
-  .tarjeta__enlace:hover .tarjeta__imagen--segunda { opacity: 1; }
+/* La segunda foto solo existe en dispositivos con puntero: en táctil queda display:none y el navegador no la descarga */
+.tarjeta__imagen--segunda { display: none; position: absolute; inset: 0; opacity: 0; transition: opacity var(--duracion-media) var(--curva); }
+@media (hover: hover) and (pointer: fine) {
+  .tarjeta__imagen--segunda { display: block; }
+  .tarjeta__enlace:hover .tarjeta__imagen--segunda,
+  .tarjeta__enlace:focus-visible .tarjeta__imagen--segunda { opacity: 1; }
 }
 .tarjeta__sellos {
   position: absolute;
@@ -59,5 +62,11 @@
   font-size: var(--texto-m);
   letter-spacing: var(--espaciado-boton);
   margin: 0;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  overflow-wrap: anywhere;
 }
 .tarjeta__precio { margin: 0; font-size: var(--texto-s); }

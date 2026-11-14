@@ -17,7 +17,7 @@
           <ul class="rejilla-productos">
             {%- for resultado in search.results -%}
               {%- if resultado.object_type == 'product' -%}
-                <li>{% render 'tarjeta-producto', producto: resultado %}</li>
+                <li>{% render 'tarjeta-producto', producto: resultado, nivel: 2 %}</li>
               {%- endif -%}
             {%- endfor -%}
           </ul>
@@ -25,7 +25,7 @@
             <nav class="paginacion" aria-label="Paginación">{{ paginate | default_pagination: next: 'Siguiente', previous: 'Anterior' }}</nav>
           {%- endif -%}
         {%- else -%}
-          <p>No encontramos resultados para “{{ search.terms | escape }}”. Prueba con otra palabra o escríbenos por WhatsApp.</p>
+          {% render 'sin-resultados', termino: search.terms %}
         {%- endif -%}
       {%- endpaginate -%}
     {%- endif -%}

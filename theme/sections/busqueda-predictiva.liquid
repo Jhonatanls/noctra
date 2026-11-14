@@ -1,0 +1,54 @@
+{%- comment -%}
+  Sugerencias de búsqueda (SPEC-003, RF-02). Se pide con /search/suggest?section_id=busqueda-predictiva.
+  No se incluye en ninguna plantilla: solo la renderiza la API de búsqueda predictiva.
+{%- endcomment -%}
+{%- if predictive_search.performed -%}
+  {%- liquid
+    assign productos = predictive_search.resources.products
+    assign colecciones = predictive_search.resources.collections
+    assign total = productos.size | plus: colecciones.size
+  -%}
+  <div data-total="{{ total }}">
+    {%- if total > 0 -%}
+      <ul class="sugerencias__lista" role="presentation">
+        {%- for producto in productos limit: 4 -%}
+          <li role="presentation">
+            <a class="sugerencia" role="option" id="sugerencia-p{{ forloop.index }}" href="{{ producto.url }}" aria-selected="false">
+              <span class="sugerencia__foto">
+                {%- if producto.featured_image != blank -%}
+                  {{ producto.featured_image | image_url: width: 120 | image_tag: widths: '60, 120', sizes: '56px', loading: 'lazy', alt: '' }}
+                {%- endif -%}
+              </span>
+              <span class="sugerencia__texto">
+                <span class="sugerencia__nombre">{{ producto.title }}</span>
+                <span class="precio">{% if producto.price_varies %}Desde {% endif %}{{ producto.price | money }}</span>
+              </span>
+            </a>
+          </li>
+        {%- endfor -%}
+        {%- for coleccion in colecciones limit: 3 -%}
+          <li role="presentation">
+            <a class="sugerencia sugerencia--coleccion" role="option" id="sugerencia-c{{ forloop.index }}" href="{{ coleccion.url }}" aria-selected="false">
+              <span class="sugerencia__texto">
+                <span class="sugerencia__nombre">{{ coleccion.title }}</span>
+                <span class="sugerencia__tipo">Colección</span>
+              </span>
+            </a>
+          </li>
+        {%- endfor -%}
+      </ul>
+      <a class="sugerencias__todos" role="option" id="sugerencia-todos" href="{{ routes.search_url }}?q={{ predictive_search.terms | url_encode }}&type=product" aria-selected="false">
+        Ver todos los resultados de «{{ predictive_search.terms | escape }}»
+      </a>
+    {%- else -%}
+      {% render 'sin-resultados', termino: predictive_search.terms %}
+    {%- endif -%}
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Búsqueda predictiva",
+  "settings": []
+}
+{% endschema %}

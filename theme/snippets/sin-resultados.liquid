@@ -1,0 +1,12 @@
+{%- comment -%}
+  Mensaje de búsqueda sin resultados (SPEC-003, C19).
+  Parámetro: termino (texto buscado). El enlace de WhatsApp solo aparece si hay número configurado.
+{%- endcomment -%}
+{%- liquid
+  assign numero = settings.whatsapp_numero | remove: '+' | remove: ' ' | remove: '-'
+  assign mensaje = 'Hola, busqué «' | append: termino | append: '» en la tienda y no lo encontré. ¿Me ayudan?'
+-%}
+<p class="sin-resultados">
+  No encontramos nada con «{{ termino | escape }}». Prueba con otra palabra
+  {%- if numero != blank %} o <a href="https://wa.me/{{ numero }}?text={{ mensaje | url_encode }}" target="_blank" rel="noopener">escríbenos por WhatsApp<span class="oculto-visual"> (se abre en una pestaña nueva)</span></a>{% endif -%}.
+</p>

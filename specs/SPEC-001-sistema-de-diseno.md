@@ -72,7 +72,7 @@ Colores en `CLAUDE.md` sección 6 y en `tokens.css`. Tipografía (escala ~1,25 s
 
 - [x] Ningún componente define colores, fuentes o tamaños fuera de `tokens.css` (la única excepción es `meta theme-color`).
 - [x] Cambiar `--color-acento` en `tokens.css` cambia el color del isotipo en toda la tienda; cambiar `--color-oro` cambia todos los acabados.
-- [ ] El oro sobre marfil en modo claro (#8C6E3A sobre #F3F3F1) cumple 4,5:1 en precios (verificar).
+- [x] El oro sobre marfil en modo claro (#856837 sobre #F3F3F1) cumple 4,5:1 en precios: mide 4,69:1, y 5,21:1 sobre la superficie #FFFFFF. Antes era #8C6E3A, que medía 4,29:1; se oscureció el 13 nov 2026 en SPEC-003 (criterio C13).
 - [x] El logotipo y el isotipo se ven correctamente en modo oscuro y claro sin archivos distintos.
 - [x] Sin preferencia guardada, la tienda carga en oscuro sin parpadeo.
 - [x] El interruptor cambia el modo y al recargar se mantiene.

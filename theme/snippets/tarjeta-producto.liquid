@@ -1,10 +1,22 @@
 {%- comment -%}
   Tarjeta de producto (SPEC-003, RF-03).
-  Parámetros: producto (product), carga ('lazy' por defecto).
-  Sellos, máximo dos, en orden: Agotado, Últimas unidades, Combo, Nuevo.
+  Parámetros:
+    producto (product)
+    carga ('lazy' por defecto; 'eager' en las primeras visibles)
+    nivel (nivel del título, 3 por defecto; en colección y búsqueda se pasa 2 porque la página ya tiene h1)
+    segunda_foto (true por defecto; false desactiva la segunda foto al pasar el mouse)
+  Sellos, máximo dos, en orden: Agotado, Últimas unidades, gama alta, Combo, Nuevo.
+  Los productos de gama alta no muestran el sello de combo.
 {%- endcomment -%}
 {%- liquid
   assign carga = carga | default: 'lazy'
+  assign nivel = nivel | default: 3
+  if segunda_foto == false
+    assign usar_segunda = false
+  else
+    assign usar_segunda = true
+  endif
+
   assign inventario = 0
   assign rastreado = false
   for v in producto.variants
@@ -16,16 +28,35 @@
     endif
   endfor
 
+  assign gama = producto.metafields.custom.gama.value
+  assign es_gama_alta = false
+  if settings.gama_premium_valor != blank and gama == settings.gama_premium_valor
+    assign es_gama_alta = true
+  endif
+
+  assign es_nuevo = false
+  if settings.dias_sello_nuevo > 0 and producto.published_at != blank
+    assign ahora = 'now' | date: '%s' | plus: 0
+    assign publicado = producto.published_at | date: '%s' | plus: 0
+    assign segundos_nuevo = settings.dias_sello_nuevo | times: 86400
+    assign antiguedad = ahora | minus: publicado
+    if antiguedad < segundos_nuevo
+      assign es_nuevo = true
+    endif
+  endif
+
   assign sellos = ''
   if producto.available == false
     assign sellos = sellos | append: 'agotado,'
-  elsif rastreado and inventario <= settings.umbral_ultimas_unidades
+  elsif rastreado and settings.umbral_ultimas_unidades > 0 and inventario > 0 and inventario <= settings.umbral_ultimas_unidades
     assign sellos = sellos | append: 'ultimas,'
   endif
-  if producto.tags contains 'combo'
+  if es_gama_alta
+    assign sellos = sellos | append: 'premium,'
+  elsif producto.tags contains 'combo'
     assign sellos = sellos | append: 'combo,'
   endif
-  if producto.tags contains 'nuevo'
+  if es_nuevo
     assign sellos = sellos | append: 'nuevo,'
   endif
   assign lista_sellos = sellos | split: ','
@@ -38,11 +69,11 @@
       {%- if imagen != blank -%}
         {%- assign alt_imagen = imagen.alt | default: producto.title -%}
         {{ imagen | image_url: width: 900 | image_tag: widths: '300, 450, 600, 900', sizes: '(min-width: 990px) 25vw, 50vw', loading: carga, alt: alt_imagen, class: 'tarjeta__imagen' }}
-        {%- if segunda != blank -%}
+        {%- if segunda != blank and usar_segunda -%}
           {{ segunda | image_url: width: 900 | image_tag: widths: '450, 600, 900', sizes: '25vw', loading: 'lazy', alt: '', class: 'tarjeta__imagen tarjeta__imagen--segunda' }}
         {%- endif -%}
       {%- else -%}
-        {{ 'product-1' | placeholder_svg_tag: 'tarjeta__imagen' }}
+        {{ 'product-1' | placeholder_svg_tag: 'tarjeta__imagen tarjeta__imagen--vacia' }}
       {%- endif -%}
       {%- if lista_sellos.size > 0 -%}
         <ul class="tarjeta__sellos">
@@ -50,6 +81,7 @@
             {%- case sello -%}
               {%- when 'agotado' -%}<li class="sello sello--agotado">Agotado</li>
               {%- when 'ultimas' -%}<li class="sello">Últimas unidades</li>
+              {%- when 'premium' -%}<li class="sello sello--premium">{{ gama }}</li>
               {%- when 'combo' -%}<li class="sello sello--combo">Combo</li>
               {%- when 'nuevo' -%}<li class="sello">Nuevo</li>
             {%- endcase -%}
@@ -57,7 +89,7 @@
         </ul>
       {%- endif -%}
     </div>
-    <h3 class="tarjeta__nombre">{{ producto.title }}</h3>
+    <h{{ nivel }} class="tarjeta__nombre">{{ producto.title }}</h{{ nivel }}>
   </a>
   <p class="tarjeta__precio">
     {%- if producto.price_varies -%}Desde {% endif -%}

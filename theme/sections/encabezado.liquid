@@ -1,4 +1,6 @@
 {{ 'componente-encabezado.css' | asset_url | stylesheet_tag }}
+{{ 'componente-busqueda.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'componente-busqueda.js' | asset_url }}" defer></script>
 
 <header class="encabezado">
   <div class="contenedor encabezado__fila">
@@ -29,10 +31,39 @@
     </nav>
 
     <div class="encabezado__acciones">
-      <a href="{{ routes.search_url }}" class="encabezado__icono">
-        <span class="oculto-visual">Buscar</span>
-        {% render 'icono', nombre: 'buscar' %}
-      </a>
+      <busqueda-predictiva class="busqueda-predictiva" data-url="{{ routes.predictive_search_url }}" data-seccion="busqueda-predictiva">
+        <a href="{{ routes.search_url }}" class="encabezado__icono" data-abrir-busqueda aria-controls="busqueda-panel">
+          <span class="oculto-visual">Buscar</span>
+          {% render 'icono', nombre: 'buscar' %}
+        </a>
+        <div class="sugerencias" id="busqueda-panel" hidden>
+          <div class="contenedor sugerencias__contenido">
+            <form action="{{ routes.search_url }}" method="get" role="search" class="sugerencias__formulario">
+              <label for="busqueda-encabezado" class="oculto-visual">Buscar productos</label>
+              <input
+                id="busqueda-encabezado"
+                type="search"
+                name="q"
+                value="{{ search.terms | escape }}"
+                placeholder="Busca un modelo, color o talla"
+                autocomplete="off"
+                role="combobox"
+                aria-expanded="false"
+                aria-controls="busqueda-resultados"
+                aria-autocomplete="list"
+              >
+              <input type="hidden" name="type" value="product">
+              <button type="submit" class="boton">Buscar</button>
+              <button type="button" class="encabezado__icono" data-cerrar-busqueda>
+                <span class="oculto-visual">Cerrar búsqueda</span>
+                {% render 'icono', nombre: 'cerrar' %}
+              </button>
+            </form>
+            <div class="sugerencias__resultados" id="busqueda-resultados" role="listbox" aria-label="Sugerencias de búsqueda" data-resultados></div>
+            <p class="oculto-visual" role="status" aria-live="polite" data-anuncio></p>
+          </div>
+        </div>
+      </busqueda-predictiva>
       {%- if shop.customer_accounts_enabled -%}
         <a href="{{ routes.account_url }}" class="encabezado__icono encabezado__cuenta">
           <span class="oculto-visual">Mi cuenta</span>
