@@ -153,6 +153,8 @@ Configurados en `.mcp.json`:
 - **playwright**: abrir el tema de desarrollo en un navegador, tomar capturas a 360 px y 1280 px en ambos modos, y probar flujos (elegir talla, agregar al carrito, pedir por WhatsApp).
 - **notion** (opcional): leer el tablero de decisiones y la tabla de estrategia de ventas del equipo. Solo lectura salvo que el equipo pida lo contrario.
 
+Las versiones de los MCP van fijas en `.mcp.json` y en `devDependencies` (`npm install` una vez al clonar). Con `@latest`, `npx` consulta el registro en cada arranque, tarda más de 30 s y Claude Code da el servidor por caído. Para actualizarlos, cambia la versión en los dos lugares.
+
 No agregues un MCP con acceso de escritura a la tienda (Admin API) sin una spec aprobada que lo justifique y un token de alcance mínimo.
 
 ## 11. Convenciones de código
