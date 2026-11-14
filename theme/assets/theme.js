@@ -1,7 +1,8 @@
 // Comportamiento progresivo del tema de Noctra (SPEC-001, SPEC-002, SPEC-004). Sin dependencias.
 
 const formatoCOP = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 });
-const pesos = (centavos) => formatoCOP.format(Math.round(centavos / 100));
+// Intl pone un espacio duro entre "$" y el número ("$ 180.000"); la tienda escribe "$180.000", como el filtro money de Liquid.
+const pesos = (centavos) => formatoCOP.format(Math.round(centavos / 100)).replace(/\$\s+/u, '$');
 
 /* Modo claro / oscuro (RF-34) */
 function modoActual() {
