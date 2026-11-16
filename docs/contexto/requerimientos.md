@@ -45,7 +45,7 @@ Costo a considerar: Shopify Payments no está disponible en Colombia, así que S
 | RF-14 | Carrito | Carrito lateral con combos aplicados, ahorro total y barra de progreso al envío gratis | 1 |
 | RF-15 | Checkout | Dirección con departamento y ciudad de Colombia y costo de envío calculado por ciudad | 1 |
 | RF-16 | Checkout | Botón "Comprar por WhatsApp" que arma el mensaje con productos, tallas, combo y total | 1 |
-| RF-17 | Pagos | Addi, Sistecrédito, Mercado Pago, Wompi (tarjeta, PSE, Nequi, Daviplata), transferencia y contraentrega | 1 |
+| RF-17 | Pagos | Addi, Sistecrédito, Mercado Pago (tarjeta, PSE y los demás medios que el equipo active en su cuenta), transferencia y contraentrega. Cambio por decisión del equipo 16 nov 2026: Wompi sale del alcance (ver SPEC-007) | 1 |
 | RF-18 | Pagos | Mensaje de cuotas en la ficha del producto ("desde $X al mes con Addi") | 1 |
 | RF-19 | Pagos | Contraentrega con monto máximo, ciudades habilitadas y confirmación por WhatsApp antes de despachar | 1 |
 | RF-20 | Pagos | Transferencia con datos bancarios y carga de comprobante; el pedido queda pendiente hasta validarlo | 1 |

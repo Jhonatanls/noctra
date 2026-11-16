@@ -10,7 +10,13 @@ Los productos **no se programan**: se cargan en el admin de Shopify y el tema lo
    - La **primera** foto es la que se ve en el catálogo y la que abre la ficha. La **segunda** aparece al pasar el mouse en computador. Ordénalas arrastrando.
    - Mínimo 5 fotos y un video corto (RF-04).
    - Formato vertical **4:5**, mínimo **1600 × 2000 px**, fondo neutro y uniforme (gris oscuro o claro), producto centrado.
-   - En cada foto, "Agregar texto alternativo": describe lo que se ve ("Tenis Umbra 01 negro, vista lateral").
+   - En cada foto, "Agregar texto alternativo": describe lo que se ve ("Tenis Umbra 01 negro, vista lateral"). El texto alternativo es para personas con lector de pantalla: no lo uses para clasificar fotos.
+   - **Galería por color (aplica cuando el equipo apruebe el cambio propuesto en SPEC-004; mientras tanto la ficha muestra todas las fotos):** si el producto tiene varios colores, la ficha mostrará solo las fotos y videos del color elegido. Para eso:
+     1. Ordena la Multimedia **por color, en bloques seguidos**: primero todas las fotos y el video del Negro, después todas las del Blanco, y así con cada color. No mezcles colores dentro de un bloque.
+     2. La **primera** foto de cada bloque es la "foto del color". En el paso 7 se asigna a sus variantes.
+     3. El primer bloque es también el que se ve en el catálogo. Pon primero el color que quieras en la tarjeta.
+     4. Si quieres fotos para todos los colores (por ejemplo, el empaque), ponlas **al principio**, antes del primer color: la ficha las muestra al final de la galería de cada color. Ten en cuenta que la primera de ellas será la foto del catálogo.
+     5. Si no asignas foto a ninguna variante, la ficha muestra todas las fotos, como hoy.
 4. **Precio**: en pesos, sin centavos (189900). **Precio de comparación** solo si es un precio anterior real (Estatuto del Consumidor): el tema lo muestra tachado.
 5. **Costo por artículo**: lo que te cuesta. Shopify calcula el margen; no lo ve el cliente.
 6. **Inventario**: activa "Hacer seguimiento de la cantidad" y SKU por variante.
@@ -19,6 +25,7 @@ Los productos **no se programan**: se cargan en el admin de Shopify y el tema lo
    - **Gorras:** **no agregues la opción "Talla"** (son de talla única o ajustable). Usa solo la opción **Color** (o una sola variante si hay un único color). Así el filtro de talla no aparece en la colección "Gorras".
    - Si una gorra llega con una opción "Talla" de un solo valor (por ejemplo, "Única"), la ficha no la muestra, pero quítala igual para mantener los datos limpios.
    - Con varios colores, asigna a cada variante su foto: así al elegir el color cambia la imagen.
+     - **Cuando se apruebe la galería por color (SPEC-004):** asigna a **todas** las variantes de un color (todas sus tallas) la **misma** foto: la primera del bloque de ese color en Multimedia. Dos colores distintos nunca comparten foto asignada; si pasa, la ficha muestra todas las fotos para esos colores. Un color sin foto asignada también muestra todas las fotos.
    - **Plantilla de la ficha (solo gorras):** en la ficha de cada gorra, en **Plantilla de tema**, elige `gorra`. Esa plantilla no muestra selector de talla ni guía de tallas, muestra el selector de **Color** y el texto "Ajustable" (se cambia en el editor del tema: Productos → plantilla `gorra` → bloque "Texto"). Los tenis dejan la plantilla `Producto predeterminado`.
 8. **Organización del producto**:
    - **Tipo de producto**: `Tenis` o `Gorras` (alimenta las colecciones automáticas).
@@ -48,4 +55,5 @@ El precio individual de cada producto se pone en su ficha. Los combos (2 tenis +
 - [ ] Etiqueta `grupo-tenis` o `grupo-gorras` (y `combo` solo si no es Noctra Premium).
 - [ ] Género lleno; Gama = `Noctra Premium` solo si lo es.
 - [ ] Gorras sin opción "Talla" y con la plantilla de tema `gorra`.
+- [ ] Con varios colores (cuando se apruebe la galería por color): Multimedia en bloques por color y cada variante con la primera foto de su color.
 - [ ] Vista previa revisada en el celular.

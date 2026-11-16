@@ -74,6 +74,32 @@ Recomendación: **A** para cumplir RF-09 ("sin tocar código") con poco desarrol
 - Entrada: líneas del carrito con precio unitario, cantidad, id de variante y si el producto tiene las etiquetas `grupo-*` (`hasAnyTag`), más el metacampo de configuración.
 - Salida: un descuento de monto fijo por línea según el reparto del algoritmo, con el mensaje "Combo <nombre>".
 
+## Riesgo: plan de Shopify (bloqueante, agregado el 16 nov 2026)
+
+**Restricción verificada en shopify.dev (16 nov 2026):** "Stores on any plan can use public apps that are distributed through the Shopify App Store and contain functions. Only stores on a Shopify Plus plan can use custom apps that contain Shopify Function APIs."
+
+La tienda lanza en plan **Basic**. La app privada que plantea la sección anterior (`apps/combos/`, creada con `shopify app init`) es una custom app. Se puede instalar y probar en la tienda de desarrollo, pero **su Function de descuento no correría en la tienda de producción**. Sin una decisión, la etapa 3 no tiene cómo aplicar los combos en el checkout. La lógica pura de `packages/combos` y su uso en el tema (`assets/combos.js`, mensajes "te falta…") no se ven afectados.
+
+La misma restricción afecta a la contraentrega de SPEC-007 (no se puede ocultar el método con una Function propia).
+
+### Alternativas
+
+| Alternativa | Pros | Contras |
+| --- | --- | --- |
+| **1. Subir a Shopify Plus** | Se mantiene el diseño actual: Function propia con el algoritmo exacto (unidades más caras, reparto proporcional, `limitePorPedido`, exclusión de Noctra Premium). También resuelve la contraentrega de SPEC-007 con una Function de personalización de pagos | Costo mensual mucho mayor que Basic (consultar el precio vigente con Shopify; no se estima aquí). Sobredimensionado para el volumen de lanzamiento |
+| **2. Publicar la app propia como pública en la App Store** | Conserva la Function y la fuente única de lógica. Corre en cualquier plan | Revisión de Shopify antes de publicarla, con sus requisitos (ficha de la app, política de privacidad, soporte, webhooks de datos personales, entre otros), que toma semanas y puede rechazarla. Mantenimiento como producto público. Hay que verificar con `shopify-dev` si existe una forma de distribución pública no listada y si cuenta como "distribuida por la App Store" |
+| **3. App pública de combos o descuentos de la App Store** | Sin código propio para el checkout. Instalación rápida. Corre en Basic | Costo mensual. Hay que encontrar una que haga precio fijo por mezcla de grupos (2 tenis cualesquiera + 1 gorra) con la regla de las unidades más caras; si sus reglas difieren, el mensaje "te falta…" y el ahorro del carrito (calculados con `packages/combos`) no coincidirían con el checkout. Dependencia de un tercero con acceso a pedidos (revisión de cumplimiento). RF-09 ("configurable sin tocar código") queda en manos de la app |
+| **4. Descuentos automáticos nativos de Shopify** | Gratis, sin app, sin código. Se configuran en el admin (RNF-17) | No existe "precio fijo por un conjunto". Las opciones nativas (monto o porcentaje sobre productos con cantidad mínima, "compra X y lleva Y") solo dan el precio exacto del combo si todos los productos elegibles de cada grupo tienen el mismo precio: con tenis de $190.000 y $180.000, un descuento fijo no deja el combo en $350.000 en todos los casos. Tampoco eligen las unidades más caras ni respetan `limitePorPedido` con la misma lógica. El tema tendría que replicar las reglas nativas para que el carrito diga lo mismo que el checkout |
+| **4b. Nativos + precios uniformes** | Igual que 4, y el combo es exacto: si todos los tenis elegibles cuestan lo mismo y todas las gorras también, "2 tenis + 1 gorra" es un descuento de monto fijo conocido | Es una decisión comercial: obliga a tener un solo precio por grupo para los productos en combo. Cualquier producto con otro precio rompe el combo |
+
+### Decisión
+
+La decisión es **del equipo** y debe tomarse **antes de empezar la etapa 3**. Hasta entonces no se crea `apps/combos/` ni la extensión de descuento.
+
+Para decidir, el equipo necesita: precio vigente de Plus; si los precios de los productos en combo serán uniformes por grupo; y una lista corta de apps públicas candidatas, que se revisa con `cumplimiento` y se prueba en la tienda de desarrollo con los criterios de esta spec. Si se elige 3, 4 o 4b, se reescriben la sección "Shopify Function" y los criterios "La Function devuelve el mismo descuento que `packages/combos`" y "El equipo crea un combo nuevo desde el admin y se aplica sin desplegar código", y se agregan pruebas que comparen el carrito con el checkout.
+
+Sugerencia no vinculante: evaluar primero 4b, porque es la única sin costo ni terceros, y, si el equipo no quiere precios uniformes, comparar 3 con 1 por costo.
+
 ## Criterios de aceptación
 
 - [x] 2 tenis ($190.000 y $180.000) + 1 gorra ($60.000) con el combo de $350.000 → ahorro $80.000.
