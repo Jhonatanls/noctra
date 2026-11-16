@@ -138,18 +138,107 @@ class FichaProducto extends HTMLElement {
     document.documentElement.style.removeProperty('--alto-barra');
   }
 
-  /* Galería: indicador "N de total" */
+  /* Galería: carrusel con indicador "N de total", botones y flechas del teclado (escritorio) y grupo por color */
   iniciarGaleria() {
     const medios = this.querySelector('[data-medios]');
-    const contador = this.querySelector('[data-contador]');
-    if (!medios || !contador) return;
-    const items = [...medios.children];
-    contador.hidden = false;
+    if (!medios) return;
+    this.medios = medios;
+    this.itemsMedios = [...medios.children];
+    this.contador = this.querySelector('[data-contador]');
+    this.indiceMedio = 0;
+    this.colorGaleria = this.dataset.colorInicial ?? null;
+    this.grupos = new Set(this.itemsMedios.map((i) => i.dataset.grupo).filter(Boolean));
+
+    if (this.contador) this.contador.hidden = false;
     this.observadorMedios = new IntersectionObserver((entradas) => {
       const visible = entradas.filter((e) => e.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-      if (visible) contador.textContent = `${items.indexOf(visible.target) + 1} de ${items.length}`;
+      if (!visible) return;
+      const indice = this.mediosVisibles().indexOf(visible.target);
+      if (indice < 0) return;
+      this.indiceMedio = indice;
+      this.pintarContador();
     }, { root: medios, threshold: [0.6, 0.9] });
-    items.forEach((item) => this.observadorMedios.observe(item));
+    this.itemsMedios.forEach((item) => this.observadorMedios.observe(item));
+
+    if (this.itemsMedios.length > 1) this.crearFlechas();
+    this.pintarContador();
+    this.querySelector('.ficha__galeria').addEventListener('keydown', (evento) => {
+      if (evento.key !== 'ArrowLeft' && evento.key !== 'ArrowRight') return;
+      // Los controles de un video usan las flechas para avanzar o retroceder
+      if (evento.target.closest('video, iframe, input, select, textarea')) return;
+      evento.preventDefault();
+      this.moverMedios(evento.key === 'ArrowRight' ? 1 : -1);
+    });
+  }
+
+  mediosVisibles() {
+    return this.itemsMedios.filter((item) => !item.hasAttribute('data-fuera'));
+  }
+
+  pintarContador() {
+    const total = this.mediosVisibles().length;
+    if (this.contador) {
+      this.contador.textContent = `${this.indiceMedio + 1} de ${total}`;
+      this.contador.hidden = total < 2;
+    }
+    if (this.flechaAnterior) {
+      this.flechaAnterior.setAttribute('aria-disabled', String(this.indiceMedio <= 0));
+      this.flechaSiguiente.setAttribute('aria-disabled', String(this.indiceMedio >= total - 1));
+    }
+  }
+
+  crearFlechas() {
+    const galeria = this.querySelector('.ficha__galeria');
+    const flecha = (clase, texto) => {
+      const boton = document.createElement('button');
+      boton.type = 'button';
+      boton.className = `ficha__flecha ficha__flecha--${clase}`;
+      boton.setAttribute('aria-disabled', 'false');
+      boton.innerHTML = '<span class="oculto-visual"></span><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="m9 5 7 7-7 7"/></svg>';
+      boton.firstElementChild.textContent = texto;
+      return boton;
+    };
+    this.flechaAnterior = flecha('anterior', 'Foto anterior');
+    this.flechaSiguiente = flecha('siguiente', 'Foto siguiente');
+    this.flechaAnterior.addEventListener('click', () => this.moverMedios(-1));
+    this.flechaSiguiente.addEventListener('click', () => this.moverMedios(1));
+    galeria.append(this.flechaAnterior, this.flechaSiguiente);
+  }
+
+  moverMedios(paso) {
+    const visibles = this.mediosVisibles();
+    // La posición real del desplazamiento manda: el observador puede ir un paso atrás
+    const actual = visibles.reduce((mejor, item, i) => (
+      Math.abs(item.offsetLeft - this.medios.offsetLeft - this.medios.scrollLeft) < Math.abs(visibles[mejor].offsetLeft - this.medios.offsetLeft - this.medios.scrollLeft) ? i : mejor
+    ), 0);
+    const destino = Math.min(visibles.length - 1, Math.max(0, actual + paso));
+    if (destino === actual) return;
+    this.indiceMedio = destino;
+    this.pintarContador();
+    this.medios.scrollTo({ left: visibles[destino].offsetLeft - this.medios.offsetLeft, behavior: reducirMovimiento ? 'instant' : 'smooth' });
+  }
+
+  /* Muestra solo el grupo del color elegido. Un color sin grupo propio muestra todos los medios. */
+  mostrarGrupoColor(color, anunciar) {
+    if (!this.medios || !this.grupos.size || color === this.colorGaleria) return;
+    this.colorGaleria = color;
+    this.itemsMedios.forEach((item) => {
+      const propio = !this.grupos.has(color) || item.dataset.grupo === color || item.hasAttribute('data-comun');
+      item.toggleAttribute('data-fuera', !propio);
+      if (!propio) {
+        item.querySelectorAll('video').forEach((video) => video.pause());
+        // Un video externo no se puede pausar desde aquí: se recarga para detenerlo
+        item.querySelectorAll('iframe').forEach((marco) => { marco.src = marco.src; });
+      }
+    });
+    const visibles = this.mediosVisibles();
+    visibles[0]?.querySelector('img')?.setAttribute('loading', 'eager');
+    this.medios.scrollTo({ left: 0, behavior: 'instant' });
+    this.indiceMedio = 0;
+    this.pintarContador();
+    this.rotularZoom();
+    const aviso = this.querySelector('[data-anuncio-galeria]');
+    if (aviso && anunciar) aviso.textContent = `Fotos del color ${color}, ${visibles.length} en total`;
   }
 
   /* Zoom: diálogo a pantalla completa. Pellizco nativo en celular; clic alterna 2× en escritorio */
@@ -159,11 +248,10 @@ class FichaProducto extends HTMLElement {
     if (!dialogo || !imagen || typeof dialogo.showModal !== 'function') return;
     const punteroFino = window.matchMedia('(pointer: fine)').matches;
 
-    this.querySelectorAll('[data-zoom-src]').forEach((item, i) => {
+    this.querySelectorAll('[data-zoom-src]').forEach((item) => {
       const boton = document.createElement('button');
       boton.type = 'button';
       boton.className = 'ficha__zoom-boton';
-      boton.setAttribute('aria-label', `Ampliar foto ${i + 1}`);
       boton.addEventListener('click', () => {
         imagen.src = item.dataset.zoomSrc;
         imagen.alt = item.dataset.zoomAlt || '';
@@ -176,6 +264,8 @@ class FichaProducto extends HTMLElement {
       item.append(boton);
     });
 
+    this.rotularZoom();
+
     imagen.addEventListener('click', () => {
       if (punteroFino) imagen.classList.toggle('ficha__zoom-imagen--ampliada');
     });
@@ -185,6 +275,15 @@ class FichaProducto extends HTMLElement {
     });
     this.alVolver = () => { if (dialogo.open) dialogo.close(); };
     window.addEventListener('popstate', this.alVolver);
+  }
+
+  // El número de cada foto cuenta solo las del grupo visible
+  rotularZoom() {
+    const visibles = this.mediosVisibles?.() ?? [];
+    this.querySelectorAll('.ficha__zoom-boton').forEach((boton) => {
+      const indice = visibles.indexOf(boton.closest('.ficha__medio'));
+      if (indice >= 0) boton.setAttribute('aria-label', `Ampliar foto ${indice + 1}`);
+    });
   }
 
   /* Barra fija de compra (celular) */
@@ -270,6 +369,10 @@ class FichaProducto extends HTMLElement {
       if (destino) destino.textContent = elegidos[i] ?? '';
     });
     this.pintarEquivalencia(elegidos);
+
+    // Galería por color: solo cambia si cambió el color, no con la talla
+    const indiceColor = this.fieldsets.findIndex((f) => f.hasAttribute('data-opcion-color'));
+    if (indiceColor >= 0 && elegidos[indiceColor]) this.mostrarGrupoColor(elegidos[indiceColor], cambiarUrl);
 
     const botonAgregar = this.querySelector('[data-boton-agregar]');
     if (!variante) {

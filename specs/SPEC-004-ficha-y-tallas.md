@@ -171,7 +171,7 @@ Salvo que se indique otra cosa, cada criterio se verifica con Playwright en cuat
 
 | # | Criterio | Prototipo |
 | --- | --- | --- |
-| C1 | [x] Dado el tenis de prueba con 6 fotos y 1 video, cuando abro la ficha, entonces a 360 px puedo deslizar entre los 7 medios y veo el indicador "1 de 7"; a 1280 px veo los 7 apilados y la información fija al hacer scroll. | Parcial: deslizable y apilado sí; falta el indicador |
+| C1 | [x] Dado el tenis de prueba con 6 fotos y 1 video, cuando abro la ficha, entonces a 360 px puedo deslizar entre los 7 medios y veo el indicador "1 de 7"; a 1280 px veo el mismo carrusel horizontal con botones "Foto anterior" y "Foto siguiente", el indicador "1 de 7" y la información fija al lado (cambio del 16 nov 2026: ya no se apila). | Parcial: celular verificado; escritorio verificado solo en página estática |
 | C2 | [x] Cuando toco la segunda foto, se abre el zoom a pantalla completa; a 360 px puedo ampliarla con dos dedos; Escape o "Cerrar" lo cierran y el foco vuelve a la foto. | Falta |
 | C3 | [x] Con "reducir movimiento" activado, el video no se reproduce solo y la barra fija aparece sin animación. | Parcial: el video no se reproduce solo; falta la barra |
 | C4 | [x] El nombre se ve en Pirata One y el precio "$189.900" en oro; con precio anterior de $229.900, se ve tachado. | Cumple |
@@ -256,9 +256,14 @@ Cada tarea cabe en menos de un día. Las tareas 1 a 3 desbloquean el resto.
   - Pendiente: **C11** (aviso de datos con número real; el aviso va dentro del mismo bloque condicionado al número); **C13** (hace falta crear en el admin la página "Guía de tallas" con dirección `guia-de-tallas`; sin ella el enlace queda oculto sin JavaScript); **C14** (con 7 entradas del metaobjeto: el orden se probó solo con la tabla provisional); **C16** (verificado por lectura del código; no hay en la tienda una gorra con "Talla: Única"); **C18** y **C19** (necesitan el bloque de app de cuotas: SPEC-007); **C22** (Lighthouse no se corrió); **C23** (validación de resultados enriquecidos de Google); **C24** (caso sin políticas verificado: el bloque no aparece; falta probar con las políticas publicadas, hoy la tienda de desarrollo no las tiene).
   - Plan: las tareas 15 y 16 quedan para SPEC-007; la 17 (QA) la hace `qa-calidad`.
 
-### Cambio propuesto: galería por color (16 nov 2026, pendiente de aprobación)
+### Cambio: galería por color (propuesto el 16 nov 2026; pedido por el equipo el 16 nov 2026)
 
-**No se implementa hasta que el equipo lo apruebe.** Mientras tanto, la galería sigue mostrando todos los medios del producto (C1).
+**Decisión del equipo (16 nov 2026, en conversación):** el equipo pidió implementar la galería por color y ya ordenó la Multimedia de los productos de prueba por color. Agregó dos condiciones:
+
+- **Color predeterminado:** la ficha abre en el color de la primera variante. El equipo elige cuál es poniendo ese color primero en la opción Color del producto en el admin (por ejemplo, Blanco).
+- **Carrusel también en escritorio:** la galería no se apila hacia abajo en ningún ancho. Es un carrusel horizontal que se mueve a la derecha y a la izquierda. En celular se desliza con el dedo; en escritorio tiene botones "Foto anterior" y "Foto siguiente", funciona con las flechas del teclado cuando el foco está en la galería y muestra el indicador "N de total". Esto reemplaza lo de "a 1280 px veo los medios apilados" de C1 y C28.
+
+El estado de la spec lo cambia el equipo en el archivo.
 
 **Problema.** Hoy la galería muestra todos los medios del producto. El equipo quiere que, al elegir un color, la galería muestre solo las fotos y videos de ese color. Shopify permite asignar **una sola imagen por variante** (`variant.featured_media` en Liquid, verificado en shopify.dev), así que no hay un dato nativo que diga "estas 6 fotos son del Blanco".
 
@@ -293,7 +298,7 @@ Reglas para los casos borde:
 - **Al cambiar solo de talla** dentro del mismo color: la galería no cambia ni se mueve.
 - **Zoom:** solo recorre las fotos del grupo visible.
 - **Video:** va en el grupo donde esté por orden, con las mismas reglas de hoy (`preload="none"`, imagen previa, nunca se reproduce solo con "reducir movimiento").
-- **Escritorio:** las fotos apiladas son solo las del grupo.
+- **Escritorio:** carrusel horizontal con botones anterior y siguiente, solo con los medios del grupo; la información de compra sigue fija al lado.
 - **Lectores de pantalla:** al cambiar de color se anuncia una sola vez, de forma discreta (región `aria-live="polite"`), por ejemplo "Fotos del color Blanco, 6 en total". No se mueve el foco: sigue en el botón de color.
 - **Sin JavaScript:** se muestran todos los medios, como hoy, y el `<select>` de variantes sigue funcionando.
 
@@ -301,8 +306,8 @@ Reglas para los casos borde:
 
 | # | Criterio |
 | --- | --- |
-| C28 | [ ] Dado el tenis de prueba, cuando abro la ficha en Negro, entonces veo solo los medios 1 a 6, el indicador dice "1 de 6" a 360 px y a 1280 px veo 6 medios apilados; las fotos 7 a 12 no se descargan (panel de red). |
-| C29 | [ ] Dada la ficha en Negro, cuando toco Blanco, entonces la galería muestra solo los medios 7 a 12 desde el 7, el indicador dice "1 de 6", la URL cambia a `?variant=` de una variante Blanco y un lector de pantalla anuncia una vez el cambio de fotos sin mover el foco del botón Blanco. |
+| C28 | [x] Dado el tenis de prueba, cuando abro la ficha en Negro, entonces veo solo los medios 1 a 6, el indicador dice "1 de 6" a 360 px y a 1280 px veo el mismo carrusel (botones, flechas del teclado e indicador "1 de 6"); las fotos 7 a 12 no se descargan (panel de red). |
+| C29 | [x] Dada la ficha en Negro, cuando toco Blanco, entonces la galería muestra solo los medios 7 a 12 desde el 7, el indicador dice "1 de 6", la URL cambia a `?variant=` de una variante Blanco y un lector de pantalla anuncia una vez el cambio de fotos sin mover el foco del botón Blanco. |
 | C30 | [ ] Dada la URL `?variant=` de la talla 41 en Blanco abierta en otra pestaña, entonces la primera foto visible es la 7, es el LCP y en ningún momento se ven fotos del Negro (CLS < 0,1). |
 | C31 | [ ] Dada la ficha en Blanco, cuando abro el zoom en la segunda foto, entonces el zoom solo recorre fotos del grupo Blanco. |
 | C32 | [ ] Dada la ficha en Blanco con la tercera foto visible, cuando cambio de la talla 41 a la 42 en Blanco, entonces la galería no cambia y sigue en la tercera foto. |
@@ -315,7 +320,7 @@ Reglas para los casos borde:
 
 **Plan (si se aprueba):**
 
-- [ ] **Tarea 18. Galería por color** (dev-tema-liquid + disenador-ui): cálculo de grupos en Liquid a partir de `variant.featured_media` y el orden de `product.media`, marca de JavaScript en `<html>` desde el script en línea del `<head>`, cambio de grupo en `theme.js` al cambiar de color, indicador, zoom, pausa del video y anuncio en región viva (C28 a C38). Antes, verificar con el MCP `shopify-dev` `variant.featured_media` y `media.position`. QA de C28 a C38 en la tarea 17.
+- [x] **Tarea 18. Galería por color** (implementada el 16 nov 2026) (dev-tema-liquid + disenador-ui): cálculo de grupos en Liquid a partir de `variant.featured_media` y el orden de `product.media`, marca de JavaScript en `<html>` desde el script en línea del `<head>`, cambio de grupo en `theme.js` al cambiar de color, indicador, zoom, pausa del video y anuncio en región viva (C28 a C38). Antes, verificar con el MCP `shopify-dev` `variant.featured_media` y `media.position`. QA de C28 a C38 en la tarea 17.
 - [x] **Tarea 19. Runbook** (arquitecto-specs, 16 nov 2026; revisar con operaciones-shopify): cómo ordenar la Multimedia por color y asignar la foto a las variantes, en `docs/operaciones/cargar-productos.md`, marcado "aplica cuando se apruebe el cambio".
 
 **Preguntas de este cambio para el equipo:**
@@ -396,3 +401,13 @@ La revisión en vivo quedó incompleta porque el servidor local se cayó (401, s
   - C14 con entradas en el metaobjeto (hoy sale la tabla provisional).
   - C19 (SPEC-007).
   - C25 mientras los productos de prueba lleven nombres de marcas de terceros.
+
+- **Galería por color implementada (16 nov 2026, rama `spec/SPEC-004-galeria-color`):**
+  - Color inicial = el de `product.selected_or_first_available_variant` (respeta `?variant=`). Sin ajuste nuevo: el equipo ordena la opción Color en el admin.
+  - `main-product.liquid` calcula los grupos con `variant.featured_media` (posición dentro de `product.media`, comparando `id`, sin depender de `media.position`): primera foto de cada color, mínimo por color, colores con la misma foto descartados (muestran todo), medios anteriores al primer grupo = comunes. Marca en cada medio `data-grupo` o `data-comun`, y `data-fuera` en los que no son del color inicial; la foto prioritaria (eager + `fetchpriority`) es la primera del grupo inicial.
+  - El script en línea del `<head>` pone `data-js` en `<html>`; con esa marca el CSS oculta `[data-fuera]` y manda los comunes al final con `order`. Sin JavaScript se ven todos los medios en el orden de Multimedia.
+  - `theme.js`: al cambiar de color (no de talla) se muestra el grupo nuevo, vuelve a la primera foto sin animación, pausa videos, rotula el zoom por grupo y anuncia "Fotos del color X, N en total" en una región `aria-live="polite"` sin mover el foco. Un color sin grupo propio muestra todos los medios.
+  - Carrusel horizontal en todos los anchos. A partir de 990 px se agregan botones "Foto anterior" y "Foto siguiente" (44 x 44 px, `aria-disabled` en los extremos, foco visible), flechas izquierda y derecha del teclado dentro de la galería (no se capturan sobre un video) e indicador "N de total". Con "reducir movimiento" el desplazamiento es instantáneo. Altura reservada con `aspect-ratio` 4 / 5. Sin miniaturas.
+  - Todos los medios llevan el marco de esquinas (`marco`), no solo el primero, porque ahora la primera foto visible cambia con el color.
+  - Verificación: Theme Check sin ofensas y 13 pruebas en verde. `shopify theme dev` pide iniciar sesión, así que se probó el JS y el CSS reales en una página estática (fuera del repositorio) con 7 medios, 2 colores y 1 medio común: grupo inicial, cambio de color, indicador, botones y teclado (con límites), talla sin mover la galería, zoom con rótulos por grupo, 360 y 1280 px en oscuro y claro, sin desborde y sin JS (7 medios visibles). **El Liquid de los grupos no se ha ejecutado contra productos reales**: C28 a C38 siguen sin marcar hasta probarlos en la tienda.
+- **16 nov 2026, prueba con `shopify theme dev` y el tenis de prueba de 3 colores (15 medios, 5 por color).** Sin `?variant=` la ficha abre en el primer color (Blanco) y muestra solo sus 5 medios. Al elegir Gris y Negro, la galería pasa a sus 5 medios, el indicador dice "1 de 5", la URL cambia a `?variant=` y se anuncia "Fotos del color …, 5 en total". Las fotos de otros colores no tienen `currentSrc` hasta que se muestran. A 1280 px aparecen los botones "Foto anterior" y "Foto siguiente"; a 360 px no hay desborde. Quedan C28 y C29 verificados; C30 a C38 siguen pendientes (LCP con `?variant=`, zoom, video, medios comunes, color sin foto y gorra).

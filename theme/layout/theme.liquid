@@ -6,7 +6,8 @@
     <meta name="color-scheme" content="dark light">
     <meta name="theme-color" content="#0E0F11">
     <script>
-      {%- comment -%} Aplica el modo guardado antes de pintar para evitar parpadeo (SPEC-001). {%- endcomment -%}
+      {%- comment -%} Aplica el modo guardado antes de pintar para evitar parpadeo (SPEC-001) y marca que hay JavaScript (SPEC-004: galería por color). {%- endcomment -%}
+      document.documentElement.setAttribute('data-js', '');
       (function () {
         try {
           var t = localStorage.getItem('tema');
