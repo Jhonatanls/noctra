@@ -264,7 +264,7 @@ Con Playwright contra `shopify theme dev` y los productos cargados por el equipo
 
 **Hallazgos para otras specs:**
 - SPEC-004: `sections/main-product.liquid` reconoce la talla solo si la opción se llama "Talla", "Tallas" o "Size". Con "Talla del calzado" la ficha no la tratará como talla.
-- Cumplimiento (RNF-13): los productos de prueba usan nombres de modelos de una marca de terceros, y la gorra se llama "Amiri", que también es una marca de moda. Las fotos muestran logos de terceros. Hay que cambiarlos antes de cualquier publicación.
+- Cumplimiento (RNF-13): los productos de prueba usan nombres de modelos de una marca de terceros, y la gorra lleva el nombre de otra marca de moda. Las fotos muestran logos de terceros. Hay que cambiarlos antes de cualquier publicación.
 - Ningún producto tiene "Tipo de producto"; las colecciones funcionan, pero el runbook asume "Tenis" y "Gorra".
 
 ### QA, segunda pasada (14 nov 2026)
@@ -272,7 +272,7 @@ Con Playwright contra `shopify theme dev` y los productos cargados por el equipo
 El equipo configuró los filtros, el tipo de producto, la etiqueta `combo` y la colección "En combo".
 
 **Cumplen ahora:**
-- C8: el Air Force 1 muestra "Últimas unidades" y "Noctra Premium".
+- C8: el tenis de prueba A muestra "Últimas unidades" y "Noctra Premium".
 - C10: un producto agotado con etiqueta `combo` y publicado hace 1 día muestra "Agotado" y "Combo", sin "Nuevo".
 - C13: contraste de los sellos en oscuro / claro. "Combo" 6,95 / 4,69; "Agotado" 7,48 / 6,14; "Nuevo" y "Noctra Premium" 17,3 en los dos modos.
 - C15: el producto con dos precios muestra "Desde $120.000".
@@ -300,9 +300,9 @@ Los tenis tienen Color y Talla, y solo hay existencias en talla 40.
 - `tarjeta-producto.liquid`: las imágenes con carga `eager` llevan `fetchpriority="high"` (sugerencia de Lighthouse para el LCP).
 
 **Cumplen ahora:**
-- C2: talla 42 da 0 productos; talla 40 da Air Max 90 y Air Force 1.
+- C2: talla 42 da 0 productos; talla 40 da los tenis de prueba A y B.
 - C14: "$180.000" en oro y "$200.000" tachado, con "Antes" para lectores de pantalla.
-- C28: Gama "Noctra Premium" + talla 40 da solo el Air Force 1.
+- C28: Gama "Noctra Premium" + talla 40 da solo el tenis de prueba A.
 
 **Lighthouse móvil (C23), medido como referencia en `theme dev`, no en la vista previa:**
 - Rendimiento 86 a 87, accesibilidad 100 y CLS 0.

@@ -256,6 +256,73 @@ Cada tarea cabe en menos de un día. Las tareas 1 a 3 desbloquean el resto.
   - Pendiente: **C11** (aviso de datos con número real; el aviso va dentro del mismo bloque condicionado al número); **C13** (hace falta crear en el admin la página "Guía de tallas" con dirección `guia-de-tallas`; sin ella el enlace queda oculto sin JavaScript); **C14** (con 7 entradas del metaobjeto: el orden se probó solo con la tabla provisional); **C16** (verificado por lectura del código; no hay en la tienda una gorra con "Talla: Única"); **C18** y **C19** (necesitan el bloque de app de cuotas: SPEC-007); **C22** (Lighthouse no se corrió); **C23** (validación de resultados enriquecidos de Google); **C24** (caso sin políticas verificado: el bloque no aparece; falta probar con las políticas publicadas, hoy la tienda de desarrollo no las tiene).
   - Plan: las tareas 15 y 16 quedan para SPEC-007; la 17 (QA) la hace `qa-calidad`.
 
+### Cambio propuesto: galería por color (16 nov 2026, pendiente de aprobación)
+
+**No se implementa hasta que el equipo lo apruebe.** Mientras tanto, la galería sigue mostrando todos los medios del producto (C1).
+
+**Problema.** Hoy la galería muestra todos los medios del producto. El equipo quiere que, al elegir un color, la galería muestre solo las fotos y videos de ese color. Shopify permite asignar **una sola imagen por variante** (`variant.featured_media` en Liquid, verificado en shopify.dev), así que no hay un dato nativo que diga "estas 6 fotos son del Blanco".
+
+**Recomendación: agrupar por orden.** Sin datos extra:
+
+1. En Multimedia del producto, el equipo ordena los medios por color: todos los del Negro seguidos, luego todos los del Blanco, y así.
+2. A todas las variantes de un color (todas sus tallas) les asigna la **primera foto de su grupo**.
+3. La galería de un color va desde la foto asignada a sus variantes hasta antes de la foto asignada al siguiente color en el orden de Multimedia. El último color llega hasta el final.
+
+Reglas para los casos borde:
+
+- **Ninguna variante tiene foto asignada:** se muestran todos los medios, como hoy.
+- **Medios antes de la primera foto de color** (por ejemplo, una foto con los dos colores juntos o del empaque): se muestran **al final de la galería de cada color**, nunca al principio. Razón: al elegir un color, la primera foto que ve el cliente tiene que ser de ese color (confirma su elección y es la que carga con prioridad, el LCP). Así esos medios siguen disponibles en todos los colores sin confundir. Como la primera foto de Multimedia es también la del catálogo (SPEC-003), el runbook recomienda no poner medios comunes adelante salvo que el equipo quiera esa foto en la tarjeta.
+- **Un color sin foto asignada** (y los demás sí): al elegir ese color se muestran todos los medios, y ese color no corta ningún grupo.
+- **Variantes del mismo color con fotos distintas:** manda la que esté más arriba en Multimedia. Las otras quedan dentro del grupo que les toque por orden.
+- **Dos colores con la misma foto asignada:** es un error de carga. Para esos colores se muestran todos los medios.
+- **Producto sin opción Color, o con un solo color:** se muestran todos los medios.
+- Aplica igual a tenis y a gorras (las gorras tienen variantes de color, SPEC-004 "Respuestas del equipo, segunda ronda").
+
+**Alternativas consideradas:**
+
+| Alternativa | Por qué no es la recomendada |
+| --- | --- |
+| Metacampo de variante con una lista de archivos | Explícito y permite compartir un medio entre colores en cualquier orden, pero hay que llenarlo en cada variante (7 tallas × 2 colores = 14 variantes por tenis) o definir que solo cuenta la primera de cada color, lo que es fácil de olvidar. Los archivos del metacampo apuntan a Contenido → Archivos, no a la Multimedia del producto, así que habría que subir cada foto dos veces o manejar dos fuentes. Complica la carga por CSV. Queda como respaldo si el orden no le sirve al equipo |
+| Escribir el color en el texto alternativo de cada foto y filtrar por ese texto | **Descartada por accesibilidad.** El texto alternativo es para quien usa lector de pantalla y debe describir la foto con naturalidad. Si además decide qué fotos se muestran, se vuelve un código con formato fijo: una corrección de redacción, un sinónimo, un error de escritura o la concordancia ("negro" o "negra") esconde fotos sin que nadie lo note, y cualquier mejora de accesibilidad rompe la galería. Mezcla datos de presentación con contenido accesible |
+
+**Comportamiento:**
+
+- **Al cargar la ficha:** se muestra el grupo del color de la variante elegida (`?variant=` o la primera disponible). La primera foto de ese grupo es la que carga con prioridad alta (`fetchpriority`) y sin carga diferida; las demás, con carga diferida. Las fotos de otros colores no se descargan hasta que se elige su color.
+- **Sin parpadeo:** el servidor ya marca qué medios están fuera del grupo inicial, y el script en línea del `<head>` (el mismo que pone el modo) agrega una marca en `<html>` para que el CSS los oculte solo cuando hay JavaScript. No se pintan primero todos y luego se ocultan (CLS < 0,1).
+- **Al cambiar de color:** se reemplaza la galería por el grupo del nuevo color, vuelve a la primera foto, el indicador pasa a "1 de N" con el total del grupo, se pausa cualquier video que esté sonando y la URL cambia a `?variant=` como hoy. Sin animación de transición con "reducir movimiento".
+- **Al cambiar solo de talla** dentro del mismo color: la galería no cambia ni se mueve.
+- **Zoom:** solo recorre las fotos del grupo visible.
+- **Video:** va en el grupo donde esté por orden, con las mismas reglas de hoy (`preload="none"`, imagen previa, nunca se reproduce solo con "reducir movimiento").
+- **Escritorio:** las fotos apiladas son solo las del grupo.
+- **Lectores de pantalla:** al cambiar de color se anuncia una sola vez, de forma discreta (región `aria-live="polite"`), por ejemplo "Fotos del color Blanco, 6 en total". No se mueve el foco: sigue en el botón de color.
+- **Sin JavaScript:** se muestran todos los medios, como hoy, y el `<select>` de variantes sigue funcionando.
+
+**Criterios nuevos.** Producto de prueba: un tenis con colores Negro y Blanco, tallas 38 a 44 y 12 medios en este orden: Negro, 5 fotos y 1 video (posiciones 1 a 6); Blanco, 5 fotos y 1 video (posiciones 7 a 12). Las variantes Negro tienen asignada la foto 1 y las Blanco la foto 7. Se verifican en las cuatro combinaciones de siempre.
+
+| # | Criterio |
+| --- | --- |
+| C28 | [ ] Dado el tenis de prueba, cuando abro la ficha en Negro, entonces veo solo los medios 1 a 6, el indicador dice "1 de 6" a 360 px y a 1280 px veo 6 medios apilados; las fotos 7 a 12 no se descargan (panel de red). |
+| C29 | [ ] Dada la ficha en Negro, cuando toco Blanco, entonces la galería muestra solo los medios 7 a 12 desde el 7, el indicador dice "1 de 6", la URL cambia a `?variant=` de una variante Blanco y un lector de pantalla anuncia una vez el cambio de fotos sin mover el foco del botón Blanco. |
+| C30 | [ ] Dada la URL `?variant=` de la talla 41 en Blanco abierta en otra pestaña, entonces la primera foto visible es la 7, es el LCP y en ningún momento se ven fotos del Negro (CLS < 0,1). |
+| C31 | [ ] Dada la ficha en Blanco, cuando abro el zoom en la segunda foto, entonces el zoom solo recorre fotos del grupo Blanco. |
+| C32 | [ ] Dada la ficha en Blanco con la tercera foto visible, cuando cambio de la talla 41 a la 42 en Blanco, entonces la galería no cambia y sigue en la tercera foto. |
+| C33 | [ ] Dado el video del Negro reproduciéndose, cuando toco Blanco, entonces el video se pausa. |
+| C34 | [ ] Sin JavaScript, la ficha muestra los 12 medios. |
+| C35 | [ ] Dado el mismo tenis sin fotos asignadas a ninguna variante, entonces la ficha muestra los 12 medios y el indicador dice "1 de 12", en cualquier color. |
+| C36 | [ ] Dado el tenis con 1 foto común en la posición 1, Negro en 2 a 6 y Blanco en 7 a 11 (variantes con las fotos 2 y 7), cuando abro la ficha en Negro, entonces veo las fotos 2 a 6 y, al final, la 1: "1 de 6" empieza en la foto 2. |
+| C37 | [ ] Dado un tercer color Gris sin foto asignada, cuando lo elijo, entonces se muestran todos los medios; al volver a Negro, se muestran solo los del Negro. |
+| C38 | [ ] Dada una gorra con Negro (fotos 1 y 2) y Blanco (fotos 3 y 4), con las variantes asignadas a las fotos 1 y 3, cuando elijo Blanco, entonces veo solo las fotos 3 y 4 y el indicador dice "1 de 2". |
+
+**Plan (si se aprueba):**
+
+- [ ] **Tarea 18. Galería por color** (dev-tema-liquid + disenador-ui): cálculo de grupos en Liquid a partir de `variant.featured_media` y el orden de `product.media`, marca de JavaScript en `<html>` desde el script en línea del `<head>`, cambio de grupo en `theme.js` al cambiar de color, indicador, zoom, pausa del video y anuncio en región viva (C28 a C38). Antes, verificar con el MCP `shopify-dev` `variant.featured_media` y `media.position`. QA de C28 a C38 en la tarea 17.
+- [x] **Tarea 19. Runbook** (arquitecto-specs, 16 nov 2026; revisar con operaciones-shopify): cómo ordenar la Multimedia por color y asignar la foto a las variantes, en `docs/operaciones/cargar-productos.md`, marcado "aplica cuando se apruebe el cambio".
+
+**Preguntas de este cambio para el equipo:**
+
+- RF-04 pide mínimo 5 fotos y un video. Con galería por color, ¿el mínimo es **por color** o por producto?
+- ¿Quieren usar medios comunes (foto con todos los colores, empaque)? Si no, la regla de "comunes al final" no se usa nunca y la carga es más simple.
+
 ## Preguntas para el equipo
 
 Siguen abiertas (ninguna bloquea la aprobación de esta spec):
