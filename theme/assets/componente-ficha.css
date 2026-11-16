@@ -1,6 +1,6 @@
 .ficha { display: grid; gap: var(--espacio-8); }
 
-/* Galería: deslizable en celular, apilada en escritorio */
+/* Galería: carrusel horizontal en todos los anchos (SPEC-004). En escritorio suma botones y teclado. */
 .ficha__medios {
   list-style: none;
   margin: 0 calc(-1 * var(--espacio-4));
@@ -77,9 +77,41 @@
 
 @media (min-width: 990px) {
   .ficha { grid-template-columns: 7fr 5fr; gap: var(--espacio-12); align-items: start; }
-  .ficha__medios { margin: 0; grid-auto-flow: row; grid-auto-columns: auto; overflow: visible; gap: var(--espacio-3); }
+  .ficha__medios { margin: 0; }
   .ficha__info { position: sticky; top: calc(var(--alto-encabezado) + var(--espacio-6)); }
-  .ficha__contador { display: none; }
+}
+
+/* Galería por color: con JavaScript se ocultan los medios de otros colores; los comunes van al final */
+html[data-js] .ficha__medio[data-fuera] { display: none; }
+html[data-js] .ficha__medio[data-comun] { order: 1; }
+.ficha__medios { overscroll-behavior-x: contain; }
+
+/* Botones anterior y siguiente: solo escritorio y solo con JavaScript (los crea theme.js) */
+.ficha__flecha { display: none; }
+@media (min-width: 990px) {
+  .ficha__flecha {
+    position: absolute;
+    inset-block-start: 50%;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    inline-size: var(--tactil-min);
+    block-size: var(--tactil-min);
+    margin-block-start: calc(-0.5 * var(--tactil-min));
+    padding: 0;
+    background: var(--color-superficie);
+    color: var(--color-texto);
+    border: var(--borde-fino) solid var(--color-oro);
+    border-radius: 0;
+    cursor: pointer;
+  }
+  .ficha__flecha--anterior { inset-inline-start: var(--espacio-3); }
+  .ficha__flecha--siguiente { inset-inline-end: var(--espacio-3); }
+  .ficha__flecha svg { inline-size: 1.5rem; block-size: 1.5rem; }
+  .ficha__flecha--anterior svg { transform: scaleX(-1); }
+  .ficha__flecha:hover:not([aria-disabled="true"]) { background: var(--color-oro); color: var(--color-fondo); }
+  .ficha__flecha:focus-visible { outline: var(--anillo-foco) solid var(--color-acento); outline-offset: var(--anillo-foco); }
+  .ficha__flecha[aria-disabled="true"] { color: var(--color-texto-2); border-color: var(--color-borde); cursor: default; }
 }
 
 /* Cabecera: sello, nombre */

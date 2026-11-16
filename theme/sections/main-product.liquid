@@ -56,6 +56,75 @@
 
   assign en_cuotas = false
   assign total_medios = product.media.size
+
+  # Galería por color (SPEC-004): el grupo de un color empieza en la foto asignada a sus variantes
+  # (posición en Multimedia) y llega hasta antes del grupo siguiente. Lo anterior al primer grupo es común.
+  assign indice_color = -1
+  assign valores_color = ''
+  for opcion in product.options_with_values
+    assign nombre_opcion = opcion.name | downcase
+    if nombre_opcion == 'color' or nombre_opcion == 'colour' or nombre_opcion == 'colores'
+      if opcion.values.size > 1
+        assign indice_color = forloop.index0
+        assign valores_color = opcion.values
+      endif
+    endif
+  endfor
+
+  assign inicios = ''
+  if indice_color >= 0
+    for valor in valores_color
+      assign nombre_color = valor.name | default: valor
+      assign minimo = 0
+      for v in product.variants
+        if v.options[indice_color] == nombre_color and v.featured_media != blank
+          for m in product.media
+            if m.id == v.featured_media.id
+              if minimo == 0 or forloop.index < minimo
+                assign minimo = forloop.index
+              endif
+            endif
+          endfor
+        endif
+      endfor
+      if minimo > 0
+        assign posicion_txt = '0000' | append: minimo | slice: -4, 4
+        assign inicios = inicios | append: posicion_txt | append: '~' | append: nombre_color | append: '|'
+      endif
+    endfor
+  endif
+
+  # Dos colores con la misma foto asignada es un error de carga: esos colores muestran todos los medios
+  assign lista_inicios = inicios | split: '|'
+  assign grupos_validos = ''
+  for entrada in lista_inicios
+    assign posicion_a = entrada | split: '~' | first
+    assign repetidos = 0
+    for otra in lista_inicios
+      assign posicion_b = otra | split: '~' | first
+      if posicion_a == posicion_b
+        assign repetidos = repetidos | plus: 1
+      endif
+    endfor
+    if repetidos == 1
+      assign grupos_validos = grupos_validos | append: entrada | append: '|'
+    endif
+  endfor
+  assign lista_grupos = grupos_validos | split: '|' | sort
+
+  assign color_inicial = ''
+  if indice_color >= 0
+    assign color_inicial = variante.options[indice_color]
+  endif
+  assign galeria_por_color = false
+  assign primer_visible = 1
+  for entrada in lista_grupos
+    assign partes = entrada | split: '~'
+    if partes[1] == color_inicial
+      assign galeria_por_color = true
+      assign primer_visible = partes[0] | plus: 0
+    endif
+  endfor
 -%}
 
 <ficha-producto
@@ -64,16 +133,33 @@
   data-url="{{ url_producto }}"
   data-producto="{{ product.title | escape }}"
   data-whatsapp="{{ numero_whatsapp }}"
+  data-color-inicial="{{ color_inicial | escape }}"
 >
-  <div class="ficha__galeria">
-    <ul class="ficha__medios" aria-label="Fotos de {{ product.title | escape }}" data-medios>
+  <div class="ficha__galeria" role="group" aria-roledescription="carrusel" aria-label="Fotos de {{ product.title | escape }}">
+    <ul class="ficha__medios" data-medios>
       {%- for medio in product.media -%}
-        <li class="ficha__medio{% if forloop.first %} marco{% endif %}"
+        {%- liquid
+          assign grupo_medio = ''
+          for entrada in lista_grupos
+            assign partes = entrada | split: '~'
+            assign inicio_grupo = partes[0] | plus: 0
+            if inicio_grupo <= forloop.parentloop.index
+              assign grupo_medio = partes[1]
+            endif
+          endfor
+          assign fuera = false
+          if galeria_por_color and grupo_medio != '' and grupo_medio != color_inicial
+            assign fuera = true
+          endif
+        -%}
+        <li class="ficha__medio marco"
+          {%- if lista_grupos.size > 0 %}{% if grupo_medio == '' %} data-comun{% else %} data-grupo="{{ grupo_medio | escape }}"{% endif %}{% endif -%}
+          {%- if fuera %} data-fuera{% endif -%}
           {%- if medio.media_type == 'image' %} data-zoom-src="{{ medio | image_url: width: 2048 }}" data-zoom-alt="{{ medio.alt | default: product.title | escape }}"{% endif %}>
           {%- case medio.media_type -%}
             {%- when 'image' -%}
               {%- assign alt_medio = medio.alt | default: product.title -%}
-              {%- if forloop.first -%}
+              {%- if forloop.index == primer_visible -%}
                 {{ medio | image_url: width: 1600 | image_tag: widths: '600, 900, 1200, 1600', sizes: '(min-width: 990px) 58vw, 100vw', loading: 'eager', fetchpriority: 'high', alt: alt_medio }}
               {%- else -%}
                 {{ medio | image_url: width: 1600 | image_tag: widths: '600, 900, 1200, 1600', sizes: '(min-width: 990px) 58vw, 100vw', loading: 'lazy', alt: alt_medio }}
@@ -92,6 +178,9 @@
     </ul>
     {%- if total_medios > 1 -%}
       <p class="ficha__contador" data-contador role="status" hidden>1 de {{ total_medios }}</p>
+    {%- endif -%}
+    {%- if lista_grupos.size > 0 -%}
+      <p class="oculto-visual" role="status" aria-live="polite" data-anuncio-galeria></p>
     {%- endif -%}
   </div>
 
@@ -153,6 +242,7 @@
                     data-indice-opcion="{{ indice_opcion }}"
                     data-agotado="{% if es_talla %}agotada{% else %}agotado{% endif %}"
                     {% if es_talla %}data-talla{% endif %}
+                    {% if indice_opcion == indice_color %}data-opcion-color{% endif %}
                     {% if es_unica %}data-unica hidden{% endif %}
                   >
                     <legend class="ficha__leyenda">
