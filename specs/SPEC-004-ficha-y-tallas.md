@@ -262,6 +262,7 @@ Cada tarea cabe en menos de un día. Las tareas 1 a 3 desbloquean el resto.
 
 - **Color predeterminado:** la ficha abre en el color de la primera variante. El equipo elige cuál es poniendo ese color primero en la opción Color del producto en el admin (por ejemplo, Blanco).
 - **Carrusel también en escritorio:** la galería no se apila hacia abajo en ningún ancho. Es un carrusel horizontal que se mueve a la derecha y a la izquierda. En celular se desliza con el dedo; en escritorio tiene botones "Foto anterior" y "Foto siguiente", funciona con las flechas del teclado cuando el foco está en la galería y muestra el indicador "N de total". Esto reemplaza lo de "a 1280 px veo los medios apilados" de C1 y C28.
+- **Galería más baja en escritorio (16 nov 2026):** al revisarla, el equipo pidió que la foto fuera un poco más pequeña. Desde 990 px la columna de la galería pasa de 7/12 a 6/11 del ancho y la foto va cuadrada (1:1) en vez de 4:5; a 1280 px queda de unos 640 px de alto y cabe en la pantalla. En celular sigue en 4:5.
 
 El estado de la spec lo cambia el equipo en el archivo.
 

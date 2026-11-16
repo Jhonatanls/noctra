@@ -76,8 +76,10 @@
 .guia-tallas__pasos { margin: 0; padding-inline-start: var(--espacio-5); display: grid; gap: var(--espacio-2); }
 
 @media (min-width: 990px) {
-  .ficha { grid-template-columns: 7fr 5fr; gap: var(--espacio-12); align-items: start; }
+  /* Galería más baja en escritorio: columna más angosta y foto cuadrada, para que quepa en la pantalla. */
+  .ficha { grid-template-columns: 6fr 5fr; gap: var(--espacio-12); align-items: start; }
   .ficha__medios { margin: 0; }
+  .ficha__medio { aspect-ratio: 1 / 1; }
   .ficha__info { position: sticky; top: calc(var(--alto-encabezado) + var(--espacio-6)); }
 }
 
