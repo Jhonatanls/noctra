@@ -181,20 +181,20 @@ Salvo que se indique otra cosa, cada criterio se verifica con Playwright en cuat
 | C8 | [x] Dado el tenis con la talla 42 agotada en Negro, cuando abro la ficha en Negro, entonces la 42 se ve tachada y un lector de pantalla la anuncia como agotada. | Cumple |
 | C9 | [x] Cuando toco la 42 agotada, entonces "Agregar al carrito" queda deshabilitado con el texto "Agotado" y el botón de WhatsApp dice "Preguntar disponibilidad por WhatsApp", con un mensaje que incluye el nombre, "42", "Negro" y el enlace con `?variant=`; no aparece ningún formulario de aviso por correo. | Cumple |
 | C10 | [x] Cuando toco "Pedir por WhatsApp" con la talla 41 en Negro, se abre `wa.me/<número>` con un mensaje que incluye el nombre del producto, "41", "Negro" y el enlace con `?variant=`. | Cumple |
-| C11 | [ ] Con número de WhatsApp configurado, bajo el botón de WhatsApp aparece el aviso de tratamiento de datos con enlace a la política de privacidad; sin número, no aparecen ni el botón ni el aviso. | Cumple |
+| C11 | [x] Con número de WhatsApp configurado, bajo el botón de WhatsApp aparece el aviso de tratamiento de datos con enlace a la política de privacidad; sin número, no aparecen ni el botón ni el aviso. | Cumple |
 | C12 | [x] Cuando toco "¿Cuál es mi talla?", se abre la guía, el foco entra al diálogo, Escape lo cierra y el foco vuelve al enlace. | Parcial: abre y cierra; falta verificar el regreso del foco |
 | C13 | [ ] Sin JavaScript, "¿Cuál es mi talla?" lleva a la página de guía de tallas y el `<select>` permite agregar una talla disponible al carrito. | Parcial: el `<select>` sí; el enlace no funciona sin JS |
 | C14 | [ ] La guía muestra primero la aclaración de la etiqueta EUR, luego la tabla y los 5 pasos para medir; sin entradas en el metaobjeto, muestra la tabla provisional con la nota de tabla de referencia general; con 7 entradas cargadas (38 a 44), muestra esas 7 ordenadas por EUR y sin la nota. | Parcial: cumple el caso sin entradas; falta verificar con entradas |
 | C15 | [x] Dada la gorra de prueba sin opción "Talla", con la plantilla `product.gorra`, entonces no aparece selector de talla, ni "¿Cuál es mi talla?", ni "(EUR)"; sí aparece el grupo "Color" con Negro y Blanco, y "Pedir por WhatsApp" con Negro elegido envía un mensaje con el nombre, "Negro" y el enlace con `?variant=`. | Falta (hoy una gorra con opción "Talla: Única" muestra "(EUR)" y la guía de tenis) |
 | C16 | [ ] Dada una gorra con la opción "Talla: Única" (un solo valor), entonces no se pinta ningún selector de talla ni la guía, con cualquiera de las dos plantillas. | Falta |
 | C17 | [x] A 360 px, al bajar más allá del botón "Agregar al carrito", aparece la barra fija con talla elegida, precio y botón; el botón flotante de WhatsApp queda por encima de la barra sin taparla; la barra no aparece a 1280 px. | Falta |
-| C18 | [ ] Con "Mostrar mensaje de cuotas" apagado y el bloque de app de cuotas agregado en el editor, entonces bajo el precio no aparece ningún mensaje de cuotas ni "Sujeto a aprobación.". | Falta |
+| C18 | [x] Con "Mostrar mensaje de cuotas" apagado y el bloque de app de cuotas agregado en el editor, entonces bajo el precio no aparece ningún mensaje de cuotas ni "Sujeto a aprobación.". | Falta |
 | C19 | [ ] Con "Mostrar mensaje de cuotas" encendido, las apps de Addi y Sistecrédito instaladas y su bloque agregado, entonces el mensaje de cuotas aparece bajo el precio seguido de "Sujeto a aprobación.", en ambos modos y con contraste AA. | Parcial: existe el bloque `@app`; falta el ajuste, la nota y probar con las apps |
 | C20 | [x] Todas las tallas, colores y botones miden al menos 44 × 44 px, tienen foco visible con el anillo de foco y se pueden elegir con teclado (flechas dentro del grupo). | Parcial: 44 px de alto sí; verificar ancho y foco en ambos modos |
 | C21 | [x] La ficha no tiene desborde horizontal a 360 px con 11 tallas, con el diálogo de guía abierto ni con la barra fija visible. | Sin verificar |
-| C22 | [ ] Lighthouse móvil en la ficha del tenis de prueba: la primera foto es el LCP, LCP < 2,5 s, CLS < 0,1 y puntaje ≥ 85. | Sin verificar |
+| C22 | [x] Lighthouse móvil en la ficha del tenis de prueba: la primera foto es el LCP, LCP < 2,5 s, CLS < 0,1 y puntaje ≥ 85. | Sin verificar |
 | C23 | [ ] El HTML de la ficha incluye datos estructurados de producto válidos en la prueba de resultados enriquecidos de Google. | Parcial: usa `structured_data`; falta validar |
-| C24 | [ ] Dadas las políticas de envío y de cambios publicadas en el admin, el desplegable "Envíos y cambios" muestra un enlace a cada una; sin políticas publicadas, el desplegable no aparece. En ningún caso el código del tema contiene plazos en días, cobertura geográfica ni quién paga el envío (revisión de cumplimiento sobre `templates/product*.json` y la sección). | Falta (hoy dice "Si la talla no te queda, te la cambiamos" y "Enviamos a toda Colombia") |
+| C24 | [x] Dadas las políticas de envío y de cambios publicadas en el admin, el desplegable "Envíos y cambios" muestra un enlace a cada una; sin políticas publicadas, el desplegable no aparece. En ningún caso el código del tema contiene plazos en días, cobertura geográfica ni quién paga el envío (revisión de cumplimiento sobre `templates/product*.json` y la sección). | Falta (hoy dice "Si la talla no te queda, te la cambiamos" y "Enviamos a toda Colombia") |
 | C25 | [x] Ningún valor de color, tamaño, espaciado o radio de los componentes nuevos está fuera de `tokens.css`, y ningún `alt`, texto de ejemplo o dato de prueba contiene marcas de terceros (revisión de qa-calidad y cumplimiento). | Cumple en lo existente |
 
 ## Plan
@@ -307,3 +307,25 @@ La revisión en vivo quedó incompleta porque el servidor local se cayó (401, s
   - Los títulos y handles de los productos de prueba contienen nombres de marcas de terceros. Hay que cambiarlos (regla 1, RNF-13).
 - **Despliegue:** la plantilla `gorra` aún no existe en la tienda porque el despliegue a `dev` falla desde el PR #11 (el tema Noctra está publicado en la tienda de desarrollo).
 - **Observación:** el enlace dice "Política de cambios y devoluciones" y la política del admin se llama "Política de reembolso". Queda para contenido-copy.
+
+### QA en vivo, 14 nov 2026 (qa-calidad, tema publicado de la tienda de desarrollo)
+
+- **Cumplen en el navegador:**
+  - C1 con 3 medios: "1 de 3" a "3 de 3" a 360 px; a 1280 px van apilados con la información fija.
+  - C2: zoom, Escape y Cerrar, y el foco vuelve a la foto.
+  - C3: la barra fija tiene transición de 0 s con "reducir movimiento".
+  - C6, C7 (precarga en otra pestaña) y C8/C9 (talla agotada, "Agotado" y mensaje de aviso por WhatsApp).
+  - C10 y C11: número real, aviso de datos con enlace a la política de privacidad.
+  - C12, C15 y C26: la gorra ya usa la plantilla `gorra` asignada en el admin.
+  - C17: barra fija con el flotante encima y sin taparse; no aparece a 1280 px.
+  - C18, C21 y C24.
+  - C22: rendimiento 88, LCP 2,1 s en la primera foto, CLS 0. Accesibilidad 100, SEO 92 por falta de la meta descripción del producto.
+- **C20:** "¿Cuál es mi talla?" medía 22 px de alto y los enlaces de políticas 25 px. Se corrigió en la rama `fix/SPEC-004-objetivos-tactiles` con `min-block-size: var(--tactil-min)`; ahora miden 44 px.
+- **C13 no cumple por configuración:** la página `guia-de-tallas` usa la plantilla `page` y no `page.guia-tallas`, así que sin JavaScript se ve solo el título. El `<select>` sin JavaScript sí agrega al carrito. El equipo debe asignar la plantilla en el admin, en Tienda online → Páginas → Guía de tallas → Plantilla de tema.
+- **C23 queda parcial:** Shopify emite un JSON-LD de tipo `ProductGroup` con una `Offer` por variante (precio, COP, disponibilidad, URL con `?variant=` e imagen). No trae `description` ni `sku`. La prueba de Google se hace en la vista previa de la tienda real.
+- **Siguen pendientes:**
+  - C1 con 6 medios y video: en la tienda no hay ningún producto así publicado.
+  - C5 sin la opción de impuestos.
+  - C14 con entradas en el metaobjeto (hoy sale la tabla provisional).
+  - C19 (SPEC-007).
+  - C25 mientras los productos de prueba lleven nombres de marcas de terceros.
