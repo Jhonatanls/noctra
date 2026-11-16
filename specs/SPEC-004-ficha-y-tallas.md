@@ -256,9 +256,14 @@ Cada tarea cabe en menos de un día. Las tareas 1 a 3 desbloquean el resto.
   - Pendiente: **C11** (aviso de datos con número real; el aviso va dentro del mismo bloque condicionado al número); **C13** (hace falta crear en el admin la página "Guía de tallas" con dirección `guia-de-tallas`; sin ella el enlace queda oculto sin JavaScript); **C14** (con 7 entradas del metaobjeto: el orden se probó solo con la tabla provisional); **C16** (verificado por lectura del código; no hay en la tienda una gorra con "Talla: Única"); **C18** y **C19** (necesitan el bloque de app de cuotas: SPEC-007); **C22** (Lighthouse no se corrió); **C23** (validación de resultados enriquecidos de Google); **C24** (caso sin políticas verificado: el bloque no aparece; falta probar con las políticas publicadas, hoy la tienda de desarrollo no las tiene).
   - Plan: las tareas 15 y 16 quedan para SPEC-007; la 17 (QA) la hace `qa-calidad`.
 
-### Cambio propuesto: galería por color (16 nov 2026, pendiente de aprobación)
+### Cambio: galería por color (propuesto el 16 nov 2026; pedido por el equipo el 16 nov 2026)
 
-**No se implementa hasta que el equipo lo apruebe.** Mientras tanto, la galería sigue mostrando todos los medios del producto (C1).
+**Decisión del equipo (16 nov 2026, en conversación):** el equipo pidió implementar la galería por color y ya ordenó la Multimedia de los productos de prueba por color. Agregó dos condiciones:
+
+- **Color predeterminado:** la ficha abre en el color de la primera variante. El equipo elige cuál es poniendo ese color primero en la opción Color del producto en el admin (por ejemplo, Blanco).
+- **Carrusel también en escritorio:** la galería no se apila hacia abajo en ningún ancho. Es un carrusel horizontal que se mueve a la derecha y a la izquierda. En celular se desliza con el dedo; en escritorio tiene botones "Foto anterior" y "Foto siguiente", funciona con las flechas del teclado cuando el foco está en la galería y muestra el indicador "N de total". Esto reemplaza lo de "a 1280 px veo los medios apilados" de C1 y C28.
+
+El estado de la spec lo cambia el equipo en el archivo.
 
 **Problema.** Hoy la galería muestra todos los medios del producto. El equipo quiere que, al elegir un color, la galería muestre solo las fotos y videos de ese color. Shopify permite asignar **una sola imagen por variante** (`variant.featured_media` en Liquid, verificado en shopify.dev), así que no hay un dato nativo que diga "estas 6 fotos son del Blanco".
 
@@ -293,7 +298,7 @@ Reglas para los casos borde:
 - **Al cambiar solo de talla** dentro del mismo color: la galería no cambia ni se mueve.
 - **Zoom:** solo recorre las fotos del grupo visible.
 - **Video:** va en el grupo donde esté por orden, con las mismas reglas de hoy (`preload="none"`, imagen previa, nunca se reproduce solo con "reducir movimiento").
-- **Escritorio:** las fotos apiladas son solo las del grupo.
+- **Escritorio:** carrusel horizontal con botones anterior y siguiente, solo con los medios del grupo; la información de compra sigue fija al lado.
 - **Lectores de pantalla:** al cambiar de color se anuncia una sola vez, de forma discreta (región `aria-live="polite"`), por ejemplo "Fotos del color Blanco, 6 en total". No se mueve el foco: sigue en el botón de color.
 - **Sin JavaScript:** se muestran todos los medios, como hoy, y el `<select>` de variantes sigue funcionando.
 

@@ -76,6 +76,8 @@ Recomendación: **A** para cumplir RF-09 ("sin tocar código") con poco desarrol
 
 ## Riesgo: plan de Shopify (bloqueante, agregado el 16 nov 2026)
 
+**Decisión del equipo (16 nov 2026):** la tienda real pasa a **Shopify Plus** antes del lanzamiento, así que se mantiene la app privada con la Function de descuento. La Function se prueba en la tienda de desarrollo, donde sí corre. Mientras la tienda real esté en Basic, los combos no se aplican en el checkout real. Hay que actualizar "plan Basic al lanzar" en CLAUDE.md (sección 4); lo hace el equipo.
+
 **Restricción verificada en shopify.dev (16 nov 2026):** "Stores on any plan can use public apps that are distributed through the Shopify App Store and contain functions. Only stores on a Shopify Plus plan can use custom apps that contain Shopify Function APIs."
 
 La tienda lanza en plan **Basic**. La app privada que plantea la sección anterior (`apps/combos/`, creada con `shopify app init`) es una custom app. Se puede instalar y probar en la tienda de desarrollo, pero **su Function de descuento no correría en la tienda de producción**. Sin una decisión, la etapa 3 no tiene cómo aplicar los combos en el checkout. La lógica pura de `packages/combos` y su uso en el tema (`assets/combos.js`, mensajes "te falta…") no se ven afectados.
