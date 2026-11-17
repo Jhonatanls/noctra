@@ -242,7 +242,7 @@
         "id": "combo_1_valor",
         "label": "Valor del descuento",
         "default": 35000,
-        "info": "Igual al descuento del admin. Pesos por artículo (ej. 35000) o porcentaje de 1 a 100. Ignorado si es gratis."
+        "info": "Para cambiar el precio de la promoción: cambia el descuento en el admin y escribe aquí el mismo valor. Pesos por artículo (ej. 35000) o porcentaje de 1 a 100. Ignorado si es gratis."
       },
       {
         "type": "number",
@@ -389,7 +389,7 @@
         "id": "combo_2_valor",
         "label": "Valor del descuento",
         "default": 0,
-        "info": "Igual al descuento del admin. Pesos por artículo (ej. 35000) o porcentaje de 1 a 100. Ignorado si es gratis."
+        "info": "Para cambiar el precio de la promoción: cambia el descuento en el admin y escribe aquí el mismo valor. Pesos por artículo (ej. 35000) o porcentaje de 1 a 100. Ignorado si es gratis."
       },
       {
         "type": "number",
@@ -535,7 +535,7 @@
         "id": "combo_3_valor",
         "label": "Valor del descuento",
         "default": 125000,
-        "info": "Igual al descuento del admin. Pesos por artículo (ej. 35000) o porcentaje de 1 a 100. Ignorado si es gratis."
+        "info": "Para cambiar el precio de la promoción: cambia el descuento en el admin y escribe aquí el mismo valor. Pesos por artículo (ej. 35000) o porcentaje de 1 a 100. Ignorado si es gratis."
       },
       {
         "type": "number",

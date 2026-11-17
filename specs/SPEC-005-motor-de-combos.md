@@ -28,6 +28,13 @@ El equipo evaluó dejar los combos sin límite y eligió **un máximo de 3 usos 
 - La lógica compara el ahorro **total** de cada combo contando sus usos, y el carrito sugiere repetir el combo ("Agrega 3 pares y Luna Llena se aplica 2 veces").
 - QA en vivo del 16 nov 2026 (antes de este cambio en el admin): Shopify ya aplicaba Luna Nueva ×2 en 2T + 2G, lo que confirma que el límite cuenta por grupo "compra + lleva".
 
+### Decisión: cómo se cambia el precio de una promoción (equipo, 17 nov 2026, en conversación)
+
+- El precio de cada combo se cambia **en el descuento del admin** (monto, porcentaje o gratis) y se copia **el mismo valor** en Ajustes del tema > Combos > "Valor del descuento". Con eso el tema recalcula solo el precio, el precio sin combo y el ahorro.
+- La **página de ofertas es la sección "Combos" del inicio** (`sections/combos-destacados.liquid`); no se crea una página aparte. Ahí quedan consignados el precio vigente de cada combo, el precio sin combo y el ahorro.
+- Alternativa evaluada y descartada por ahora: que el tema lea el descuento real del admin creando un carrito temporal con la Storefront API sin token (`cartCreate`). Shopify bloquea esa API mientras la tienda tenga contraseña ("Online Store channel is locked", probado el 17 nov 2026 en la tienda de desarrollo), así que no se podía probar antes del lanzamiento. Se puede retomar cuando la tienda esté abierta.
+- El equipo confirmó el 17 nov 2026 que puso **3** en "máximo de usos por pedido" en los tres descuentos. Falta la verificación con 12 pares ($1.725.000 con los precios de diseño; con los vigentes 12 × $174.900 − 3 × $125.000 = $1.723.800).
+
 ### Cambio: precios reales de la tienda (decisión del equipo, 16 nov 2026, en conversación)
 
 El equipo pidió ajustar todo a los precios cargados hoy en la tienda de desarrollo, que reemplazan los $175.000 / $60.000 / $45.000 de la decisión inicial. Medidos con el carrito real:
