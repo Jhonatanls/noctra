@@ -4,7 +4,7 @@ Este archivo es la memoria del proyecto para Claude Code. Léelo completo al ini
 
 ## 1. Qué estamos construyendo
 
-Una tienda online de lujo accesible para Colombia que vende tenis y gorras de marca propia u originales, con el gancho comercial de **combos de precio fijo**: 1 par + 1 gorra por $190.000, 2 pares + 1 gorra por $350.000 y 3 pares por $400.000 (detalle en la sección 1.1). Las personas llegan sobre todo desde Instagram y TikTok en el celular, conversan por WhatsApp y pagan con Addi, Sistecrédito, Mercado Pago, transferencia o contraentrega.
+Una tienda online de lujo accesible para Colombia que vende tenis y gorras de marca propia u originales, con el gancho comercial de **combos de precio fijo**: 1 par + 1 gorra por $189.800, 2 pares + 1 gorra por $349.800 y 3 pares por $399.700 con los precios vigentes (detalle en la sección 1.1). Las personas llegan sobre todo desde Instagram y TikTok en el celular, conversan por WhatsApp y pagan con Addi, Sistecrédito, Mercado Pago, transferencia o contraentrega.
 
 La marca se llama **Noctra**: una marca nocturna de lujo urbano. Su identidad es gótica y afilada (isotipo en forma de N con puntas de lanza y logotipo en letra gótica), en negro, blanco y plata. La prioridad número uno es la **impresión visual**: la página tiene que sentirse oscura, sobria e imponente, como una vitrina de noche donde solo brilla el producto. La prioridad número dos es que **comprar sea muy fácil** desde el celular, incluyendo cerrar la venta por WhatsApp.
 
@@ -16,11 +16,12 @@ La tienda se queda en **Shopify Basic, sin Plus y sin Shopify Functions propias*
 
 | Combo | Compra | Lleva | Total |
 | --- | --- | --- | --- |
-| Luna Nueva | 1 de Tenis en combo | 1 de Gorras en combo con $45.000 de descuento | $190.000 |
-| Eclipse | 2 de Tenis en combo | 1 de Gorras en combo gratis | $350.000 |
-| Luna Llena | 2 de Tenis en combo | 1 más de Tenis en combo con $125.000 de descuento | $400.000 |
+| Luna Nueva | 1 de Tenis en combo | 1 de Gorras en combo con $35.000 de descuento | $189.800 |
+| Eclipse | 2 de Tenis en combo | 1 de Gorras en combo gratis | $349.800 |
+| Luna Llena | 2 de Tenis en combo | 1 más de Tenis en combo con $125.000 de descuento | $399.700 |
 
-- Precios base: todo tenis de la colección `tenis-en-combo` a $175.000 y toda gorra de `gorras-en-combo` a $60.000. Los modelos premium no entran a esas colecciones.
+- Precios vigentes (16 nov 2026): todo tenis de la colección `tenis-en-combo` a $174.900 y toda gorra de `gorras-en-combo` a $49.900, un solo precio por colección. Los modelos premium no entran a esas colecciones.
+- **Precios calculados, no escritos**: el snippet `combos-precio` calcula precio, precio sin combo y ahorro de cada combo con los precios reales de las colecciones. Nunca escribas el precio de un combo a mano en código ni en textos; en los ajustes usa `{precio}` y `{ahorro}`.
 - **Manda Shopify**: el precio real lo ponen los descuentos del admin. `packages/combos` (copiado a `theme/assets/combos.js`) solo calcula para mostrar mensajes en carrito y ficha ("qué falta", "Elige tu gorra de regalo").
 - **Dos lugares que deben coincidir**: cada combo existe como descuento en el admin (Descuentos) y como combo en Ajustes del tema > Combos. El título del descuento debe ser idéntico al nombre del combo en el tema; si se cambia un combo, se cambia en los dos. Paso a paso: `docs/operaciones/combos-nativos.md`. Textos: `docs/contenido/combos.md`.
 - La gorra de regalo de Eclipse no se agrega sola: el carrito ofrece "Elige tu gorra de regalo".
@@ -144,7 +145,7 @@ Cada funcionalidad vive en una spec en `specs/`. El ciclo es:
 
 **Etapa activa: 3.** Las etapas 1 y 2 están implementadas y probadas en la tienda de desarrollo; los criterios que faltan están en cada spec. Los combos (SPEC-005 y SPEC-006) están implementados y los tres descuentos creados en la tienda de desarrollo.
 
-**Estado verificado del código:** Theme Check sin errores ni avisos, fuentes autoalojadas, 36 pruebas de combos en verde (`npm test`). El tema Noctra va publicado en la tienda de desarrollo (con contraseña) y se probó allí a 360 y 1280 px en ambos modos.
+**Estado verificado del código:** Theme Check sin errores ni avisos, fuentes autoalojadas, 43 pruebas de combos en verde (`npm test`). El tema Noctra va publicado en la tienda de desarrollo (con contraseña) y se probó allí a 360 y 1280 px en ambos modos.
 
 ## 9. Subagentes
 
@@ -187,7 +188,7 @@ No agregues un MCP con acceso de escritura a la tienda (Admin API) sin una spec 
 
 - **Eslogan**: "Viste la noche." Úsalo como cierre, no en cada frase. Hashtag de campaña: #VisteLaNoche.
 
-- **Combo**: promoción de precio fijo por un conjunto de productos, hecha con un descuento automático nativo. Hoy son tres: Luna Nueva (1 par + 1 gorra = $190.000), Eclipse (2 pares + 1 gorra = $350.000) y Luna Llena (3 pares = $400.000). Ver sección 1.1.
+- **Combo**: promoción de precio fijo por un conjunto de productos, hecha con un descuento automático nativo. Hoy son tres: Luna Nueva (1 par + 1 gorra = $189.800), Eclipse (2 pares + 1 gorra = $349.800) y Luna Llena (3 pares = $399.700), con los precios vigentes. Ver sección 1.1.
 - **Precio Club**: precio especial para clientes registrados (fase 2).
 - **Talla EUR**: la talla del tenis se elige por el número europeo de la etiqueta de un tenis que le quede bien al cliente; la guía muestra la equivalencia en centímetros de pie.
 - **Contraentrega**: el cliente paga en efectivo al recibir; requiere confirmación por WhatsApp antes de despachar.
