@@ -43,14 +43,24 @@
           assign valor = valor | times: 100
         endif
       -%}
+{%- capture total_combo -%}{%- render 'combos-precio', i: i, dato: 'total' -%}{%- endcapture -%}
+{%- capture ahorro_combo -%}{%- render 'combos-precio', i: i, dato: 'ahorro' -%}{%- endcapture -%}
+{%- capture lista_combo -%}{%- render 'combos-precio', i: i, dato: 'lista' -%}{%- endcapture -%}
+{%- assign total_combo = total_combo | strip | plus: 0 -%}
+{%- assign ahorro_combo = ahorro_combo | strip | plus: 0 -%}
+{%- assign lista_combo = lista_combo | strip | plus: 0 -%}
+{%- assign precio_texto = total_combo | money_without_trailing_zeros | strip_html -%}
+{%- assign ahorro_texto = ahorro_combo | money_without_trailing_zeros | strip_html -%}
+{%- if settings[k_precio] != blank -%}{%- assign precio_texto = settings[k_precio] -%}{%- endif -%}
+      {%- assign beneficio = settings[k_beneficio] | replace: '{precio}', precio_texto | replace: '{ahorro}', ahorro_texto -%}
       {
         "id": "combo-{{ i }}",
         "nombre": {{ settings[k_nombre] | json }},
         "tipo": "compraXllevaY",
         "activo": {% if settings[k_activo] %}true{% else %}false{% endif %},
         "detalle": {{ settings[k_detalle] | json }},
-        "precio": {{ settings[k_precio] | json }},
-        "beneficio": {{ settings[k_beneficio] | json }},
+        "precio": {{ precio_texto | json }},
+        "beneficio": {{ beneficio | json }},
         "desde": {% if settings[k_desde] != blank %}{{ settings[k_desde] | json }}{% else %}null{% endif %},
         "hasta": {% if settings[k_hasta] != blank %}{{ settings[k_hasta] | json }}{% else %}null{% endif %},
         "compra": { "grupo": {{ settings[k_cg] | json }}, "cantidad": {{ settings[k_cc] | default: 1 }} },

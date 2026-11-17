@@ -225,3 +225,32 @@ test('siguientePaso: con el tope alcanzado no sugiere repetir más', () => {
 test('siguientePaso: sin productos de combo no sugiere nada', () => {
   assert.equal(siguientePaso([], COMBOS_3, { hoy: HOY }), null);
 });
+
+// --- Precios reales de la tienda (medidos en la tienda de desarrollo el 16 nov 2026) ---
+// Tenis en combo $174.900, gorras en combo $49.900, Luna Nueva con $35.000 de descuento, tope de 3 usos.
+// Los totales esperados son los que cobró Shopify en el carrito con esos descuentos.
+const REALES = [
+  { ...lunaNueva, limitePorPedido: 3, lleva: { ...lunaNueva.lleva, valor: { tipo: 'monto', valor: p(35000) } } },
+  { ...eclipse, limitePorPedido: 3 },
+  { ...lunaLlena, limitePorPedido: 3 },
+];
+const tReal = (n) => tenis(n, 174900);
+const gReal = (n) => gorras(n, 49900);
+
+const CASOS_REALES = [
+  ['1T + 1G', [tReal(1), gReal(1)], 189800, 'luna-nueva'],
+  ['2T + 1G', [tReal(2), gReal(1)], 349800, 'eclipse'],
+  ['2T + 2G', [tReal(2), gReal(2)], 379600, 'luna-nueva'],
+  ['3T', [tReal(3)], 399700, 'luna-llena'],
+  ['3T + 1G', [tReal(3), gReal(1)], 449600, 'luna-llena'],
+  ['4T', [tReal(4)], 574600, 'luna-llena'],
+  ['6T', [tReal(6)], 799400, 'luna-llena'],
+];
+
+for (const [nombre, lineas, esperado, combo] of CASOS_REALES) {
+  test('precios reales: ' + nombre + ' = ' + esperado + ' (igual a lo que cobró Shopify)', () => {
+    const r = evaluarCarrito(lineas, REALES, { hoy: HOY });
+    assert.equal(r.total, p(esperado));
+    assert.equal(r.aplicaciones[0].comboId, combo);
+  });
+}

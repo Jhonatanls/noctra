@@ -24,14 +24,34 @@
           assign k_detalle = p | append: 'detalle'
           assign k_precio = p | append: 'precio'
           assign k_descripcion = p | append: 'descripcion'
+          assign i = block.settings.combo | plus: 0
         -%}
+        {%- capture total_combo -%}{%- render 'combos-precio', i: i, dato: 'total' -%}{%- endcapture -%}
+        {%- capture ahorro_combo -%}{%- render 'combos-precio', i: i, dato: 'ahorro' -%}{%- endcapture -%}
+        {%- capture lista_combo -%}{%- render 'combos-precio', i: i, dato: 'lista' -%}{%- endcapture -%}
+        {%- assign total_combo = total_combo | strip | plus: 0 -%}
+        {%- assign ahorro_combo = ahorro_combo | strip | plus: 0 -%}
+        {%- assign lista_combo = lista_combo | strip | plus: 0 -%}
+        {%- assign precio_texto = total_combo | money_without_trailing_zeros | strip_html -%}
+        {%- assign ahorro_texto = ahorro_combo | money_without_trailing_zeros | strip_html -%}
+        {%- if settings[k_precio] != blank -%}{%- assign precio_texto = settings[k_precio] -%}{%- endif -%}
+        {%- assign descripcion = settings[k_descripcion] | replace: '{precio}', precio_texto | replace: '{ahorro}', ahorro_texto -%}
         {%- if settings[k_activo] or request.design_mode -%}
-          <li class="combo" {{ block.shopify_attributes }}>
+          <li class="combo{% if block.settings.favorito %} combo--favorito{% endif %}" {{ block.shopify_attributes }}>
+            {%- if block.settings.favorito -%}
+              <p class="combo__sello">{{ 'combos.favorito' | t }}</p>
+            {%- endif -%}
             {% render 'ornamento', clase: 'combo__ornamento' %}
             <h3 class="combo__nombre">{{ settings[k_nombre] }}</h3>
             <p class="combo__detalle">{{ settings[k_detalle] }}</p>
-            <p class="combo__precio precio">{{ settings[k_precio] }}</p>
-            <p class="combo__descripcion">{{ settings[k_descripcion] }}</p>
+            <p class="combo__precio precio">{{ precio_texto }}</p>
+            {%- if ahorro_combo > 0 and settings[k_precio] == blank -%}
+              <p class="combo__comparacion">
+                <s class="combo__anterior"><span class="oculto-visual">Precio sin combo: </span>{{ lista_combo | money_without_trailing_zeros | strip_html }}</s>
+                <span class="combo__ahorro">Ahorras {{ ahorro_texto }}</span>
+              </p>
+            {%- endif -%}
+            <p class="combo__descripcion">{{ descripcion }}</p>
             {%- if block.settings.nota != blank -%}
               <p class="combo__nota">{{ block.settings.nota }}</p>
             {%- elsif request.design_mode -%}
@@ -85,6 +105,7 @@
           "default": "1",
           "info": "Nombre, precio y descripción se editan en Ajustes del tema > Combos."
         },
+        { "type": "checkbox", "id": "favorito", "label": "Destacar como favorito", "default": false, "info": "Muestra el sello \"El favorito\" sobre la tarjeta. Úsalo en un solo combo." },
         { "type": "text", "id": "nota", "label": "Vigencia y condiciones", "info": "Obligatorio antes de publicar. Ejemplo: Válido hasta el 31 de diciembre de 2026 o hasta agotar existencias. Solo productos de las colecciones en combo." },
         { "type": "url", "id": "enlace", "label": "Enlace", "info": "Colección con los productos elegibles." }
       ]
@@ -96,7 +117,7 @@
       "name": "Combos destacados",
       "blocks": [
         { "type": "combo", "settings": { "combo": "1" } },
-        { "type": "combo", "settings": { "combo": "2" } },
+        { "type": "combo", "settings": { "combo": "2", "favorito": true } },
         { "type": "combo", "settings": { "combo": "3" } }
       ]
     }

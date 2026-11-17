@@ -28,6 +28,27 @@ El equipo evaluó dejar los combos sin límite y eligió **un máximo de 3 usos 
 - La lógica compara el ahorro **total** de cada combo contando sus usos, y el carrito sugiere repetir el combo ("Agrega 3 pares y Luna Llena se aplica 2 veces").
 - QA en vivo del 16 nov 2026 (antes de este cambio en el admin): Shopify ya aplicaba Luna Nueva ×2 en 2T + 2G, lo que confirma que el límite cuenta por grupo "compra + lleva".
 
+### Cambio: precios reales de la tienda (decisión del equipo, 16 nov 2026, en conversación)
+
+El equipo pidió ajustar todo a los precios cargados hoy en la tienda de desarrollo, que reemplazan los $175.000 / $60.000 / $45.000 de la decisión inicial. Medidos con el carrito real:
+
+- Tenis en combo: **$174.900** (el equipo mencionó $179.900; la tienda muestra $174.900 en las 7 referencias, por eso se toma este valor y se marca como pregunta).
+- Gorras en combo: **$49.900**.
+- Descuentos del admin: Luna Nueva **$35.000** a la gorra, Eclipse gorra gratis, Luna Llena **$125.000**; ya permiten más de un uso.
+
+| # | Carrito | Gana | Total que cobró Shopify |
+| --- | --- | --- | --- |
+| 1 | 1T + 1G | Luna Nueva (−$35.000) | $189.800 |
+| 2 | 2T + 1G | Eclipse (gorra gratis, −$49.900) | $349.800 |
+| 3 | 2T + 2G | Luna Nueva ×2 (−$70.000) | $379.600 |
+| 4 | 3T | Luna Llena (−$125.000) | $399.700 |
+| 5 | 3T + 1G | Luna Llena (−$125.000) | $449.600 |
+| 6 | 4T | Luna Llena una vez (−$125.000) | $574.600 |
+| 6b | 6T | Luna Llena ×2 (−$250.000) | $799.400 |
+
+- **El tema ya no lleva precios escritos a mano**: el snippet `combos-precio` calcula el precio de cada combo, el precio sin combo y el ahorro con el precio del primer producto de cada colección y el valor del descuento de Ajustes del tema > Combos. Si el equipo cambia el precio de los productos, la vitrina, el carrito, la ficha y WhatsApp se actualizan solos. Lo único que debe coincidir a mano es el **valor del descuento** (ajuste "Valor del descuento" = descuento del admin) y el máximo de usos.
+- Las tablas de abajo con $175.000 / $60.000 quedan como referencia del diseño original; las pruebas de `npm test` cubren los dos juegos de precios (43 pruebas).
+
 ## Trazabilidad
 
 | Requerimiento | Qué cubre esta spec | Dónde se cumple |

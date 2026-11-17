@@ -5,6 +5,7 @@
   "combos": {
     "sello_ficha": "Entra en combo",
     "sello_tarjeta": "Combo",
+    "favorito": "El favorito",
     "sin_combo_ficha": "Este modelo no participa en combos.",
     "par_uno": "1 par",
     "par_otros": "{n} pares",

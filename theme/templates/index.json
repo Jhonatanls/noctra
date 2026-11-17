@@ -45,6 +45,7 @@
           "type": "combo",
           "settings": {
             "combo": "2",
+            "favorito": true,
             "enlace": "shopify://collections/tenis-en-combo"
           }
         },

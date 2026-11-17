@@ -11,9 +11,16 @@
     assign k_precio = p | append: 'precio'
     for d in cart.discount_applications
       if d.title == settings[k_nombre]
+        capture total_combo
+          render 'combos-precio', i: i, dato: 'total'
+        endcapture
+        assign precio_texto = total_combo | strip | plus: 0 | money_without_trailing_zeros | strip_html
+        if settings[k_precio] != blank
+          assign precio_texto = settings[k_precio]
+        endif
         assign detalle = settings[k_wa] | default: settings[k_detalle]
         assign ahorro = d.total_allocated_amount | money_without_trailing_zeros | strip_html
-        echo 'combos.whatsapp_linea' | t: combo: d.title, detalle: detalle, precio: settings[k_precio], ahorro: ahorro
+        echo 'combos.whatsapp_linea' | t: combo: d.title, detalle: detalle, precio: precio_texto, ahorro: ahorro
         break
       endif
     endfor

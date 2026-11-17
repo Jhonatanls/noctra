@@ -16,10 +16,12 @@
 }
 
 .combo {
-  display: grid;
-  justify-items: center;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   gap: var(--espacio-3);
-  padding: var(--espacio-10) var(--espacio-6);
+  padding: var(--espacio-12) var(--espacio-6) var(--espacio-10);
   text-align: center;
   background: var(--color-superficie);
   border: var(--borde-fino) solid var(--color-oro);
@@ -27,27 +29,59 @@
   outline-offset: calc(-1 * var(--espacio-2));
   border-radius: var(--radio-m);
 }
+/* El favorito cierra el doble filo con oro pleno y lleva el sello sobre el borde superior */
+.combo--favorito { outline-color: var(--color-oro); }
+.combo__sello {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 50%;
+  transform: translate(-50%, -50%);
+  margin: 0;
+  padding: var(--espacio-1) var(--espacio-4);
+  font-size: var(--texto-xs);
+  line-height: 1.4;
+  letter-spacing: var(--espaciado-boton);
+  white-space: nowrap;
+  color: var(--color-boton-texto);
+  background: var(--color-oro);
+  border-radius: var(--radio-s);
+}
 .combo__ornamento { width: min(100%, 8rem); }
 .combo__nombre { font-size: var(--texto-xl); margin: 0; }
 .combo__detalle { margin: 0; color: var(--color-texto-2); }
-.combo__precio { font-size: var(--texto-2xl); font-weight: var(--peso-normal); margin: 0; line-height: 1.1; }
+.combo__precio { font-size: var(--texto-2xl); font-weight: var(--peso-normal); margin: var(--espacio-3) 0 0; line-height: 1.1; }
+.combo__comparacion { margin: 0; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: var(--espacio-2) var(--espacio-3); }
+.combo__anterior { color: var(--color-texto-2); font-size: var(--texto-s); text-decoration: line-through; }
+.combo__ahorro { padding: var(--espacio-1) var(--espacio-3); font-size: var(--texto-s); font-weight: var(--peso-medio); color: var(--color-texto); border: var(--borde-fino) solid var(--color-oro-suave); border-radius: var(--radio-s); }
 .combo__nota { font-size: var(--texto-xs); color: var(--color-texto-2); margin: 0; }
-.combo__boton { margin-block-start: var(--espacio-2); }
+.combo__boton { margin-block-start: auto; }
 .combos__terminos { margin-block-start: var(--espacio-6); text-align: center; max-width: none; }
-.combo__descripcion { margin: 0; font-size: var(--texto-s); max-width: var(--ancho-texto); }
+.combo__descripcion { margin: var(--espacio-2) 0 var(--espacio-4); font-size: var(--texto-s); max-width: var(--ancho-texto); }
 .combos__cierre { margin-block: var(--espacio-8) 0; text-align: center; max-width: none; font-family: var(--fuente-eslogan); font-size: var(--texto-xl); }
 
 /* Mensajes de combos (carrito y ficha) */
 .combos-mensajes { display: block; }
-.combos-mensajes__lista { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--espacio-2); }
+.combos-mensajes__lista { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--espacio-3); }
 .combos-mensajes__lista:empty { display: none; }
-.combos-mensajes__item { margin: 0; font-size: var(--texto-s); color: var(--color-texto-2); }
-.combos-mensajes__item--principal { color: var(--color-texto); padding: var(--espacio-3) var(--espacio-4); border: var(--borde-fino) solid var(--color-oro-suave); border-inline-start: var(--espacio-1) solid var(--color-oro); border-radius: var(--radio-s); background: var(--color-superficie); }
+/* Avisos secundarios: discretos */
+.combos-mensajes__item { margin: 0; font-size: var(--texto-xs); color: var(--color-texto-2); }
+/* Aviso principal: el combo activo o lo que falta, con filo y barra de oro */
+.combos-mensajes__item--principal {
+  font-size: var(--texto-m);
+  line-height: 1.5;
+  color: var(--color-texto);
+  padding: var(--espacio-4) var(--espacio-5);
+  background: var(--color-superficie);
+  border: var(--borde-fino) solid var(--color-oro-suave);
+  border-inline-start: var(--espacio-1) solid var(--color-oro);
+  border-radius: var(--radio-s);
+}
 .carrito .combos-mensajes { margin-block-end: var(--espacio-6); }
 .ficha__combo .combos-mensajes__item { font-size: var(--texto-s); }
+.ficha__combo .combos-mensajes__item--principal { padding: var(--espacio-3) var(--espacio-4); }
 
 /* Gorra de regalo */
-.regalo { margin-block-end: var(--espacio-6); padding: var(--espacio-5); background: var(--color-superficie); border: var(--borde-fino) solid var(--color-oro); border-radius: var(--radio-m); display: grid; gap: var(--espacio-3); }
+.regalo { margin-block-end: var(--espacio-6); padding: var(--espacio-6); background: var(--color-superficie); border: var(--borde-fino) solid var(--color-oro); outline: var(--borde-fino) solid var(--color-oro-suave); outline-offset: calc(-1 * var(--espacio-2)); border-radius: var(--radio-m); display: grid; gap: var(--espacio-3); }
 .regalo[hidden] { display: none; }
 .regalo__titulo { margin: 0; font-size: var(--texto-xl); }
 .regalo__ayuda, .regalo__vacio { margin: 0; color: var(--color-texto-2); font-size: var(--texto-s); }

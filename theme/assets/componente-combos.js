@@ -62,6 +62,7 @@ class MensajesCombos extends HTMLElement {
       if (aplicacion && combo.activo !== false) { real = { combo, monto: aplicacion.monto }; break; }
     }
 
+    let destacar = !!real;
     if (real) {
       textoActivo = rellenar(t.activo, { combo: real.combo.nombre, ahorro: formatoPesos(real.monto) });
       let texto = textoActivo;
@@ -98,6 +99,7 @@ class MensajesCombos extends HTMLElement {
       if (candidatos.length) {
         const c = candidatos[0];
         const combo = porId.get(c.comboId);
+        destacar = true;
         mensajes.push(rellenar(t.agrega, { faltan: this.textoFaltan(c.faltan), combo: combo.nombre, beneficio: combo.beneficio }));
       } else if (contexto === 'ficha' && !pagina.premium) {
         const vigentes = combos.filter((c) => c.activo !== false);
@@ -117,7 +119,7 @@ class MensajesCombos extends HTMLElement {
     const lista = this.querySelector('[data-lista]');
     lista.replaceChildren(...visibles.map((texto, i) => {
       const li = document.createElement('li');
-      const principal = i === 0 && (real || contexto === 'ficha');
+      const principal = i === 0 && (destacar || contexto === 'ficha');
       li.className = principal ? 'combos-mensajes__item combos-mensajes__item--principal' : 'combos-mensajes__item';
       li.textContent = texto;
       return li;

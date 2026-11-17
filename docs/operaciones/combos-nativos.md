@@ -105,7 +105,7 @@ Se repite el mismo flujo tres veces. Fuente: [Buy X get Y](https://help.shopify.
 | Compra: colección | Tenis en combo | Tenis en combo | Tenis en combo |
 | Lleva: cantidad | 1 | 1 | 1 |
 | Lleva: colección | Gorras en combo | Gorras en combo | Tenis en combo |
-| Valor de descuento | Monto de descuento por artículo: `45000` | Gratis | Monto de descuento por artículo: `125000` |
+| Valor de descuento | Monto de descuento por artículo: `35000` (vigente; el diseño original decía 45000) | Gratis | Monto de descuento por artículo: `125000` |
 | Máximo de usos por pedido | 3 | 3 | 3 |
 | Combinaciones | Ninguna | Ninguna | Ninguna |
 
@@ -122,6 +122,22 @@ Como ninguno se combina con otro, cuando un carrito califica para varios Shopify
 Usa la tabla de carritos y la tienda de desarrollo o la tienda real sin completar el pago (el checkout muestra el descuento antes de pagar).
 
 ## Tabla de 7 carritos de prueba
+
+### Con los precios vigentes (tenis $174.900, gorras $49.900, Luna Nueva $35.000; medidos el 16 nov 2026)
+
+| # | Carrito | Gana | Total que cobró Shopify |
+| --- | --- | --- | --- |
+| 1 | 1T + 1G | Luna Nueva (−$35.000) | $189.800 |
+| 2 | 2T + 1G | Eclipse (gorra gratis, −$49.900) | $349.800 |
+| 3 | 2T + 2G | Luna Nueva ×2 (−$70.000) | $379.600 |
+| 4 | 3T | Luna Llena (−$125.000) | $399.700 |
+| 5 | 3T + 1G | Luna Llena (−$125.000) | $449.600 |
+| 6 | 4T | Luna Llena una vez (−$125.000) | $574.600 |
+| 6b | 6T | Luna Llena ×2 (−$250.000) | $799.400 |
+
+Si cambias el precio de los productos, el tema recalcula solo los precios que anuncia. Si cambias el **monto de un descuento**, cambia también "Valor del descuento" del mismo combo en Ajustes del tema > Combos.
+
+### Con los precios del diseño original ($175.000 y $60.000)
 
 Supuestos: tenis en combo (T) $175.000, gorra en combo (G) $60.000. `P` = precio de un tenis premium que no está en la colección.
 

@@ -150,21 +150,22 @@
       {
         "type": "text",
         "id": "combo_1_precio",
-        "label": "Precio del combo",
-        "default": "$190.000"
+        "label": "Precio del combo (opcional)",
+        "info": "Déjalo vacío: el tema lo calcula con los precios de las colecciones y el descuento de este combo. Escríbelo solo si quieres mostrar otro texto."
       },
       {
         "type": "textarea",
         "id": "combo_1_descripcion",
         "label": "Descripción",
-        "default": "Tu primer par y la gorra que lo cierra. La gorra te queda $45.000 más baja."
+        "default": "Tu primer par y la gorra que lo cierra. La gorra te queda {ahorro} más baja.",
+        "info": "Puedes usar {precio} y {ahorro}: el tema los reemplaza por los valores reales."
       },
       {
         "type": "text",
         "id": "combo_1_beneficio",
         "label": "Beneficio en mensajes",
-        "default": "pagas $190.000 por los dos",
-        "info": "Completa la frase «Agrega 1 gorra y activa el combo: …»."
+        "default": "pagas {precio} por los dos",
+        "info": "Completa la frase «Agrega 1 gorra y activa el combo: …». Puedes usar {precio} y {ahorro}: el tema los reemplaza por los valores reales."
       },
       {
         "type": "select",
@@ -240,8 +241,8 @@
         "type": "number",
         "id": "combo_1_valor",
         "label": "Valor del descuento",
-        "default": 45000,
-        "info": "Pesos por artículo (ej. 45000) o porcentaje de 1 a 100. Ignorado si es gratis."
+        "default": 35000,
+        "info": "Igual al descuento del admin. Pesos por artículo (ej. 35000) o porcentaje de 1 a 100. Ignorado si es gratis."
       },
       {
         "type": "number",
@@ -296,21 +297,22 @@
       {
         "type": "text",
         "id": "combo_2_precio",
-        "label": "Precio del combo",
-        "default": "$350.000"
+        "label": "Precio del combo (opcional)",
+        "info": "Déjalo vacío: el tema lo calcula con los precios de las colecciones y el descuento de este combo. Escríbelo solo si quieres mostrar otro texto."
       },
       {
         "type": "textarea",
         "id": "combo_2_descripcion",
         "label": "Descripción",
-        "default": "Dos pares al precio de siempre y la gorra la ponemos nosotros. Tú la eliges."
+        "default": "Dos pares al precio de siempre y la gorra la ponemos nosotros. Tú la eliges.",
+        "info": "Puedes usar {precio} y {ahorro}: el tema los reemplaza por los valores reales."
       },
       {
         "type": "text",
         "id": "combo_2_beneficio",
         "label": "Beneficio en mensajes",
         "default": "la gorra va por nosotros",
-        "info": "Completa la frase «Agrega 1 gorra y activa el combo: …»."
+        "info": "Completa la frase «Agrega 1 gorra y activa el combo: …». Puedes usar {precio} y {ahorro}: el tema los reemplaza por los valores reales."
       },
       {
         "type": "select",
@@ -387,7 +389,7 @@
         "id": "combo_2_valor",
         "label": "Valor del descuento",
         "default": 0,
-        "info": "Pesos por artículo (ej. 45000) o porcentaje de 1 a 100. Ignorado si es gratis."
+        "info": "Igual al descuento del admin. Pesos por artículo (ej. 35000) o porcentaje de 1 a 100. Ignorado si es gratis."
       },
       {
         "type": "number",
@@ -441,21 +443,22 @@
       {
         "type": "text",
         "id": "combo_3_precio",
-        "label": "Precio del combo",
-        "default": "$400.000"
+        "label": "Precio del combo (opcional)",
+        "info": "Déjalo vacío: el tema lo calcula con los precios de las colecciones y el descuento de este combo. Escríbelo solo si quieres mostrar otro texto."
       },
       {
         "type": "textarea",
         "id": "combo_3_descripcion",
         "label": "Descripción",
-        "default": "Tres pares para toda la semana. El de menor precio baja $125.000."
+        "default": "Tres pares para toda la semana. El de menor precio baja {ahorro}.",
+        "info": "Puedes usar {precio} y {ahorro}: el tema los reemplaza por los valores reales."
       },
       {
         "type": "text",
         "id": "combo_3_beneficio",
         "label": "Beneficio en mensajes",
-        "default": "3 pares por $400.000",
-        "info": "Completa la frase «Agrega 1 gorra y activa el combo: …»."
+        "default": "3 pares por {precio}",
+        "info": "Completa la frase «Agrega 1 gorra y activa el combo: …». Puedes usar {precio} y {ahorro}: el tema los reemplaza por los valores reales."
       },
       {
         "type": "select",
@@ -532,7 +535,7 @@
         "id": "combo_3_valor",
         "label": "Valor del descuento",
         "default": 125000,
-        "info": "Pesos por artículo (ej. 45000) o porcentaje de 1 a 100. Ignorado si es gratis."
+        "info": "Igual al descuento del admin. Pesos por artículo (ej. 35000) o porcentaje de 1 a 100. Ignorado si es gratis."
       },
       {
         "type": "number",
