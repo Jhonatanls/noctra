@@ -7,7 +7,7 @@ Estado: borrador para aprobación del equipo. Última revisión de fuentes: 16 n
 1. **Fechas de vigencia.** El equipo no las definió. Cada descuento lleva fecha de inicio y, opcionalmente, de fin. Marcador: `[FECHA_INICIO]` y `[FECHA_FIN o sin fin]`. Hora según la zona horaria de la tienda.
 2. **Precio base.** Esta guía asume que el precio publicado de cada tenis en combo es $175.000 y de cada gorra en combo es $60.000 (sin precio "antes"). Si los productos tienen otro precio, los totales de la tabla de pruebas cambian.
 3. **Precio de un tenis premium** para la prueba 7 (valor `P`). Es un modelo que NO está en "Tenis en combo".
-4. **Nombres visibles** de los combos en el checkout (propuesta en el paso 3; confirmar con la marca).
+4. **Nombres visibles** de los combos en el checkout: deben ser iguales a los de Ajustes del tema > Combos (hoy `Luna Nueva`, `Eclipse`, `Luna Llena`).
 
 ## Objetivo
 
@@ -88,7 +88,7 @@ Se repite el mismo flujo tres veces. Fuente: [Buy X get Y](https://help.shopify.
 1. Admin > **Descuentos** > **Crear descuento**.
 2. En el tipo de descuento elige **Compra X y obtén Y** (en inglés "Buy X get Y"; nombre exacto en español: verificar en pantalla).
 3. En **Método**, elige **Descuento automático** (no código).
-4. **Título**: es el nombre que ve el cliente en el carrito y el checkout. Propuestas: `Combo Luna Nueva`, `Combo Eclipse`, `Combo Luna Llena`. No uses nombres de marcas de terceros.
+4. **Título**: es el nombre que ve el cliente en el carrito y el checkout. Debe ser **idéntico** al nombre del combo en Ajustes del tema > Combos (`Luna Nueva`, `Eclipse`, `Luna Llena`): el tema lo usa para reconocer qué combo aplicó Shopify. Si cambias uno, cambia el otro. No uses nombres de marcas de terceros.
 5. **El cliente compra** (Customer buys): elige **Cantidad mínima de artículos**, escribe el número, y en "Cualquier artículo de" elige **Colecciones específicas** y agrega la colección.
 6. **El cliente obtiene** (Customer gets): escribe la cantidad, elige colección, y en **Con un valor de descuento** elige según el combo.
 7. Marca **Establecer el número máximo de usos por pedido** y escribe `1`.
@@ -100,7 +100,7 @@ Se repite el mismo flujo tres veces. Fuente: [Buy X get Y](https://help.shopify.
 
 | Campo | Luna Nueva | Eclipse | Luna Llena |
 | --- | --- | --- | --- |
-| Título | Combo Luna Nueva | Combo Eclipse | Combo Luna Llena |
+| Título | Luna Nueva | Eclipse | Luna Llena |
 | Compra: cantidad mínima | 1 | 2 | 2 |
 | Compra: colección | Tenis en combo | Tenis en combo | Tenis en combo |
 | Lleva: cantidad | 1 | 1 | 1 |
