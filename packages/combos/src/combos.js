@@ -14,6 +14,8 @@
  *   comboVigente(combo, hoy)                  -> boolean
  *   evaluarCarrito(lineas, combos, { hoy })   -> Resultado (qué combo aplica y cuánto ahorra)
  *   estadoCombos(lineas, combos, { hoy })     -> Estado (aplicado + qué falta para cada combo)
+ *   siguientePaso(lineas, combos, { hoy, maxUnidades?, preciosReferencia? })
+ *                                             -> lo mínimo que conviene agregar para ahorrar más, o null
  *   grupoDesdeEtiquetas(etiquetas)            -> string | null (ayuda opcional)
  *
  * Formato de datos que el tema debe pasar:
@@ -28,13 +30,15 @@
  *     compra: { grupo, cantidad },
  *     lleva:  { grupo, cantidad, valor: { tipo: 'gratis' } | { tipo: 'porcentaje', valor: 1..100 }
  *                                      | { tipo: 'monto', valor: centavos por unidad } },
- *     limitePorPedido: 1 (por defecto 1), desde?: 'YYYY-MM-DD', hasta?: 'YYYY-MM-DD', activo?: boolean
+ *     limitePorPedido: n (por defecto 1; el equipo usa 3), desde?: 'YYYY-MM-DD', hasta?: 'YYYY-MM-DD', activo?: boolean
  *   }
  *   Los combos vienen de configuración editable (metacampos/metaobjetos o ajustes del tema).
  *
  * Reglas modeladas:
  *   - Solo se aplica UN combo por pedido (los descuentos no se combinan entre sí): el de mayor
- *     ahorro; un combo sin ahorro positivo nunca se aplica. Se repite solo hasta limitePorPedido.
+ *     ahorro TOTAL; cada combo se repite hasta limitePorPedido y se compara con todos sus usos
+ *     (p. ej. con 2 tenis + 2 gorras, Luna Nueva ×2 ahorra más que Eclipse ×1). Un combo sin
+ *     ahorro positivo nunca se aplica.
  *   - Las unidades de "compra" son las más caras del grupo. Las de "lleva" son las de MENOR
  *     precio entre las elegibles restantes. Si compra y lleva son el mismo grupo, las unidades
  *     se reparten del mismo conjunto (primero las más caras compran, la más barata se lleva).
@@ -96,8 +100,27 @@ function ahorroDe(combo, llevadas) {
   return llevadas.reduce((s, u) => s + descuentoUnidad(combo.lleva.valor, u.precio), 0);
 }
 
+/** Aplica un combo tantas veces como permita su límite por pedido y devuelve sus usos. */
+function aplicarCombo(combo, unidades) {
+  let disponibles = unidades;
+  const aplicaciones = [];
+  const limite = combo.limitePorPedido ?? 1;
+  for (let uso = 0; uso < limite; uso++) {
+    const sel = seleccionar(combo, disponibles);
+    if (!sel) break;
+    const ahorro = ahorroDe(combo, sel.llevadas);
+    if (ahorro <= 0) break;
+    const reparto = sel.llevadas.map((u) => ({ lineaId: u.lineaId, descuento: descuentoUnidad(combo.lleva.valor, u.precio) }));
+    aplicaciones.push({ comboId: combo.id, nombre: combo.nombre, ahorro, reparto });
+    const usadas = new Set([...sel.compradas, ...sel.llevadas]);
+    disponibles = disponibles.filter((u) => !usadas.has(u));
+  }
+  return { aplicaciones, ahorro: aplicaciones.reduce((s, a) => s + a.ahorro, 0) };
+}
+
 /**
- * Calcula qué combo aplica (como mucho uno, el de mayor ahorro) y el total esperado.
+ * Calcula qué combo aplica (uno solo, el de mayor ahorro TOTAL contando sus usos repetidos
+ * hasta limitePorPedido) y el total esperado.
  * @returns {{ aplicaciones: Array<{comboId, nombre, ahorro, reparto}>, descuentoTotal: number,
  *             descuentoPorLinea: Record<string, number>, subtotal: number, total: number }}
  */
@@ -105,30 +128,14 @@ export function evaluarCarrito(lineas, combos, opciones = {}) {
   const hoy = hoyColombia(opciones);
   const vigentes = combos.filter((c) => comboVigente(c, hoy));
   const subtotal = lineas.reduce((s, l) => s + l.precio * l.cantidad, 0);
-  let disponibles = expandir(lineas);
+  const unidades = expandir(lineas);
 
-  let mejor = null;
+  let mejor = { aplicaciones: [], ahorro: 0 };
   for (const combo of vigentes) {
-    const sel = seleccionar(combo, disponibles);
-    if (!sel) continue;
-    const ahorro = ahorroDe(combo, sel.llevadas);
-    if (ahorro > 0 && (!mejor || ahorro > mejor.ahorro)) mejor = { combo, ahorro };
+    const intento = aplicarCombo(combo, unidades);
+    if (intento.ahorro > mejor.ahorro) mejor = intento;
   }
-
-  const aplicaciones = [];
-  if (mejor) {
-    const limite = mejor.combo.limitePorPedido ?? 1;
-    for (let uso = 0; uso < limite; uso++) {
-      const sel = seleccionar(mejor.combo, disponibles);
-      if (!sel) break;
-      const ahorro = ahorroDe(mejor.combo, sel.llevadas);
-      if (ahorro <= 0) break;
-      const reparto = sel.llevadas.map((u) => ({ lineaId: u.lineaId, descuento: descuentoUnidad(mejor.combo.lleva.valor, u.precio) }));
-      aplicaciones.push({ comboId: mejor.combo.id, nombre: mejor.combo.nombre, ahorro, reparto });
-      const usadas = new Set([...sel.compradas, ...sel.llevadas]);
-      disponibles = disponibles.filter((u) => !usadas.has(u));
-    }
-  }
+  const { aplicaciones } = mejor;
 
   const descuentoPorLinea = {};
   for (const ap of aplicaciones) {
@@ -136,6 +143,55 @@ export function evaluarCarrito(lineas, combos, opciones = {}) {
   }
   const descuentoTotal = aplicaciones.reduce((s, a) => s + a.ahorro, 0);
   return { aplicaciones, descuentoTotal, descuentoPorLinea, subtotal, total: subtotal - descuentoTotal };
+}
+
+/**
+ * Lo mínimo que conviene agregar al carrito para ahorrar más (pasar a un combo mejor o
+ * repetir el actual), probando hasta `maxUnidades` unidades nuevas de los grupos de combo.
+ * Cada unidad hipotética toma el mayor precio de su grupo en el carrito; si el grupo no está
+ * en el carrito, se usa `preciosReferencia[grupo]` o se omite.
+ * @returns {{ agregar: Record<string, number>, unidades: number, comboId: string, nombre: string,
+ *             usos: number, ahorroTotal: number, ahorroExtra: number } | null}
+ */
+export function siguientePaso(lineas, combos, opciones = {}) {
+  const hoy = hoyColombia(opciones);
+  const maxUnidades = opciones.maxUnidades ?? 3;
+  const referencia = opciones.preciosReferencia ?? {};
+  const base = evaluarCarrito(lineas, combos, { hoy });
+  const grupos = [...new Set(combos.filter((c) => comboVigente(c, hoy)).flatMap((c) => [c.compra.grupo, c.lleva.grupo]))];
+  const precio = (g) => {
+    const precios = lineas.filter((l) => l.grupo === g).map((l) => l.precio);
+    return precios.length ? Math.max(...precios) : referencia[g];
+  };
+  const conPrecio = grupos.filter((g) => Number.isInteger(precio(g)));
+
+  // Todas las formas de repartir 1..maxUnidades unidades entre los grupos
+  const repartos = [];
+  const armar = (i, quedan, actual) => {
+    if (i === conPrecio.length) {
+      const n = Object.values(actual).reduce((s, x) => s + x, 0);
+      if (n > 0) repartos.push({ ...actual });
+      return;
+    }
+    for (let k = 0; k <= quedan; k++) armar(i + 1, quedan - k, k ? { ...actual, [conPrecio[i]]: k } : actual);
+  };
+  armar(0, maxUnidades, {});
+
+  let mejor = null;
+  for (const agregar of repartos) {
+    const extra = Object.entries(agregar).map(([g, n], i) => ({ id: `hipotetica-${i}`, precio: precio(g), cantidad: n, grupo: g }));
+    const r = evaluarCarrito([...lineas, ...extra], combos, { hoy });
+    const ahorroExtra = r.descuentoTotal - base.descuentoTotal;
+    if (ahorroExtra <= 0 || !r.aplicaciones.length) continue;
+    const unidades = Object.values(agregar).reduce((s, x) => s + x, 0);
+    if (!mejor || unidades < mejor.unidades || (unidades === mejor.unidades && ahorroExtra > mejor.ahorroExtra)) {
+      mejor = {
+        agregar, unidades, comboId: r.aplicaciones[0].comboId, nombre: r.aplicaciones[0].nombre,
+        usos: r.aplicaciones.length, ahorroTotal: r.descuentoTotal, ahorroExtra,
+      };
+    }
+  }
+  return mejor;
 }
 
 /**

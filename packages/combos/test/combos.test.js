@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { evaluarCarrito, estadoCombos, comboVigente, grupoDesdeEtiquetas } from '../src/combos.js';
+import { evaluarCarrito, estadoCombos, comboVigente, grupoDesdeEtiquetas, siguientePaso } from '../src/combos.js';
 
 const p = (pesos) => pesos * 100; // pesos → centavos
 const HOY = '2026-12-10';
@@ -173,4 +173,55 @@ test('carrito vacío o sin productos de combo no sugiere nada', () => {
 test('grupoDesdeEtiquetas lee la etiqueta grupo-*', () => {
   assert.equal(grupoDesdeEtiquetas(['nuevo', 'grupo-tenis']), 'tenis');
   assert.equal(grupoDesdeEtiquetas(['nuevo']), null);
+});
+
+// --- Tope de 3 usos por pedido (decisión del equipo, 16 nov 2026) ---
+const COMBOS_3 = COMBOS.map((c) => ({ ...c, limitePorPedido: 3 }));
+const total3 = (lineas) => evaluarCarrito(lineas, COMBOS_3, { hoy: HOY });
+
+const CASOS_TOPE_3 = [
+  ['1T + 1G', [tenis(1), gorras(1)], 190000, 'luna-nueva', 1],
+  ['2T + 1G', [tenis(2), gorras(1)], 350000, 'eclipse', 1],
+  ['2T + 2G (Luna Nueva x2 gana a Eclipse)', [tenis(2), gorras(2)], 380000, 'luna-nueva', 2],
+  ['3T', [tenis(3)], 400000, 'luna-llena', 1],
+  ['3T + 1G', [tenis(3), gorras(1)], 460000, 'luna-llena', 1],
+  ['3T + 3G (Luna Nueva x3)', [tenis(3), gorras(3)], 570000, 'luna-nueva', 3],
+  ['4T', [tenis(4)], 575000, 'luna-llena', 1],
+  ['4T + 4G (Luna Nueva topado en 3 usos)', [tenis(4), gorras(4)], 805000, 'luna-nueva', 3],
+  ['6T (Luna Llena x2)', [tenis(6)], 800000, 'luna-llena', 2],
+  ['6T + 3G (Luna Llena x2)', [tenis(6), gorras(3)], 980000, 'luna-llena', 2],
+  ['9T (Luna Llena x3)', [tenis(9)], 1200000, 'luna-llena', 3],
+  ['12T (tope de 3 usos)', [tenis(12)], 1725000, 'luna-llena', 3],
+];
+
+for (const [nombre, lineas, esperado, combo, usos] of CASOS_TOPE_3) {
+  test('tope 3: ' + nombre + ' = ' + esperado, () => {
+    const r = total3(lineas);
+    assert.equal(r.total, p(esperado));
+    assert.equal(r.aplicaciones[0].comboId, combo);
+    assert.equal(r.aplicaciones.length, usos);
+  });
+}
+
+test('siguientePaso: con 3 tenis y tope 3, sugiere 3 pares más para repetir Luna Llena', () => {
+  const paso = siguientePaso([tenis(3)], COMBOS_3, { hoy: HOY });
+  assert.deepEqual(paso.agregar, { [T]: 3 });
+  assert.equal(paso.comboId, 'luna-llena');
+  assert.equal(paso.usos, 2);
+  assert.equal(paso.ahorroTotal, p(250000));
+});
+
+test('siguientePaso: con 1 tenis + 1 gorra sugiere 1 par para pasar a Eclipse', () => {
+  const paso = siguientePaso([tenis(1), gorras(1)], COMBOS_3, { hoy: HOY });
+  assert.deepEqual(paso.agregar, { [T]: 1 });
+  assert.equal(paso.comboId, 'eclipse');
+  assert.equal(paso.ahorroTotal, p(60000));
+});
+
+test('siguientePaso: con el tope alcanzado no sugiere repetir más', () => {
+  assert.equal(siguientePaso([tenis(9)], COMBOS_3, { hoy: HOY }), null);
+});
+
+test('siguientePaso: sin productos de combo no sugiere nada', () => {
+  assert.equal(siguientePaso([], COMBOS_3, { hoy: HOY }), null);
 });

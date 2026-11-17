@@ -16,7 +16,17 @@ Reemplaza las decisiones anteriores de esta spec (ver "Historial"). Texto del eq
 
 - Tienda en **Shopify Basic**, sin Plus y sin Functions propias. **No se crea `apps/combos/`.**
 - Precios: todos los tenis de la colección **"Tenis en combo"** a **$175.000**; las gorras de **"Gorras en combo"** a **$60.000**. Los modelos premium no entran a esas colecciones.
-- Tres descuentos automáticos nativos **"Compra X lleva Y"**, **1 uso por pedido**, **sin combinarse entre sí**: cuando varios califican, Shopify aplica el que más ahorra.
+- Tres descuentos automáticos nativos **"Compra X lleva Y"**, ~~1 uso por pedido~~ **hasta 3 usos por pedido** (ver el cambio de abajo), **sin combinarse entre sí**: cuando varios califican, Shopify aplica el que más ahorra.
+
+### Cambio: tope de 3 usos por pedido (decisión del equipo, 16 nov 2026, en conversación)
+
+El equipo evaluó dejar los combos sin límite y eligió **un máximo de 3 usos por pedido** en cada descuento: un mismo combo se puede repetir hasta 3 veces en un pedido (por ejemplo, 6 pares = Luna Llena ×2 = $800.000), pero los combos siguen sin combinarse entre sí. Motivos: no castigar las compras de grupo o familia, limitar la reventa a unos 9 pares por pedido y acotar el monto de los pedidos contraentrega.
+
+- En el admin: "Máximo de usos por pedido" = 3 en los tres descuentos.
+- En el tema: Ajustes del tema > Combos > "Máximo de usos por pedido" = 3 (debe coincidir).
+- Efecto que el equipo debe conocer: con tantas gorras como pares, Luna Nueva repetida puede ganarle a Eclipse (2T + 2G = Luna Nueva ×2, $380.000, en vez de Eclipse + 1 gorra, $410.000).
+- La lógica compara el ahorro **total** de cada combo contando sus usos, y el carrito sugiere repetir el combo ("Agrega 3 pares y Luna Llena se aplica 2 veces").
+- QA en vivo del 16 nov 2026 (antes de este cambio en el admin): Shopify ya aplicaba Luna Nueva ×2 en 2T + 2G, lo que confirma que el límite cuenta por grupo "compra + lleva".
 
 ## Trazabilidad
 
@@ -68,7 +78,7 @@ Precios de lista: tenis en combo (T) $175.000, gorra en combo (G) $60.000.
 | **Eclipse** | 2 de "Tenis en combo" | 1 de "Gorras en combo" | Gorra gratis | **$350.000** (2 × 175.000 + 0) | $60.000 |
 | **Luna Llena** | 2 de "Tenis en combo" | 1 más de "Tenis en combo" | $125.000 de descuento en el tenis de menor precio | **$400.000** (3 × 175.000 − 125.000) | $125.000 |
 
-Reglas comunes: descuento automático (sin código), máximo **1 uso por pedido**, Combinaciones **todas desmarcadas**, vigencia por fechas (pregunta 1).
+Reglas comunes: descuento automático (sin código), máximo **3 usos por pedido**, Combinaciones **todas desmarcadas**, vigencia por fechas (pregunta 1).
 
 ## Comportamiento esperado
 
@@ -76,7 +86,7 @@ Reglas comunes: descuento automático (sin código), máximo **1 uso por pedido*
 
 1. Shopify revisa los tres descuentos. Califica uno cuando el carrito tiene las unidades de "compra" **y** las de "lleva".
 2. Como no se combinan, aplica **solo uno**: el de mayor ahorro para el cliente.
-3. Con 1 uso por pedido, el combo ganador se aplica una sola vez aunque el carrito alcance para dos. Las unidades sobrantes pagan precio de lista.
+3. El combo ganador se repite mientras el carrito alcance, hasta 3 veces por pedido. Se elige por el ahorro total con sus repeticiones. Las unidades sobrantes pagan precio de lista.
 4. En la parte "lleva", el descuento cae en la unidad de **menor precio** entre las elegibles.
 5. El cliente tiene que agregar la unidad "lleva" al carrito. Shopify no la agrega sola (por eso existe el selector "Elige tu gorra de regalo" de SPEC-006).
 
@@ -88,10 +98,12 @@ Totales de productos, sin envío. Son los mismos de la tabla de pruebas de `docs
 | --- | --- | --- | --- | --- | --- |
 | 1 | 1T + 1G | Luna Nueva ($45.000) | Luna Nueva | 175.000 + (60.000 − 45.000) | **$190.000** |
 | 2 | 2T + 1G | Luna Nueva ($45.000), Eclipse ($60.000) | Eclipse | 350.000 + 0 | **$350.000** |
-| 3 | 2T + 2G | Luna Nueva ($45.000), Eclipse ($60.000) | Eclipse sobre 1 gorra; la otra a precio de lista | 350.000 + 0 + 60.000 | **$410.000** |
+| 3 | 2T + 2G | Luna Nueva ×2 ($90.000), Eclipse ($60.000) | Luna Nueva dos veces (tope de 3 usos) | 350.000 + 2 × 15.000 | **$380.000** |
 | 4 | 3T | Luna Llena ($125.000) | Luna Llena | 525.000 − 125.000 | **$400.000** |
 | 5 | 3T + 1G | Luna Nueva ($45.000), Eclipse ($60.000), Luna Llena ($125.000) | Luna Llena; la gorra a precio de lista | 400.000 + 60.000 | **$460.000** |
-| 6 | 4T | Luna Llena ($125.000) | Luna Llena una vez (1 uso por pedido) | 700.000 − 125.000 | **$575.000** |
+| 6 | 4T | Luna Llena ($125.000) | Luna Llena una vez (4 pares solo alcanzan para un uso) | 700.000 − 125.000 | **$575.000** |
+| 6b | 6T | Luna Llena ×2 ($250.000) | Luna Llena dos veces | 1.050.000 − 250.000 | **$800.000** |
+| 6c | 12T | Luna Llena ×3 ($375.000) | Luna Llena tres veces; el tope deja 3 pares a precio de lista | 2.100.000 − 375.000 | **$1.725.000** |
 | 7 | 1T + 1 tenis premium de precio P + 1G | Luna Nueva ($45.000) | Luna Nueva; el premium no cuenta | 175.000 + 15.000 + P | **$190.000 + P** |
 
 ### Caso: un tenis de otro precio
@@ -170,18 +182,18 @@ Precios de prueba: T = $175.000, G = $60.000, P = precio de un premium que defin
 
 | # | Criterio |
 | --- | --- |
-| C1 | [ ] Dado el carrito 1 (1T + 1G), cuando abro el carrito y luego el checkout, entonces los dos muestran "Combo Luna Nueva" y un total de productos de $190.000. |
-| C2 | [ ] Dado el carrito 2 (2T + 1G), entonces carrito y checkout aplican "Combo Eclipse" (no Luna Nueva) y el total es $350.000. |
-| C3 | [ ] Dado el carrito 3 (2T + 2G), entonces aplica Eclipse sobre una sola gorra, la otra queda en $60.000 y el total es $410.000. |
+| C1 | [ ] Dado el carrito 1 (1T + 1G), cuando abro el carrito y luego el checkout, entonces los dos muestran "Luna Nueva" y un total de productos de $190.000. |
+| C2 | [ ] Dado el carrito 2 (2T + 1G), entonces carrito y checkout aplican "Eclipse" (no Luna Nueva) y el total es $350.000. |
+| C3 | [ ] Dado el carrito 3 (2T + 2G), entonces aplica Luna Nueva dos veces y el total es $380.000. |
 | C4 | [ ] Dado el carrito 4 (3T), entonces aplica Luna Llena y el total es $400.000. |
 | C5 | [ ] Dado el carrito 5 (3T + 1G), entonces aplica Luna Llena (ahorro $125.000, mayor que los $60.000 de Eclipse), la gorra queda en $60.000 y el total es $460.000. |
-| C6 | [ ] Dado el carrito 6 (4T), entonces Luna Llena se aplica una sola vez y el total es $575.000 (si da $450.000, el límite de 1 uso no quedó configurado). |
+| C6 | [ ] Dado el carrito 6 (4T), entonces Luna Llena se aplica una vez y el total es $575.000; con 6T se aplica dos veces ($800.000) y con 12T tres veces ($1.725.000; si da $1.600.000, el tope de 3 usos no quedó configurado). |
 | C7 | [ ] Dado el carrito 7 (1T + 1 premium de P + 1G), entonces aplica Luna Nueva, el premium no tiene descuento y el total es $190.000 + P. |
 | C8 | [ ] **En los 7 carritos, el total de productos del carrito del tema y el subtotal del checkout son iguales** entre sí y al total esperado de la tabla (capturas de los dos). |
 | C9 | [ ] `npm test` cubre los 7 carritos con la lógica `compraXllevaY` y da el mismo combo ganador y el mismo total de la tabla; también cubre: combo inactivo o vencido no aplica, combo sin ahorro no aplica, monto mayor que el precio deja la unidad en $0, porcentaje, y línea sin grupo no cuenta. |
 | C10 | [ ] Dadas las colecciones publicadas, cuando qa-calidad las revisa antes de unir a `prod`, entonces todos los productos de "Tenis en combo" cuestan $175.000, todos los de "Gorras en combo" $60.000 y ningún producto con `custom.gama` = "Noctra Premium" está en ellas. |
-| C11 | [ ] Dado que el equipo desactiva "Combo Eclipse" en el admin, cuando abro el carrito 2 en una ventana de incógnito, entonces aplica Luna Nueva y el total es $175.000 + $175.000 + $15.000 = $365.000; sin desplegar código. Al reactivarlo vuelve a $350.000. |
-| C12 | [ ] Dado el metaobjeto `combo` con los tres registros, cuando qa-calidad compara cada campo con su descuento en el admin (colecciones, cantidades, beneficio, fechas, título), entonces coinciden todos. |
+| C11 | [ ] Dado que el equipo desactiva "Eclipse" en el admin, cuando abro el carrito 2 en una ventana de incógnito, entonces aplica Luna Nueva y el total es $175.000 + $175.000 + $15.000 = $365.000; sin desplegar código. Al reactivarlo vuelve a $350.000. |
+| C12 | [ ] Dados los tres combos de Ajustes del tema > Combos, cuando qa-calidad compara cada campo con su descuento en el admin (título, colecciones, cantidades, valor, máximo de usos por pedido, fechas), entonces coinciden todos. |
 | C13 | [ ] Ningún archivo del repositorio contiene `apps/combos/`, una extensión de Function ni un token de Admin API para combos. |
 
 ## Plan

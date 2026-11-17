@@ -12,7 +12,7 @@ El proyecto es de largo plazo. Después vendrán ropa premium, lociones, accesor
 
 ### 1.1 Combos (SPEC-005, decisión del equipo del 16 nov 2026)
 
-La tienda se queda en **Shopify Basic, sin Plus y sin Shopify Functions propias**. Los combos son **descuentos automáticos nativos "Compra X lleva Y"** creados en el admin, con 1 uso por pedido y sin combinarse entre sí (Shopify aplica el que más ahorra).
+La tienda se queda en **Shopify Basic, sin Plus y sin Shopify Functions propias**. Los combos son **descuentos automáticos nativos "Compra X lleva Y"** creados en el admin, con hasta 3 usos por pedido (un combo se puede repetir) y sin combinarse entre sí (Shopify aplica el que más ahorra en total).
 
 | Combo | Compra | Lleva | Total |
 | --- | --- | --- | --- |
@@ -144,7 +144,7 @@ Cada funcionalidad vive en una spec en `specs/`. El ciclo es:
 
 **Etapa activa: 3.** Las etapas 1 y 2 están implementadas y probadas en la tienda de desarrollo; los criterios que faltan están en cada spec. Los combos (SPEC-005 y SPEC-006) están implementados y los tres descuentos creados en la tienda de desarrollo.
 
-**Estado verificado del código:** Theme Check sin errores ni avisos, fuentes autoalojadas, 20 pruebas de combos en verde (`npm test`). El tema Noctra va publicado en la tienda de desarrollo (con contraseña) y se probó allí a 360 y 1280 px en ambos modos.
+**Estado verificado del código:** Theme Check sin errores ni avisos, fuentes autoalojadas, 36 pruebas de combos en verde (`npm test`). El tema Noctra va publicado en la tienda de desarrollo (con contraseña) y se probó allí a 360 y 1280 px en ambos modos.
 
 ## 9. Subagentes
 
@@ -198,6 +198,6 @@ No agregues un MCP con acceso de escritura a la tienda (Admin API) sin una spec 
 - Verificación del nombre Noctra en la SIC (clases 25 y 35), dominio y usuarios de redes.
 - Archivo vectorial original del logo hecho por un diseñador (los SVG actuales son una vectorización automática de la imagen generada; ver `docs/marca/README.md`).
 - Verificar en la SIC que el eslogan "Viste la noche" se pueda registrar como lema comercial junto con la marca.
-- Vigencia de los combos (fechas de inicio y fin) y si se permite más de un uso por pedido.
+- Vigencia de los combos (fechas de inicio y fin).
 - Medidas reales por horma para la guía de tallas (hoy hay una tabla de referencia general marcada como provisional).
 - Umbral de envío gratis (hoy $150.000 de ejemplo).

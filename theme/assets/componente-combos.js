@@ -42,19 +42,9 @@ class MensajesCombos extends HTMLElement {
     return [...partes].map(([grupo, n]) => this.unidades(grupo, n)).join(' y ');
   }
 
-  /** Ahorro si el carrito sumara lo que falta para este combo (null si no se puede estimar). */
-  ahorroSi(combo, faltan) {
-    const { lineas, combos, hoy } = this.datos;
-    const extra = [];
-    const partes = [[faltan.grupoCompra, faltan.compra], [faltan.grupoLleva, faltan.lleva]];
-    for (const [grupo, n] of partes) {
-      if (n <= 0) continue;
-      const precios = lineas.filter((l) => l.grupo === grupo).map((l) => l.precio);
-      if (!precios.length) return null;
-      extra.push({ id: `hipotetica-${extra.length}`, precio: Math.max(...precios), cantidad: n, grupo });
-    }
-    const res = this.motor.evaluarCarrito([...lineas, ...extra], combos, { hoy });
-    return res.aplicaciones[0]?.comboId === combo.id ? res.descuentoTotal : null;
+  /** Texto "3 pares" o "1 par y 1 gorra" a partir de { grupo: unidades } de siguientePaso. */
+  textoAgregar(agregar) {
+    return Object.entries(agregar).map(([grupo, n]) => this.unidades(grupo, n)).join(' y ');
   }
 
   pintar() {
@@ -75,14 +65,11 @@ class MensajesCombos extends HTMLElement {
     if (real) {
       textoActivo = rellenar(t.activo, { combo: real.combo.nombre, ahorro: formatoPesos(real.monto) });
       let texto = textoActivo;
-      const mejores = estado.combos
-        .filter((e) => !e.califica && e.faltan.total > 0 && e.comboId !== real.combo.id)
-        .map((e) => ({ e, combo: porId.get(e.comboId), ahorro: this.ahorroSi(porId.get(e.comboId), e.faltan) }))
-        .filter((m) => m.ahorro !== null && m.ahorro > real.monto)
-        .sort((a, b) => a.e.faltan.total - b.e.faltan.total || b.ahorro - a.ahorro);
-      if (mejores.length) {
-        const m = mejores[0];
-        texto += ' ' + rellenar(t.mejor, { faltan: this.textoFaltan(m.e.faltan), combo: m.combo.nombre, ahorro: formatoPesos(m.ahorro) });
+      // Lo mínimo que conviene agregar: pasar a un combo mejor o repetir el actual (hasta su tope)
+      const paso = this.motor.siguientePaso(lineas, combos, { hoy });
+      if (paso && paso.ahorroTotal > real.monto) {
+        const valores = { faltan: this.textoAgregar(paso.agregar), combo: paso.nombre, ahorro: formatoPesos(paso.ahorroTotal), veces: paso.usos };
+        texto += ' ' + rellenar(paso.comboId === real.combo.id ? t.repite : t.mejor, valores);
       }
       mensajes.push(texto);
 
@@ -94,9 +81,12 @@ class MensajesCombos extends HTMLElement {
       if (lleva.valor.tipo === 'gratis') {
         const gorras = lineas.filter((l) => l.grupo === lleva.grupo);
         const cantidad = gorras.reduce((s, l) => s + l.cantidad, 0);
-        if (cantidad > lleva.cantidad) {
+        const estimado = estado.resultado.aplicaciones;
+        const usos = estimado[0]?.comboId === real.combo.id ? estimado.length : 1;
+        const gratis = usos * lleva.cantidad;
+        if (cantidad > gratis) {
           const precio = Math.min(...gorras.map((l) => l.precio));
-          mensajes.push(rellenar(t.extra_gorra, { combo: real.combo.nombre, precio_gorra: formatoPesos(precio) }));
+          mensajes.push(rellenar(t.extra_gorra, { combo: real.combo.nombre, gratis: this.unidades(lleva.grupo, gratis), precio_gorra: formatoPesos(precio) }));
         }
       }
       if (contexto === 'carrito') mensajes.push(t.aplicado_nota);
@@ -119,7 +109,8 @@ class MensajesCombos extends HTMLElement {
     }
 
     if (contexto === 'carrito' && lineas.some((l) => l.grupo)) {
-      mensajes.push(t.no_acumulan, t.un_uso);
+      const tope = Math.max(...combos.map((c) => c.limitePorPedido ?? 1));
+      mensajes.push(t.no_acumulan, tope > 1 ? rellenar(t.varios_usos, { n: tope }) : t.un_uso);
     }
 
     const visibles = contexto === 'ficha' ? mensajes.slice(0, 1) : mensajes;
@@ -141,7 +132,11 @@ class MensajesCombos extends HTMLElement {
 }
 if (!customElements.get('mensajes-combos')) customElements.define('mensajes-combos', MensajesCombos);
 
-/** Envuelve la sección del carrito: agrega la gorra de regalo sin recargar y refresca la sección. */
+/**
+ * Envuelve la sección del carrito: agrega la gorra de regalo y cambia cantidades sin recargar,
+ * y refresca la sección para que total, descuentos de Shopify y mensajes de combo queden al día.
+ * Sin JavaScript siguen funcionando los formularios normales ("Actualizar cantidades").
+ */
 class CarritoCombos extends HTMLElement {
   connectedCallback() {
     this.addEventListener('submit', (evento) => {
@@ -149,6 +144,11 @@ class CarritoCombos extends HTMLElement {
       if (!formulario) return;
       evento.preventDefault();
       this.agregarRegalo(formulario);
+    });
+    this.addEventListener('change', (evento) => {
+      if (!evento.target.matches('input[data-clave]')) return;
+      clearTimeout(this.espera);
+      this.espera = setTimeout(() => this.actualizarCantidades(evento.target.dataset.clave), 350);
     });
     this.addEventListener('combos:actualizado', (evento) => {
       if (!this.pendiente) return;
@@ -178,16 +178,54 @@ class CarritoCombos extends HTMLElement {
       });
       if (!respuesta.ok) throw new Error('agregar');
       this.pendiente = true;
-      const html = await (await fetch(`${this.dataset.url}?section_id=${encodeURIComponent(this.dataset.seccion)}`)).text();
-      const nuevo = new DOMParser().parseFromString(html, 'text/html').querySelector('[data-reemplazable]');
-      const actual = this.querySelector('[data-reemplazable]');
-      if (!nuevo || !actual) throw new Error('refrescar');
-      actual.replaceChildren(...nuevo.childNodes);
+      await this.refrescar();
       this.querySelector('[data-foco]')?.focus();
     } catch (fallo) {
       if (error) { error.textContent = this.textos().regalo_error; error.hidden = false; }
       if (boton) boton.disabled = false;
     }
+  }
+
+  /** Vuelve a pintar la sección con la Section Rendering API (precios y descuentos reales de Shopify). */
+  async refrescar() {
+    const html = await (await fetch(`${this.dataset.url}?section_id=${encodeURIComponent(this.dataset.seccion)}`)).text();
+    const nuevo = new DOMParser().parseFromString(html, 'text/html').querySelector('[data-reemplazable]');
+    const actual = this.querySelector('[data-reemplazable]');
+    if (!nuevo || !actual) throw new Error('refrescar');
+    actual.replaceChildren(...nuevo.childNodes);
+  }
+
+  /** Envía todas las cantidades a /cart/update.js y refresca; devuelve el foco al campo editado. */
+  async actualizarCantidades(clave) {
+    const textos = this.textos();
+    const anuncio = this.querySelector('[data-anuncio-combos]');
+    const updates = {};
+    for (const campo of this.querySelectorAll('input[data-clave]')) {
+      updates[campo.dataset.clave] = Math.max(0, Number.parseInt(campo.value, 10) || 0);
+    }
+    this.setAttribute('aria-busy', 'true');
+    let fallo = false;
+    try {
+      const respuesta = await fetch(`${this.dataset.url}/update.js`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({ updates }),
+      });
+      fallo = !respuesta.ok;
+    } catch (error) {
+      fallo = true;
+    }
+    try {
+      await this.refrescar();
+    } catch (error) {
+      window.location.reload();
+      return;
+    }
+    this.removeAttribute('aria-busy');
+    const campo = [...this.querySelectorAll('input[data-clave]')].find((c) => c.dataset.clave === clave);
+    (campo || this.querySelector('[data-foco]'))?.focus();
+    const total = this.querySelector('[data-total]')?.textContent.trim() ?? '';
+    if (anuncio) anuncio.textContent = fallo ? textos.cantidades_error : rellenar(textos.cantidades_actualizadas, { total });
   }
 }
 if (!customElements.get('carrito-combos')) customElements.define('carrito-combos', CarritoCombos);

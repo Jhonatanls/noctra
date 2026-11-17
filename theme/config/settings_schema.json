@@ -244,6 +244,13 @@
         "info": "Pesos por artículo (ej. 45000) o porcentaje de 1 a 100. Ignorado si es gratis."
       },
       {
+        "type": "number",
+        "id": "combo_1_usos",
+        "label": "Máximo de usos por pedido",
+        "default": 3,
+        "info": "Debe ser igual al \"máximo de usos por pedido\" del descuento en el admin."
+      },
+      {
         "type": "text",
         "id": "combo_1_desde",
         "label": "Vigente desde (AAAA-MM-DD)",
@@ -383,6 +390,13 @@
         "info": "Pesos por artículo (ej. 45000) o porcentaje de 1 a 100. Ignorado si es gratis."
       },
       {
+        "type": "number",
+        "id": "combo_2_usos",
+        "label": "Máximo de usos por pedido",
+        "default": 3,
+        "info": "Debe ser igual al \"máximo de usos por pedido\" del descuento en el admin."
+      },
+      {
         "type": "text",
         "id": "combo_2_desde",
         "label": "Vigente desde (AAAA-MM-DD)",
@@ -519,6 +533,13 @@
         "label": "Valor del descuento",
         "default": 125000,
         "info": "Pesos por artículo (ej. 45000) o porcentaje de 1 a 100. Ignorado si es gratis."
+      },
+      {
+        "type": "number",
+        "id": "combo_3_usos",
+        "label": "Máximo de usos por pedido",
+        "default": 3,
+        "info": "Debe ser igual al \"máximo de usos por pedido\" del descuento en el admin."
       },
       {
         "type": "text",

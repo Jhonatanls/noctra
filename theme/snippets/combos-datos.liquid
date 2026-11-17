@@ -35,6 +35,8 @@
         assign k_v = p | append: 'valor'
         assign k_desde = p | append: 'desde'
         assign k_hasta = p | append: 'hasta'
+        assign k_usos = p | append: 'usos'
+        assign usos = settings[k_usos] | default: 1 | at_least: 1
         assign tipo_valor = settings[k_vt]
         assign valor = settings[k_v] | default: 0
         if tipo_valor == 'monto'
@@ -57,13 +59,14 @@
           "cantidad": {{ settings[k_lc] | default: 1 }},
           "valor": { "tipo": {{ tipo_valor | json }}{% if tipo_valor != 'gratis' %}, "valor": {{ valor }}{% endif %} }
         },
-        "limitePorPedido": 1
+        "limitePorPedido": {{ usos }}
       }{% unless forloop.last %},{% endunless %}
     {%- endfor -%}
   ],
   "lineas": [
     {%- for item in cart.items -%}
       {%- capture grupo -%}{%- render 'combos-grupo', producto: item.product -%}{%- endcapture -%}
+      {%- assign grupo = grupo | strip -%}
       { "id": {{ item.key | json }}, "precio": {{ item.original_price }}, "cantidad": {{ item.quantity }}, "grupo": {% if grupo != blank %}{{ grupo | json }}{% else %}null{% endif %} }{% unless forloop.last %},{% endunless %}
     {%- endfor -%}
   ],
@@ -85,6 +88,10 @@
     "extra_gorra": {{ 'combos.extra_gorra' | t | json }},
     "no_acumulan": {{ 'combos.no_acumulan' | t | json }},
     "un_uso": {{ 'combos.un_uso' | t | json }},
+    "varios_usos": {{ 'combos.varios_usos' | t | json }},
+    "repite": {{ 'combos.repite' | t | json }},
+    "cantidades_actualizadas": {{ 'combos.cantidades_actualizadas' | t | json }},
+    "cantidades_error": {{ 'combos.cantidades_error' | t | json }},
     "aplicado_nota": {{ 'combos.aplicado_nota' | t | json }},
     "regalo_agregada": {{ 'combos.regalo_agregada' | t | json }},
     "regalo_error": {{ 'combos.regalo_error' | t | json }}

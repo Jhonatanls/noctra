@@ -57,11 +57,12 @@
                   <p class="carrito__variante">{{ item.variant.title }}</p>
                 {%- endunless -%}
                 {%- for asignacion in item.line_level_discount_allocations -%}
+                  {%- if asignacion.amount == 0 -%}{%- continue -%}{%- endif -%}
                   <p class="carrito__descuento">{{ asignacion.discount_application.title }}: &minus;{{ asignacion.amount | money }}</p>
                 {%- endfor -%}
                 <label class="carrito__cantidad">
                   <span class="oculto-visual">Cantidad de {{ item.product.title }}</span>
-                  <input type="number" name="updates[]" value="{{ item.quantity }}" min="0" inputmode="numeric">
+                  <input type="number" name="updates[]" value="{{ item.quantity }}" min="0" inputmode="numeric" data-clave="{{ item.key }}">
                 </label>
                 <a class="carrito__quitar" href="{{ item.url_to_remove }}">Quitar</a>
               </div>
@@ -82,10 +83,10 @@
           {%- if cart.total_discount > 0 -%}
             <p class="carrito__ahorro">Ahorras <span class="precio">{{ cart.total_discount | money }}</span></p>
           {%- endif -%}
-          <p class="carrito__total">Total <span class="precio">{{ cart.total_price | money }}</span></p>
+          <p class="carrito__total">Total <span class="precio" data-total>{{ cart.total_price | money }}</span></p>
           <p class="carrito__nota">{% if cart.taxes_included %}IVA incluido. {% endif %}El envío se calcula al finalizar la compra.</p>
 
-          <button type="submit" name="update" class="boton boton--secundario">Actualizar cantidades</button>
+          <button type="submit" name="update" class="boton boton--secundario carrito__actualizar">Actualizar cantidades</button>
           <button type="submit" name="checkout" class="boton boton--ancho">Finalizar compra</button>
 
           {%- if numero_whatsapp != blank -%}

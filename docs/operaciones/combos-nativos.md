@@ -19,7 +19,7 @@ Que los tres combos se apliquen solos en el carrito y en el checkout, sin códig
 | Eclipse | 2 de Tenis en combo | 1 de Gorras en combo gratis | $350.000 |
 | Luna Llena | 2 de Tenis en combo | 1 más de Tenis en combo con $125.000 de descuento | $350.000 + $50.000 = $400.000 |
 
-Regla de negocio: 1 uso por pedido en cada combo y ninguno se combina con otro.
+Regla de negocio: cada combo se puede repetir hasta 3 veces por pedido y ninguno se combina con otro (decisión del equipo, 16 nov 2026).
 
 ## Requisitos previos
 
@@ -91,7 +91,7 @@ Se repite el mismo flujo tres veces. Fuente: [Buy X get Y](https://help.shopify.
 4. **Título**: es el nombre que ve el cliente en el carrito y el checkout. Debe ser **idéntico** al nombre del combo en Ajustes del tema > Combos (`Luna Nueva`, `Eclipse`, `Luna Llena`): el tema lo usa para reconocer qué combo aplicó Shopify. Si cambias uno, cambia el otro. No uses nombres de marcas de terceros.
 5. **El cliente compra** (Customer buys): elige **Cantidad mínima de artículos**, escribe el número, y en "Cualquier artículo de" elige **Colecciones específicas** y agrega la colección.
 6. **El cliente obtiene** (Customer gets): escribe la cantidad, elige colección, y en **Con un valor de descuento** elige según el combo.
-7. Marca **Establecer el número máximo de usos por pedido** y escribe `1`.
+7. Marca **Establecer el número máximo de usos por pedido** y escribe `3`. Debe ser el mismo número que "Máximo de usos por pedido" en Ajustes del tema > Combos.
 8. **Combinaciones**: deja **todas las casillas desmarcadas** (productos, pedido, envío).
 9. **Fechas activas**: inicio `[FECHA_INICIO]`; fin `[FECHA_FIN o sin fin]`. Si aún no hay fechas, guarda el descuento sin activar probando primero en la tienda de desarrollo o deja la fecha de inicio en el futuro.
 10. Revisa el **Resumen** a la derecha y pulsa **Guardar**.
@@ -106,7 +106,7 @@ Se repite el mismo flujo tres veces. Fuente: [Buy X get Y](https://help.shopify.
 | Lleva: cantidad | 1 | 1 | 1 |
 | Lleva: colección | Gorras en combo | Gorras en combo | Tenis en combo |
 | Valor de descuento | Monto de descuento por artículo: `45000` | Gratis | Monto de descuento por artículo: `125000` |
-| Máximo de usos por pedido | 1 | 1 | 1 |
+| Máximo de usos por pedido | 3 | 3 | 3 |
 | Combinaciones | Ninguna | Ninguna | Ninguna |
 
 Notas:
@@ -129,13 +129,15 @@ Supuestos: tenis en combo (T) $175.000, gorra en combo (G) $60.000. `P` = precio
 | --- | --- | --- | --- | --- |
 | 1 | 1T + 1G | Luna Nueva | 175.000 + (60.000 - 45.000) | $190.000 |
 | 2 | 2T + 1G | Eclipse (ahorro $60.000 contra $45.000 de Luna Nueva) | 350.000 + 0 | $350.000 |
-| 3 | 2T + 2G | Eclipse (1 gorra gratis, 1 al precio normal) | 350.000 + 60.000 | $410.000 |
+| 3 | 2T + 2G | Luna Nueva dos veces (ahorra $90.000, más que Eclipse) | 350.000 + 2 × 15.000 | $380.000 |
 | 4 | 3T | Luna Llena | 525.000 - 125.000 | $400.000 |
 | 5 | 3T + 1G | Luna Llena (Eclipse ahorraría solo $60.000 contra $125.000) | 400.000 + 60.000 | $460.000 |
-| 6 | 4T | Luna Llena una sola vez | 700.000 - 125.000 | $575.000 |
+| 6 | 4T | Luna Llena una vez (4 pares solo alcanzan para un uso) | 700.000 - 125.000 | $575.000 |
+| 6b | 6T | Luna Llena dos veces | 1.050.000 - 250.000 | $800.000 |
+| 6c | 12T | Luna Llena tres veces (tope) | 2.100.000 - 375.000 | $1.725.000 |
 | 7 | 1T + 1 tenis premium + 1G | Luna Nueva (el premium no cuenta para ninguna compra) | 175.000 + P + 15.000 | $190.000 + P |
 
-Qué comprueba cada una: 1 el combo base; 2 y 5 la elección de mayor ahorro; 3 el límite de 1 gorra gratis; 4 la misma colección en compra y entrega; 6 el límite de 1 uso por pedido (si diera $450.000 no se aplicó el límite); 7 que los premium quedan fuera.
+Qué comprueba cada una: 1 el combo base; 2 y 5 la elección de mayor ahorro; 3 que el combo se repite y gana el de mayor ahorro total; 4 la misma colección en compra y entrega; 6, 6b y 6c el tope de 3 usos (si 12 pares dan $1.600.000, no quedó el tope); 7 que los premium quedan fuera.
 
 Para cada carrito: agrega los productos, entra al checkout con una dirección de prueba, confirma que el nombre del combo aparece en el resumen y que el subtotal coincide. No es necesario pagar.
 
@@ -155,7 +157,7 @@ Fuente: [Administrar descuentos](https://help.shopify.com/en/manual/discounts/ma
 2. **Revisa la etiqueta y la colección** del producto en el carrito. Un tenis sin etiqueta `combo` no cuenta.
 3. **Revisa el precio** del producto: si no es $175.000 o $60.000, el total cambia.
 4. **Revisa Combinaciones:** debe estar todo desmarcado en los tres descuentos. Si alguno tiene casillas marcadas, podrían sumarse dos combos.
-5. **Revisa "máximo de usos por pedido":** debe ser 1. Si en 4 tenis el total es $450.000, quedó sin límite.
+5. **Revisa "máximo de usos por pedido":** debe ser 3 en los tres descuentos y en Ajustes del tema > Combos. Si 12 pares dan $1.600.000, quedó sin tope.
 6. **Revisa duplicados:** descuentos viejos activos de pruebas anteriores, o un código de descuento puesto por el cliente.
 7. **Revisa descuentos de precio "antes/ahora"** del producto: pueden interferir con el monto mínimo.
 8. **Revisa el mercado y la moneda** (COP) y si hay descuentos limitados a ciertos clientes.
@@ -166,4 +168,4 @@ Fuente: [Administrar descuentos](https://help.shopify.com/en/manual/discounts/ma
 
 - Nombre exacto en español de "Buy X get Y", de "Amount off each" y de "Set the maximum number of uses per order".
 - Si el campo "Tipo de producto" existe como condición de colección en tu admin.
-- Comportamiento real del límite de 1 uso con 4 tenis (carrito 6).
+- Comportamiento real del tope de 3 usos con 12 pares (carrito 6c). Visto el 16 nov 2026: el límite cuenta por grupo "compra + lleva" (Luna Nueva se aplicó dos veces en 2T + 2G).

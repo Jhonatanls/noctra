@@ -1,7 +1,8 @@
 {% doc %}
   Devuelve el grupo de combo de un producto según las colecciones a las que pertenece
   (handle tenis-en-combo o gorras-en-combo). Si no está en ninguna, no imprime nada.
-  Úsalo con capture: {% capture grupo %}{% render 'combos-grupo', producto: p %}{% endcapture %}
+  Úsalo con capture y luego | strip (la salida puede traer un salto de línea):
+  {% capture grupo %}{% render 'combos-grupo', producto: p %}{% endcapture %}{% assign grupo = grupo | strip %}
   @param {product} producto - Producto a revisar
 {% enddoc %}
 {%- liquid

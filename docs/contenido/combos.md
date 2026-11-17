@@ -88,7 +88,7 @@ Mostrar solo si el combo superior ahorra más que el actual. Solo se aplica uno 
 
 - Aviso en carrito: "Los combos no se acumulan. Si calificas para varios, aplicamos el que más ahorra."
 - Cuando aplica uno y calificaba para otros: "Aplicamos {combo}, el que más te ahorra: {ahorro}."
-- Aviso de un solo uso: "Cada combo se aplica una vez por pedido."
+- Aviso de usos: "Cada combo se aplica hasta {n} veces por pedido." (con tope 1: "Cada combo se aplica una vez por pedido.")
 
 ## 3. Línea del combo para el mensaje de WhatsApp
 
@@ -118,7 +118,7 @@ Tallas en el mensaje con el formato "talla 42 (EUR)".
    - Eclipse: 2 pares + 1 gorra por $350.000; la gorra va sin costo.
    - Luna Llena: 3 pares por $400.000; el descuento de $125.000 se aplica sobre el par de menor precio.
 4. **Aplicación automática.** El descuento se aplica solo en el carrito cuando se cumplen las condiciones. En Eclipse, el cliente elige la gorra y la agrega al carrito.
-5. **Un uso por pedido.** Cada combo se aplica una sola vez por pedido.
+5. **Hasta 3 usos por pedido.** Cada combo se puede aplicar hasta 3 veces en un mismo pedido; las unidades adicionales pagan su precio normal.
 6. **No acumulables.** Los combos no se acumulan entre sí: si el carrito califica para varios, se aplica el que más ahorra. Tampoco se acumulan con otros descuentos o códigos. [confirmar con el equipo]
 7. **Precio de referencia.** Los ahorros se calculan frente al precio de lista vigente: $175.000 el par y $60.000 la gorra. [confirmar con cumplimiento que el precio de referencia sea el precio habitual real]
 8. **Cambios y devoluciones.** [confirmar con cumplimiento] Texto base: si cambias o devuelves un producto que llegó en combo, el combo se recalcula. El valor reembolsado corresponde a lo que pagaste por ese producto dentro del combo, no al precio de lista. [PENDIENTE: política de cambios y devoluciones del equipo, plazos y condiciones]

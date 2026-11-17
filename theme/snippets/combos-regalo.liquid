@@ -11,6 +11,7 @@
     capture grupo
       render 'combos-grupo', producto: item.product
     endcapture
+    assign grupo = grupo | strip
     if grupo == 'tenis-en-combo'
       assign tenis = tenis | plus: item.quantity
     elsif grupo == 'gorras-en-combo'
