@@ -223,3 +223,43 @@ dialog.ficha__zoom {
 @media (prefers-reduced-motion: reduce) {
   .ficha__barra { transition: none; }
 }
+
+/* Aviso "Agregado al carrito" (SPEC-004 y SPEC-006): se queda en la ficha para seguir comprando */
+.aviso-carrito {
+  position: fixed;
+  z-index: 90;
+  inset-inline: var(--espacio-4);
+  inset-block-end: calc(var(--espacio-4) + var(--alto-barra, 0px));
+  display: grid;
+  gap: var(--espacio-4);
+  padding: var(--espacio-5);
+  background: var(--color-superficie);
+  color: var(--color-texto);
+  border: var(--borde-fino) solid var(--color-oro);
+  outline: var(--borde-fino) solid var(--color-oro-suave);
+  outline-offset: calc(-1 * var(--espacio-2));
+  border-radius: var(--radio-m);
+  animation: aviso-carrito-entra var(--duracion-media) var(--curva);
+}
+.aviso-carrito[hidden] { display: none; }
+.aviso-carrito__titulo { margin: 0; font-weight: var(--peso-medio); color: var(--color-oro); }
+.aviso-carrito__detalle { margin: var(--espacio-1) 0 0; font-size: var(--texto-s); color: var(--color-texto-2); }
+.aviso-carrito__detalle[hidden], .aviso-carrito__acciones[hidden] { display: none; }
+.aviso-carrito__acciones { display: grid; grid-template-columns: 1fr 1fr; gap: var(--espacio-3); }
+.aviso-carrito__acciones .boton { min-block-size: var(--tactil-min); }
+.aviso-carrito--error { border-color: var(--color-error); }
+.aviso-carrito--error .aviso-carrito__titulo { color: var(--color-error); }
+@media (min-width: 750px) {
+  .aviso-carrito {
+    inset-inline: auto var(--espacio-6);
+    inset-block: calc(var(--alto-encabezado) + var(--espacio-4)) auto;
+    inline-size: min(calc(100% - 2 * var(--espacio-6)), var(--ancho-aviso-carrito));
+  }
+}
+@keyframes aviso-carrito-entra {
+  from { opacity: 0; transform: translateY(var(--espacio-2)); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .aviso-carrito { animation: none; }
+}

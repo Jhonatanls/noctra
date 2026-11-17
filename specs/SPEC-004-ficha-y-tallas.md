@@ -53,7 +53,7 @@ No cubre: el bloque "Arma tu combo" (RF-08), que depende del motor de combos (SP
 - Guía de tallas de gorras (son de talla única o ajustable).
 - Redacción de las políticas de envío, cambios, retracto y garantía (SPEC-010, con contenido-copy y cumplimiento).
 - Carga de las medidas reales de la guía: requisito de lanzamiento (SPEC-011), no de esta spec.
-- Carrito lateral al agregar (SPEC-006). Mientras tanto, "Agregar al carrito" envía el formulario y lleva a `/cart`.
+- Carrito lateral al agregar (SPEC-006). **Cambio del 17 nov 2026 (pedido del equipo):** "Agregar al carrito" ya no lleva a `/cart`: agrega sin salir de la ficha y muestra el aviso "Agregado al carrito" con el producto, la talla y el precio, y los botones "Ver carrito" y "Seguir comprando". Sin JavaScript el formulario sigue llevando a `/cart`.
 - Reseñas con foto (RF-31) y lista de deseos (RF-30), fase 2.
 - Cambiar el sistema de tallas a US o UK con un interruptor: la talla se elige siempre en EUR y las demás medidas se muestran como equivalencia.
 
@@ -166,6 +166,13 @@ No cubre: el bloque "Arma tu combo" (RF-08), que depende del motor de combos (SP
 - Admin: "Todos los precios incluyen impuestos" activado; políticas de envío, cambios y privacidad publicadas (SPEC-010).
 
 ## Criterios de aceptación
+
+Criterios del cambio "agregar sin salir de la ficha" (17 nov 2026):
+- [ ] C-AGR1: al tocar "Agregar al carrito" (o el de la barra fija) la página no cambia, el botón dice "Agregando…" y luego aparece el aviso con producto, talla y precio; el número del carrito del encabezado sube.
+- [ ] C-AGR2: agregar dos tallas distintas del mismo tenis, una tras otra, deja dos líneas en el carrito, una por talla.
+- [ ] C-AGR3: agregar una talla de la que ya están todas las unidades en el carrito muestra "Ya tienes en el carrito todas las unidades disponibles de esta opción." y no rompe la página.
+- [ ] C-AGR4: el aviso se cierra con "Seguir comprando", con Escape o solo a los 8 s (no mientras el cursor o el foco están en él); se anuncia a lectores de pantalla; a 360 px no tapa la barra fija de compra.
+- [ ] C-AGR5: el mensaje de combo de la ficha se actualiza después de agregar (por ejemplo, de "Arma tu combo" a "Agrega 1 gorra y activa Luna Nueva").
 
 Salvo que se indique otra cosa, cada criterio se verifica con Playwright en cuatro combinaciones: **360 px oscuro, 360 px claro, 1280 px oscuro y 1280 px claro**, en la tienda de desarrollo con un tenis de prueba con tallas 38 a 44, colores Negro y Blanco, 6 fotos y 1 video, y una gorra de prueba sin opción "Talla" con colores Negro y Blanco. Los datos de tallas de los criterios son de prueba, no medidas reales. La columna "Prototipo" dice qué ya cumple el código de referencia (no cuenta como implementación aprobada).
 

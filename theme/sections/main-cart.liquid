@@ -60,10 +60,47 @@
                   {%- if asignacion.amount == 0 -%}{%- continue -%}{%- endif -%}
                   <p class="carrito__descuento">{{ asignacion.discount_application.title }}: &minus;{{ asignacion.amount | money }}</p>
                 {%- endfor -%}
-                <label class="carrito__cantidad">
-                  <span class="oculto-visual">Cantidad de {{ item.product.title }}</span>
-                  <input type="number" name="updates[]" value="{{ item.quantity }}" min="0" inputmode="numeric" data-clave="{{ item.key }}">
-                </label>
+                {%- liquid
+                  # Unidades de esta misma referencia en otras líneas (Shopify divide una línea cuando un combo aplica a parte de ella)
+                  assign en_carrito = 0
+                  for otra in cart.items
+                    if otra.variant_id == item.variant_id
+                      assign en_carrito = en_carrito | plus: otra.quantity
+                    endif
+                  endfor
+                  assign limitado = false
+                  if item.variant.inventory_management == 'shopify' and item.variant.inventory_policy == 'deny'
+                    assign limitado = true
+                    assign maximo_linea = item.variant.inventory_quantity | minus: en_carrito | plus: item.quantity
+                    if maximo_linea < item.quantity
+                      assign maximo_linea = item.quantity
+                    endif
+                  endif
+                -%}
+                <div class="cantidad carrito__cantidad">
+                  <button type="button" class="cantidad__boton" data-paso="-1" data-variante="{{ item.variant_id }}" aria-label="{{ 'carrito.restar' | t: producto: item.product.title }}">
+                    <span aria-hidden="true">&minus;</span>
+                  </button>
+                  <label class="oculto-visual" for="cantidad-{{ section.id }}-{{ forloop.index }}">{{ 'carrito.cantidad' | t: producto: item.product.title }}</label>
+                  <input
+                    id="cantidad-{{ section.id }}-{{ forloop.index }}"
+                    class="cantidad__campo"
+                    type="number"
+                    name="updates[]"
+                    value="{{ item.quantity }}"
+                    min="0"
+                    {% if limitado %}max="{{ maximo_linea }}"{% endif %}
+                    inputmode="numeric"
+                    data-clave="{{ item.key }}"
+                    data-variante="{{ item.variant_id }}"
+                  >
+                  <button type="button" class="cantidad__boton" data-paso="1" data-variante="{{ item.variant_id }}" aria-label="{{ 'carrito.sumar' | t: producto: item.product.title }}"{% if limitado and item.quantity >= maximo_linea %} aria-disabled="true"{% endif %}>
+                    <span aria-hidden="true">+</span>
+                  </button>
+                </div>
+                {%- if limitado and item.quantity >= maximo_linea -%}
+                  <p class="carrito__aviso-stock">{{ 'carrito.ultimas' | t }}</p>
+                {%- endif -%}
                 <a class="carrito__quitar" href="{{ item.url_to_remove }}">Quitar</a>
               </div>
               <p class="carrito__precio">

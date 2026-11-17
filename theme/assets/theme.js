@@ -4,6 +4,19 @@ const formatoCOP = new Intl.NumberFormat('es-CO', { style: 'currency', currency:
 // Intl pone un espacio duro entre "$" y el número ("$ 180.000"); la tienda escribe "$180.000", como el filtro money de Liquid.
 const pesos = (centavos) => formatoCOP.format(Math.round(centavos / 100)).replace(/\$\s+/u, '$');
 
+/* Contador del carrito en el encabezado: se actualiza cuando el carrito cambia sin recargar
+   (evento carrito:cambio de la ficha y del carrito) */
+document.addEventListener('carrito:cambio', async () => {
+  try {
+    const raiz = window.Shopify?.routes?.root ?? '/';
+    const carrito = await (await fetch(raiz + 'cart.js', { headers: { Accept: 'application/json' } })).json();
+    document.querySelectorAll('[data-contador-carrito]').forEach((contador) => {
+      contador.textContent = String(carrito.item_count);
+      contador.hidden = carrito.item_count === 0;
+    });
+  } catch (_) { /* el número se corrige al cargar la siguiente página */ }
+});
+
 /* Modo claro / oscuro (RF-34) */
 function modoActual() {
   const elegido = document.documentElement.getAttribute('data-tema');
@@ -108,6 +121,7 @@ class FichaProducto extends HTMLElement {
     this.iniciarGaleria();
     this.iniciarZoom();
     this.querySelectorAll('[data-requiere-js]').forEach((el) => { el.hidden = false; });
+    this.iniciarAgregar();
 
     this.variantes = JSON.parse(this.querySelector('[data-variantes]')?.textContent || '[]');
     this.opciones = this.querySelector('[data-opciones]');
@@ -127,6 +141,110 @@ class FichaProducto extends HTMLElement {
     this.opciones.addEventListener('change', () => this.actualizar(true));
     this.iniciarBarra();
     this.actualizar(false);
+  }
+
+  /* Agregar al carrito sin salir de la ficha: muestra un aviso y deja seguir comprando.
+     Sin JavaScript el formulario normal lleva al carrito. */
+  iniciarAgregar() {
+    this.formulario = this.querySelector('form.ficha__formulario');
+    this.aviso = this.querySelector('[data-aviso-carrito]');
+    if (!this.formulario || !this.aviso) return;
+    this.formulario.addEventListener('submit', (evento) => {
+      evento.preventDefault();
+      this.agregar();
+    });
+    this.aviso.querySelector('[data-aviso-cerrar]')?.addEventListener('click', () => this.cerrarAviso(true));
+    this.aviso.addEventListener('keydown', (evento) => { if (evento.key === 'Escape') this.cerrarAviso(true); });
+    // No se cierra solo mientras el cliente lo está usando
+    this.aviso.addEventListener('pointerenter', () => clearTimeout(this.esperaAviso));
+    this.aviso.addEventListener('focusin', () => clearTimeout(this.esperaAviso));
+  }
+
+  botonesCompra() {
+    return [this.querySelector('[data-boton-agregar]'), this.querySelector('[data-barra-boton]')].filter(Boolean);
+  }
+
+  async agregar() {
+    if (this.agregando) return;
+    const textos = this.aviso.dataset;
+    const botones = this.botonesCompra();
+    this.agregando = true;
+    botones.forEach((boton) => {
+      boton.dataset.textoOriginal = boton.textContent;
+      boton.disabled = true;
+      boton.textContent = textos.textoAgregando;
+    });
+    let item = null;
+    let error = '';
+    try {
+      const accion = this.formulario.getAttribute('action').replace(/\/$/, '');
+      const respuesta = await fetch(accion + '.js', {
+        method: 'POST',
+        headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+        body: new FormData(this.formulario),
+      });
+      const datos = await respuesta.json();
+      if (respuesta.ok) item = datos;
+      else error = respuesta.status === 422 ? textos.textoSinUnidades : textos.textoError;
+    } catch (fallo) {
+      error = textos.textoError;
+    }
+    botones.forEach((boton) => {
+      boton.textContent = boton.dataset.textoOriginal;
+      boton.disabled = false;
+    });
+    this.agregando = false;
+    // Repinta los botones según la variante elegida (agotado, combinación no disponible)
+    if (this.opciones && this.variantes.length) this.actualizar(false);
+
+    if (item) {
+      const variante = item.variant_title && !/default/i.test(item.variant_title) ? item.variant_title : '';
+      const detalle = [variante, pesos(item.final_price)].filter(Boolean).join(' · ');
+      this.mostrarAviso(textos.textoAgregado, item.product_title + (detalle ? ' — ' + detalle : ''), false);
+      document.dispatchEvent(new CustomEvent('carrito:cambio'));
+      this.refrescarCombos();
+    } else {
+      this.mostrarAviso(error, '', true);
+    }
+  }
+
+  mostrarAviso(titulo, detalle, esError) {
+    clearTimeout(this.esperaAviso);
+    this.aviso.querySelector('[data-aviso-titulo]').textContent = titulo;
+    const parrafo = this.aviso.querySelector('[data-aviso-detalle]');
+    parrafo.textContent = detalle;
+    parrafo.hidden = !detalle;
+    this.aviso.querySelector('[data-aviso-acciones]').hidden = esError;
+    this.aviso.classList.toggle('aviso-carrito--error', esError);
+    this.aviso.hidden = false;
+    const anuncio = this.querySelector('[data-aviso-anuncio]');
+    if (anuncio) {
+      anuncio.textContent = '';
+      requestAnimationFrame(() => { anuncio.textContent = detalle ? titulo + ': ' + detalle : titulo; });
+    }
+    this.esperaAviso = setTimeout(() => this.cerrarAviso(false), esError ? 6000 : 8000);
+  }
+
+  cerrarAviso(devolverFoco) {
+    clearTimeout(this.esperaAviso);
+    const teniaFoco = this.aviso.contains(document.activeElement);
+    this.aviso.hidden = true;
+    if (devolverFoco || teniaFoco) this.querySelector('[data-boton-agregar]')?.focus({ preventScroll: true });
+  }
+
+  // El mensaje de combo de la ficha depende del carrito: se vuelve a pedir esa parte de la sección
+  async refrescarCombos() {
+    const actual = this.querySelector('mensajes-combos');
+    if (!actual || !this.dataset.seccion) return;
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.set('section_id', this.dataset.seccion);
+      const html = await (await fetch(url)).text();
+      const nuevo = new DOMParser().parseFromString(html, 'text/html').querySelector('mensajes-combos');
+      if (nuevo) actual.replaceWith(nuevo);
+    } catch (fallo) {
+      // Si falla, el mensaje se actualiza al cargar la siguiente página
+    }
   }
 
   disconnectedCallback() {

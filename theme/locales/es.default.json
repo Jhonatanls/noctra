@@ -2,6 +2,20 @@
   "general": {
     "saltar_contenido": "Saltar al contenido"
   },
+  "carrito": {
+    "cantidad": "Cantidad de {{ producto }}",
+    "restar": "Quitar una unidad de {{ producto }}",
+    "sumar": "Agregar una unidad de {{ producto }}",
+    "ultimas": "No hay más unidades disponibles de esta referencia.",
+    "sin_stock": "No hay más unidades disponibles de esa referencia.",
+    "agregado": "Agregado al carrito",
+    "agregando": "Agregando…",
+    "ver_carrito": "Ver carrito",
+    "seguir": "Seguir comprando",
+    "cerrar": "Cerrar aviso",
+    "error_agregar": "No pudimos agregarlo al carrito. Inténtalo de nuevo.",
+    "sin_unidades": "Ya tienes en el carrito todas las unidades disponibles de esta opción."
+  },
   "combos": {
     "sello_ficha": "Entra en combo",
     "sello_tarjeta": "Combo",
