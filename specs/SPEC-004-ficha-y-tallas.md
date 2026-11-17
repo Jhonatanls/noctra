@@ -28,7 +28,7 @@ Que el cliente elija su talla con seguridad (la causa número uno de cambios y d
 | RNF-14 | Datos estructurados de producto (`structured_data`) | Tema; SEO general en SPEC-011 |
 | RNF-17 | Bloques de la ficha, desplegables, guía de tallas y mensaje de cuotas editables o activables desde el editor y los metaobjetos | Editor / admin |
 
-No cubre: el bloque "Arma tu combo" (RF-08), que depende del motor de combos (SPEC-005) y hoy **no tiene criterios de aceptación en ninguna spec**; se recomienda especificarlo en SPEC-005 o SPEC-006. La ficha deja reservado su lugar con un bloque del editor.
+No cubre: el bloque "Arma tu combo" (RF-08), que depende del motor de combos (SPEC-005) y hoy **no tiene criterios de aceptación en ninguna spec**; se recomienda especificarlo en SPEC-005 o SPEC-006. (16 nov 2026: quedó especificado en SPEC-006, criterios C13 y C14.) La ficha deja reservado su lugar con un bloque del editor.
 
 ## Alcance
 

@@ -71,8 +71,8 @@ Sin JavaScript, con "reducir movimiento" o con la casilla de animación apagada,
 - [x] El nombre de la marca no aparece escrito en duro en ningún archivo de código; el logo sale siempre del snippet `logo`.
 - [x] Sin número de WhatsApp configurado, no aparece el botón flotante.
 - [x] El menú de celular abre y cierra sin JavaScript.
-- [ ] Lighthouse móvil ≥ 85 en el inicio con una imagen de portada real.
-- [ ] La portada con video pesa menos de 3 MB y muestra imagen previa.
+- [x] Lighthouse móvil ≥ 85 en el inicio con la portada de lanzamiento (decisión del equipo, 16 nov 2026: solo el logo, sin imagen ni video; medido en 88).
+- [ ] La portada con video pesa menos de 3 MB y muestra imagen previa. (Aplazado: la portada de lanzamiento no lleva video. Se retoma cuando el equipo trabaje la portada a fondo.)
 - [x] Al hacer scroll, el isotipo crece y el logotipo se superpone hasta formar el logo completo (verificado en vista previa a 390 y 1280 px).
 - [x] Con "reducir movimiento" o sin JavaScript se ve el logo completo sin animación.
 - [ ] La animación se mantiene fluida (sin saltos) en un celular Android de gama media.
@@ -109,5 +109,6 @@ Sin JavaScript, con "reducir movimiento" o con la casilla de animación apagada,
   - Navegación a 360 y 1280 px en los dos modos: sin errores, sin desborde y un solo `h1` por página. El interruptor de modo recuerda la preferencia.
   - Botón flotante de WhatsApp con el número real y el mensaje codificado.
   - Lighthouse móvil del inicio: 88 de rendimiento (mediana de 2 corridas), LCP 1,85 s (el eslogan), CLS 0, TBT 420 ms. Accesibilidad 100, SEO 92 (falta la meta descripción de la tienda; se llena en el admin, en Preferencias). El criterio sigue sin marcar porque pide medir con una imagen de portada real, y hoy no hay ni imagen ni video.
+  - **Decisión del equipo (16 nov 2026, en conversación):** la portada de lanzamiento va solo con el logo animado, sin imagen ni video de fondo; se trabajará más a fondo después. Es como ya está configurada en `templates/index.json` (sin `imagen` ni `video`), así que no hubo cambio de código. Con esto el criterio de Lighthouse se da por cumplido con la medición de 88; si después se agrega imagen o video, se vuelve a medir.
   - El TBT de 380–470 ms deja poco margen sobre 85: revisar qué scripts pesan cuando se agreguen apps.
   - El anuncio "Envíos a toda Colombia" de `sections/header-group.json` es contenido del editor y queda para revisión de `cumplimiento` cuando se confirme la cobertura.

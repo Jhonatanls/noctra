@@ -1,121 +1,176 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { evaluarCarrito, siguienteCombo, comboVigente, grupoDesdeEtiquetas } from '../src/combos.js';
+import { evaluarCarrito, estadoCombos, comboVigente, grupoDesdeEtiquetas } from '../src/combos.js';
 
 const p = (pesos) => pesos * 100; // pesos → centavos
 const HOY = '2026-12-10';
+const T = 'tenis-en-combo';
+const G = 'gorras-en-combo';
 
-const lookCompleto = { id: 'look-completo', nombre: 'Combo Look completo', precio: p(350000), requisitos: { tenis: 2, gorras: 1 } };
-const tresTenis = { id: 'tres-tenis', nombre: 'Combo Tres tenis', precio: p(420000), requisitos: { tenis: 3 } };
-const COMBOS = [lookCompleto, tresTenis];
+const lunaNueva = {
+  id: 'luna-nueva', nombre: 'Luna Nueva', tipo: 'compraXllevaY', limitePorPedido: 1,
+  compra: { grupo: T, cantidad: 1 },
+  lleva: { grupo: G, cantidad: 1, valor: { tipo: 'monto', valor: p(45000) } },
+};
+const eclipse = {
+  id: 'eclipse', nombre: 'Eclipse', tipo: 'compraXllevaY', limitePorPedido: 1,
+  compra: { grupo: T, cantidad: 2 },
+  lleva: { grupo: G, cantidad: 1, valor: { tipo: 'gratis' } },
+};
+const lunaLlena = {
+  id: 'luna-llena', nombre: 'Luna Llena', tipo: 'compraXllevaY', limitePorPedido: 1,
+  compra: { grupo: T, cantidad: 2 },
+  lleva: { grupo: T, cantidad: 1, valor: { tipo: 'monto', valor: p(125000) } },
+};
+const COMBOS = [lunaNueva, eclipse, lunaLlena];
 
-test('2 tenis y 1 gorra aplican el combo de $350.000 con ahorro de $80.000', () => {
-  const r = evaluarCarrito([
-    { id: 'a', precio: p(190000), cantidad: 1, grupo: 'tenis' },
-    { id: 'b', precio: p(180000), cantidad: 1, grupo: 'tenis' },
-    { id: 'g', precio: p(60000), cantidad: 1, grupo: 'gorras' },
-  ], COMBOS, { hoy: HOY });
+const tenis = (n, precio = 175000, id = 't') => ({ id, precio: p(precio), cantidad: n, grupo: T });
+const gorras = (n, precio = 60000, id = 'g') => ({ id, precio: p(precio), cantidad: n, grupo: G });
+const total = (lineas) => evaluarCarrito(lineas, COMBOS, { hoy: HOY });
+
+test('1 tenis + 1 gorra = $190.000 (Luna Nueva)', () => {
+  const r = total([tenis(1), gorras(1)]);
+  assert.equal(r.aplicaciones[0].comboId, 'luna-nueva');
+  assert.equal(r.total, p(190000));
+});
+
+test('2 tenis + 1 gorra = $350.000 (Eclipse gana a Luna Nueva)', () => {
+  const r = total([tenis(2), gorras(1)]);
   assert.equal(r.aplicaciones.length, 1);
-  assert.equal(r.aplicaciones[0].comboId, 'look-completo');
-  assert.equal(r.descuentoTotal, p(80000));
+  assert.equal(r.aplicaciones[0].comboId, 'eclipse');
+  assert.equal(r.total, p(350000));
 });
 
-test('3 tenis aplican el combo de $420.000 con ahorro de $150.000', () => {
-  const r = evaluarCarrito([
-    { id: 'a', precio: p(200000), cantidad: 1, grupo: 'tenis' },
-    { id: 'b', precio: p(190000), cantidad: 1, grupo: 'tenis' },
-    { id: 'c', precio: p(180000), cantidad: 1, grupo: 'tenis' },
-  ], COMBOS, { hoy: HOY });
-  assert.equal(r.aplicaciones[0].comboId, 'tres-tenis');
-  assert.equal(r.descuentoTotal, p(150000));
+test('2 tenis + 2 gorras = $410.000 (un solo uso, la segunda gorra paga completa)', () => {
+  const r = total([tenis(2), gorras(2)]);
+  assert.equal(r.aplicaciones.length, 1);
+  assert.equal(r.total, p(410000));
 });
 
-test('una línea con cantidad 2 cuenta como 2 unidades', () => {
-  const r = evaluarCarrito([
-    { id: 'a', precio: p(180000), cantidad: 2, grupo: 'tenis' },
-    { id: 'g', precio: p(60000), cantidad: 1, grupo: 'gorras' },
-  ], COMBOS, { hoy: HOY });
-  assert.equal(r.descuentoTotal, p(70000));
-  assert.equal(r.descuentoPorLinea.a + r.descuentoPorLinea.g, p(70000));
+test('3 tenis = $400.000 (Luna Llena)', () => {
+  const r = total([tenis(3)]);
+  assert.equal(r.aplicaciones[0].comboId, 'luna-llena');
+  assert.equal(r.total, p(400000));
 });
 
-test('el reparto del descuento suma exactamente el ahorro y es proporcional al precio', () => {
-  const r = evaluarCarrito([
-    { id: 'a', precio: p(190000), cantidad: 1, grupo: 'tenis' },
-    { id: 'b', precio: p(180000), cantidad: 1, grupo: 'tenis' },
-    { id: 'g', precio: p(60000), cantidad: 1, grupo: 'gorras' },
-  ], COMBOS, { hoy: HOY });
-  const suma = Object.values(r.descuentoPorLinea).reduce((s, v) => s + v, 0);
-  assert.equal(suma, r.descuentoTotal);
-  assert.ok(r.descuentoPorLinea.a > r.descuentoPorLinea.g);
+test('3 tenis + 1 gorra = $460.000 (Luna Llena ahorra más que Eclipse)', () => {
+  const r = total([tenis(3), gorras(1)]);
+  assert.equal(r.aplicaciones.length, 1);
+  assert.equal(r.aplicaciones[0].comboId, 'luna-llena');
+  assert.equal(r.total, p(460000));
 });
 
-test('un combo que no genera ahorro no se aplica', () => {
-  const r = evaluarCarrito([
-    { id: 'a', precio: p(100000), cantidad: 2, grupo: 'tenis' },
-    { id: 'g', precio: p(30000), cantidad: 1, grupo: 'gorras' },
-  ], COMBOS, { hoy: HOY });
-  assert.equal(r.aplicaciones.length, 0);
+test('4 tenis = $575.000 (1 uso por pedido, el cuarto paga completo)', () => {
+  const r = total([tenis(4)]);
+  assert.equal(r.aplicaciones.length, 1);
+  assert.equal(r.total, p(575000));
+});
+
+test('1 tenis solo, o 2 tenis sin gorra, no activan descuento', () => {
+  assert.equal(total([tenis(1)]).descuentoTotal, 0);
+  assert.equal(total([tenis(2)]).total, p(350000));
+});
+
+test('Luna Llena descuenta al tenis de menor precio: 2x$175.000 + 1x$210.000', () => {
+  const r = total([tenis(2, 175000, 'a'), tenis(1, 210000, 'b')]);
+  assert.equal(r.aplicaciones[0].comboId, 'luna-llena');
+  // 560.000 - 125.000; el descuento cae en un tenis de $175.000, no en el de $210.000
+  assert.equal(r.total, p(435000));
+  assert.equal(r.descuentoPorLinea.b, undefined);
+  assert.equal(r.descuentoPorLinea.a, p(125000));
+});
+
+test('el monto fijo nunca supera el precio de la unidad', () => {
+  const r = total([tenis(1), gorras(1, 30000)]);
+  assert.equal(r.descuentoTotal, p(30000));
+});
+
+test('Eclipse regala la gorra de menor precio', () => {
+  const r = total([tenis(2), gorras(1, 80000, 'cara'), gorras(1, 60000, 'barata')]);
+  assert.equal(r.aplicaciones[0].comboId, 'eclipse');
+  assert.equal(r.descuentoPorLinea.barata, p(60000));
+  assert.equal(r.descuentoPorLinea.cara, undefined);
+});
+
+test('un producto fuera de la colección no cuenta', () => {
+  const fuera = { id: 'x', precio: p(300000), cantidad: 2, grupo: null };
+  const r = total([tenis(2), fuera]);
+  assert.equal(r.descuentoTotal, 0);
+  assert.equal(r.subtotal, p(950000));
+  assert.equal(r.total, p(950000));
+  // 2 tenis en combo + 1 fuera de colección no completan Luna Llena
+  assert.equal(total([tenis(2), { ...fuera, cantidad: 1 }]).aplicaciones.length, 0);
+});
+
+test('combos fuera de vigencia, inactivos o mal formados no se aplican', () => {
+  assert.equal(comboVigente({ ...eclipse, hasta: '2026-12-01' }, HOY), false);
+  assert.equal(comboVigente({ ...eclipse, desde: '2026-12-20' }, HOY), false);
+  assert.equal(comboVigente({ ...eclipse, activo: false }, HOY), false);
+  assert.equal(comboVigente({ ...eclipse, compra: { grupo: T, cantidad: 0 } }, HOY), false);
+  assert.equal(comboVigente({ ...eclipse, lleva: { ...eclipse.lleva, valor: { tipo: 'porcentaje', valor: 150 } } }, HOY), false);
+  assert.equal(comboVigente(eclipse, HOY), true);
+  const r = evaluarCarrito([tenis(2), gorras(1)], [{ ...eclipse, activo: false }], { hoy: HOY });
   assert.equal(r.descuentoTotal, 0);
 });
 
-test('combos inactivos o fuera de vigencia no se aplican', () => {
-  assert.equal(comboVigente({ ...lookCompleto, activo: false }, HOY), false);
-  assert.equal(comboVigente({ ...lookCompleto, hasta: '2026-11-30' }, HOY), false);
-  assert.equal(comboVigente({ ...lookCompleto, desde: '2027-01-01' }, HOY), false);
-  assert.equal(comboVigente({ ...lookCompleto, desde: '2026-12-01', hasta: '2026-12-31' }, HOY), true);
+test('porcentaje: 50% a la gorra', () => {
+  const mitad = { ...lunaNueva, id: 'mitad', lleva: { ...lunaNueva.lleva, valor: { tipo: 'porcentaje', valor: 50 } } };
+  const r = evaluarCarrito([tenis(1), gorras(1)], [mitad], { hoy: HOY });
+  assert.equal(r.total, p(205000));
 });
 
-test('limitePorPedido se respeta', () => {
-  const limitado = { ...tresTenis, limitePorPedido: 1 };
-  const r = evaluarCarrito([
-    { id: 'a', precio: p(200000), cantidad: 6, grupo: 'tenis' },
-  ], [limitado], { hoy: HOY });
-  assert.equal(r.aplicaciones.length, 1);
-  assert.equal(r.sobrantes.length, 3);
+test('qué falta: 1 tenis + 1 gorra, para Eclipse falta 1 tenis', () => {
+  const e = estadoCombos([tenis(1), gorras(1)], COMBOS, { hoy: HOY });
+  const ecl = e.combos.find((c) => c.comboId === 'eclipse');
+  assert.equal(ecl.califica, false);
+  assert.deepEqual([ecl.faltan.compra, ecl.faltan.lleva, ecl.faltan.total], [1, 0, 1]);
+  assert.equal(e.aplicado.comboId, 'luna-nueva');
+  assert.equal(e.sugerencia.comboId, 'eclipse');
+  assert.equal(e.sugerencia.faltan.grupoCompra, T);
 });
 
-test('aplica varios combos cuando alcanza y elige siempre el de mayor ahorro primero', () => {
-  const r = evaluarCarrito([
-    { id: 'a', precio: p(200000), cantidad: 4, grupo: 'tenis' },
-    { id: 'g', precio: p(60000), cantidad: 1, grupo: 'gorras' },
-  ], COMBOS, { hoy: HOY });
-  // tres-tenis ahorra 180.000; look-completo ahorra 110.000 → primero tres-tenis, luego queda 1 tenis + 1 gorra
-  assert.equal(r.aplicaciones[0].comboId, 'tres-tenis');
-  assert.equal(r.aplicaciones.length, 1);
-  assert.equal(r.descuentoTotal, p(180000));
+test('qué falta: 2 tenis para Luna Llena falta 1 tenis (mismo grupo)', () => {
+  const e = estadoCombos([tenis(2)], COMBOS, { hoy: HOY });
+  const ll = e.combos.find((c) => c.comboId === 'luna-llena');
+  assert.deepEqual([ll.faltan.compra, ll.faltan.lleva, ll.faltan.total], [0, 1, 1]);
+  assert.equal(ll.elegirLleva, false); // no es gratis
 });
 
-test('productos sin grupo no participan en combos', () => {
-  const r = evaluarCarrito([
-    { id: 'x', precio: p(500000), cantidad: 3, grupo: null },
-  ], COMBOS, { hoy: HOY });
-  assert.equal(r.descuentoTotal, 0);
+test('qué falta: 1 tenis solo, Luna Nueva falta 1 gorra y Eclipse 1 tenis y 1 gorra', () => {
+  const e = estadoCombos([tenis(1)], COMBOS, { hoy: HOY });
+  const ln = e.combos.find((c) => c.comboId === 'luna-nueva');
+  const ec = e.combos.find((c) => c.comboId === 'eclipse');
+  assert.deepEqual([ln.faltan.compra, ln.faltan.lleva], [0, 1]);
+  assert.deepEqual([ec.faltan.compra, ec.faltan.lleva, ec.faltan.total], [1, 1, 2]);
+  assert.equal(e.aplicado, null);
+  assert.equal(e.sugerencia.comboId, 'luna-nueva');
 });
 
-test('con 1 tenis el siguiente combo más cercano pide 1 tenis y 1 gorra o 2 tenis', () => {
-  const s = siguienteCombo([
-    { id: 'a', precio: p(190000), cantidad: 1, grupo: 'tenis' },
-  ], COMBOS, { hoy: HOY });
-  assert.equal(s.totalFaltan, 2);
-  // empate en 2 unidades: gana el combo de mayor precio (mayor ahorro posible)
-  assert.equal(s.comboId, 'tres-tenis');
-  assert.deepEqual(s.faltan, { tenis: 2 });
+test('califica para Eclipse sin gorra: 2 tenis y 0 gorras pide elegir la gorra de regalo', () => {
+  const e = estadoCombos([tenis(2)], COMBOS, { hoy: HOY });
+  const ec = e.combos.find((c) => c.comboId === 'eclipse');
+  assert.equal(ec.elegirLleva, true);
+  assert.equal(ec.califica, false);
+  assert.equal(ec.faltan.compra, 0);
+  assert.equal(ec.faltan.lleva, 1);
+  assert.equal(e.combos.find((c) => c.comboId === 'luna-nueva').elegirLleva, false);
 });
 
-test('con 2 tenis el siguiente combo pide 1 gorra o 1 tenis', () => {
-  const s = siguienteCombo([
-    { id: 'a', precio: p(190000), cantidad: 2, grupo: 'tenis' },
-  ], COMBOS, { hoy: HOY });
-  assert.equal(s.totalFaltan, 1);
+test('con Eclipse completo no hay elegirLleva y está aplicado', () => {
+  const e = estadoCombos([tenis(2), gorras(1)], COMBOS, { hoy: HOY });
+  const ec = e.combos.find((c) => c.comboId === 'eclipse');
+  assert.equal(ec.elegirLleva, false);
+  assert.equal(ec.califica, true);
+  assert.equal(ec.aplicado, true);
 });
 
-test('con el carrito vacío no hay siguiente combo', () => {
-  assert.equal(siguienteCombo([], COMBOS, { hoy: HOY }), null);
+test('carrito vacío o sin productos de combo no sugiere nada', () => {
+  assert.equal(estadoCombos([], COMBOS, { hoy: HOY }).sugerencia, null);
+  const fuera = { id: 'x', precio: p(100000), cantidad: 1, grupo: null };
+  assert.equal(estadoCombos([fuera], COMBOS, { hoy: HOY }).sugerencia, null);
 });
 
-test('el grupo sale de la etiqueta grupo-*', () => {
+test('grupoDesdeEtiquetas lee la etiqueta grupo-*', () => {
   assert.equal(grupoDesdeEtiquetas(['nuevo', 'grupo-tenis']), 'tenis');
-  assert.equal(grupoDesdeEtiquetas(['Grupo-Gorras']), 'gorras');
   assert.equal(grupoDesdeEtiquetas(['nuevo']), null);
 });

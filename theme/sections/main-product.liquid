@@ -1,4 +1,6 @@
 {{ 'componente-ficha.css' | asset_url | stylesheet_tag }}
+{{ 'componente-combos.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'componente-combos.js' | asset_url }}" type="module"></script>
 
 {%- liquid
   assign variante = product.selected_or_first_available_variant
@@ -12,7 +14,10 @@
   if settings.gama_premium_valor != blank and gama == settings.gama_premium_valor
     assign es_gama_alta = true
   endif
-  assign etiquetas = product.tags | join: '|' | downcase | split: '|'
+  capture grupo_combo
+    render 'combos-grupo', producto: product
+  endcapture
+  assign grupo_combo = grupo_combo | strip
 
   # Opción de talla EUR: se llama Talla (o Size / Tallas), tiene más de un valor y algún valor es numérico.
   # Una opción de un solo valor nunca se pinta como selector.
@@ -194,8 +199,8 @@
           <div class="ficha__cabecera" {{ block.shopify_attributes }}>
             {%- if es_gama_alta -%}
               <p class="ficha__sellos"><span class="sello sello--premium">{{ gama }}</span></p>
-            {%- elsif etiquetas contains 'combo' -%}
-              <p class="ficha__sellos"><span class="sello sello--combo">Combo</span></p>
+            {%- elsif grupo_combo != blank -%}
+              <p class="ficha__sellos"><span class="sello sello--combo">{{ 'combos.sello_ficha' | t }}</span></p>
             {%- endif -%}
             <h1 class="ficha__titulo">{{ product.title }}</h1>
           </div>
@@ -336,9 +341,7 @@
           </div>
 
         {%- when 'combo' -%}
-          {%- unless es_gama_alta -%}
-            <div class="ficha__combo" data-espacio-combo {{ block.shopify_attributes }}></div>
-          {%- endunless -%}
+          <div class="ficha__combo" {{ block.shopify_attributes }}>{% render 'combos-ficha', producto: product, premium: es_gama_alta, grupo: grupo_combo %}</div>
 
         {%- when 'descripcion' -%}
           <div class="ficha__descripcion" {{ block.shopify_attributes }}>{{ product.description }}</div>
@@ -449,7 +452,7 @@
       ]
     },
     { "type": "botones", "name": "Botones de compra", "limit": 1 },
-    { "type": "combo", "name": "Arma tu combo (reservado)", "limit": 1 },
+    { "type": "combo", "name": "Mensaje de combo", "limit": 1 },
     { "type": "descripcion", "name": "Descripción", "limit": 1 },
     {
       "type": "politicas",

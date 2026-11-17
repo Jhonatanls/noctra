@@ -11,6 +11,8 @@ Necesitamos una tienda muy vistosa, con inventario, combos de precio fijo y pago
 
 Shopify como plataforma de comercio y un tema propio Online Store 2.0 escrito desde cero en Liquid, versionado en Git y desarrollado con agentes. Los combos se implementan como Shopify Function de descuento alimentada por una lógica pura compartida (`packages/combos`).
 
+**Actualización 16 nov 2026 (decisión del equipo):** la parte de combos queda reemplazada. La tienda sigue en plan Basic, sin Plus y sin Functions propias (las custom apps con Functions solo corren en Plus). Los combos se aplican con descuentos automáticos nativos "Compra X lleva Y" y `packages/combos` solo calcula los mensajes del tema. No se crea `apps/combos/`. Detalle en SPEC-005.
+
 ## Alternativas descartadas
 
 - **WooCommerce**: sin comisión por venta, pero con hosting, seguridad y mantenimiento propios.

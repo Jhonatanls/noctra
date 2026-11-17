@@ -1,0 +1,10 @@
+{% doc %}
+  Contenedor de los mensajes de combos. El componente mensajes-combos (componente-combos.js)
+  llena la lista según el carrito. Sin JavaScript la lista queda vacía y no se muestra.
+  @param {string} contexto - 'carrito' o 'ficha'
+  @param {product} [producto] - Producto de la ficha
+{% enddoc %}
+<mensajes-combos class="combos-mensajes" data-contexto="{{ contexto }}" data-motor="{{ 'combos.js' | asset_url }}" aria-live="polite">
+  {% render 'combos-datos', producto: producto %}
+  <ul class="combos-mensajes__lista" data-lista></ul>
+</mensajes-combos>

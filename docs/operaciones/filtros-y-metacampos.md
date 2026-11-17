@@ -137,18 +137,19 @@ Admin → **Productos** → **Colecciones** → **Agregar colección**. En "Prod
 
 ### Por qué "En combo" no lleva condición de Gama
 
-Los Noctra Premium no participan en combos. Shopify no permite excluir productos por metacampo en una colección automática (solo admite "es igual a" y las exclusiones son por categoría, etiqueta, tipo y proveedor). Como los tenis que no son Premium tienen la Gama vacía, tampoco se puede pedir "Gama es igual a…". Por eso "En combo" se arma solo con la etiqueta `combo`, con dos protecciones:
+Los Noctra Premium no participan en combos. Shopify no permite excluir productos por metacampo en una colección automática (solo admite "es igual a" y las exclusiones son por categoría, etiqueta, tipo y proveedor). Como los tenis que no son Premium tienen la Gama vacía, tampoco se puede pedir "Gama es igual a…". Por eso "En combo" se arma solo con la etiqueta `combo`. La protección es una sola:
 
-1. **Regla de carga:** a un Noctra Premium **nunca** se le pone la etiqueta `combo` (checklist de `cargar-productos.md`).
-2. **Protección real, en el motor de combos (SPEC-005):** el descuento ignora a los Premium aunque tengan la etiqueta por error. El tema tampoco les muestra el sello de combo.
+1. **Regla de carga:** a un Noctra Premium **nunca** se le pone la etiqueta `combo` (checklist de `cargar-productos.md`). El tema no les muestra el sello de combo.
 
-Riesgo que queda: un Premium mal etiquetado aparecería en la colección "En combo", aunque sin descuento. Revisa esa colección después de cada carga.
+Actualización 16 nov 2026: los combos pasaron a descuentos automáticos nativos (SPEC-005), que se aplican a las colecciones "Tenis en combo" y "Gorras en combo" y no leen la Gama. Ya no hay una segunda defensa en el motor de combos.
+
+Riesgo que queda: un Premium mal etiquetado aparecería en "En combo" y en "Tenis en combo", y **sí recibiría el descuento del combo** en el carrito y el checkout. Revisa esas colecciones después de cada carga.
 
 ### Cómo probar
 
 - "Tenis" muestra solo tenis; "Gorras" solo gorras.
 - Con los datos de `plantilla-productos.csv` (en borrador, actívalos para probar), "En combo" debe mostrar Umbra 01, Cenit 03 y Gorra Vesper, y **no** Eclipse 02 (Noctra Premium sin etiqueta `combo`).
-- Para probar la defensa doble: ponle temporalmente la etiqueta `combo` a Eclipse 02; no debe aparecer en "En combo". Quita la etiqueta después.
+- Ningún Noctra Premium aparece en "En combo", "Tenis en combo" ni "Gorras en combo". Si aparece, quítale la etiqueta `combo` de inmediato.
 
 ### Si falla
 

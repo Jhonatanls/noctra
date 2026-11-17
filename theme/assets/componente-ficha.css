@@ -117,7 +117,7 @@ html[data-js] .ficha__medio[data-comun] { order: 1; }
 /* Cabecera: sello, nombre */
 .ficha__cabecera { display: grid; gap: var(--espacio-3); justify-items: start; }
 .ficha__sellos { margin: 0; }
-.ficha__combo:empty, .ficha__cuotas-ancla:empty { display: none; }
+.ficha__combo:not(:has(*)), .ficha__cuotas-ancla:empty { display: none; }
 
 /* Galería: indicador, zoom */
 .ficha__galeria { position: relative; }

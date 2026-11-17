@@ -1,0 +1,21 @@
+{% doc %}
+  Imprime la línea del combo aplicado para el mensaje de WhatsApp del carrito
+  (vacío si Shopify no aplicó ningún combo). Se usa dentro de un capture.
+{% enddoc %}
+{%- liquid
+  for i in (1..3)
+    assign p = 'combo_' | append: i | append: '_'
+    assign k_nombre = p | append: 'nombre'
+    assign k_wa = p | append: 'detalle_wa'
+    assign k_detalle = p | append: 'detalle'
+    assign k_precio = p | append: 'precio'
+    for d in cart.discount_applications
+      if d.title == settings[k_nombre]
+        assign detalle = settings[k_wa] | default: settings[k_detalle]
+        assign ahorro = d.total_allocated_amount | money_without_trailing_zeros | strip_html
+        echo 'combos.whatsapp_linea' | t: combo: d.title, detalle: detalle, precio: settings[k_precio], ahorro: ahorro
+        break
+      endif
+    endfor
+  endfor
+-%}

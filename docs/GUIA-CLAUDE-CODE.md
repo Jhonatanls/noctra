@@ -131,7 +131,7 @@ Consejos:
 | --- | --- | --- |
 | 1. Diseño y esqueleto | "Cierra la etapa 1: corrige los hallazgos de QA y mide los contrastes de SPEC-001." | Apruebas cómo se ve la portada y los acabados |
 | 2. Catálogo y ficha | "Implementa SPEC-003 y SPEC-004: filtros, búsqueda predictiva, galería con zoom y barra de compra fija en celular." | Cargas medidas reales de tallas en el metaobjeto y fotos reales |
-| 3. Combos | "Con dev-funciones, verifica la API de Discount Functions con shopify-dev y crea la Function de combos de SPEC-005. Luego SPEC-006: carrito lateral con mensajes de combo." | Defines los combos finales y dónde se editan (opción A, B o C de SPEC-005) |
+| 3. Combos | "Con dev-funciones, implementa la lógica `compraXllevaY` de SPEC-005 con sus pruebas. Luego SPEC-006: carrito lateral con mensajes de combo y el selector de gorra de regalo." | Creas las colecciones y los tres descuentos automáticos con `docs/operaciones/combos-nativos.md` y defines la vigencia de cada combo |
 | 4. Pagos y envíos | "Con operaciones-shopify, escribe los runbooks de SPEC-007 y SPEC-008." | Activas Addi, Sistecrédito, Mercado Pago, Wompi, envíos y contraentrega siguiendo los runbooks |
 | 5. Canales | "Runbooks y ajustes de SPEC-009: Instagram, TikTok, WhatsApp, píxeles y banner de cookies." | Conectas las cuentas de Meta y TikTok |
 | 6. Lanzamiento | "Con contenido-copy, redacta las páginas de SPEC-010. Luego qa-calidad corre el checklist de SPEC-011." | Revisión legal de las políticas, dominio, pedido real de prueba |

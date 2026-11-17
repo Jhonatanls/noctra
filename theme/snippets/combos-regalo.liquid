@@ -1,0 +1,101 @@
+{% doc %}
+  "Elige tu gorra de regalo": se muestra cuando el carrito ya tiene lo que el combo pide comprar
+  y le falta la gorra que va gratis (p. ej. Eclipse con 2 pares). Funciona sin JavaScript con un
+  formulario real hacia el carrito; con JavaScript se agrega sin recargar la página.
+{% enddoc %}
+{%- liquid
+  assign hoy = 'now' | date: '%Y-%m-%d'
+  assign tenis = 0
+  assign gorras = 0
+  for item in cart.items
+    capture grupo
+      render 'combos-grupo', producto: item.product
+    endcapture
+    if grupo == 'tenis-en-combo'
+      assign tenis = tenis | plus: item.quantity
+    elsif grupo == 'gorras-en-combo'
+      assign gorras = gorras | plus: item.quantity
+    endif
+  endfor
+
+  assign combo_regalo = 0
+  assign compra_texto = ''
+  for i in (1..3)
+    if combo_regalo > 0
+      break
+    endif
+    assign p = 'combo_' | append: i | append: '_'
+    assign k_activo = p | append: 'activo'
+    assign k_vt = p | append: 'valor_tipo'
+    assign k_cg = p | append: 'compra_grupo'
+    assign k_cc = p | append: 'compra_cantidad'
+    assign k_lg = p | append: 'lleva_grupo'
+    assign k_lc = p | append: 'lleva_cantidad'
+    assign k_desde = p | append: 'desde'
+    assign k_hasta = p | append: 'hasta'
+    if settings[k_activo] == false or settings[k_vt] != 'gratis' or settings[k_lg] != 'gorras-en-combo' or settings[k_cg] != 'tenis-en-combo'
+      continue
+    endif
+    if settings[k_desde] != blank and hoy < settings[k_desde]
+      continue
+    endif
+    if settings[k_hasta] != blank and hoy > settings[k_hasta]
+      continue
+    endif
+    if tenis >= settings[k_cc] and gorras < settings[k_lc]
+      assign combo_regalo = i
+      assign k_nombre = p | append: 'nombre'
+      assign cantidad_compra = settings[k_cc]
+      assign nombre_regalo = settings[k_nombre]
+      if cantidad_compra == 1
+        assign compra_texto = 'combos.par_uno' | t
+      else
+        assign compra_texto = 'combos.par_otros' | t | replace: '{n}', cantidad_compra
+      endif
+    endif
+  endfor
+
+  if combo_regalo > 0
+    assign opciones = collections['gorras-en-combo'].products | where: 'available'
+  endif
+-%}
+{%- if combo_regalo > 0 -%}
+  <section class="regalo" data-regalo data-regalo-combo="combo-{{ combo_regalo }}" aria-labelledby="regalo-titulo">
+    <h2 class="regalo__titulo" id="regalo-titulo">{{ 'combos.regalo_titulo' | t }}</h2>
+    <p class="regalo__ayuda">{{ 'combos.regalo_ayuda' | t: compra: compra_texto, combo: nombre_regalo }}</p>
+
+    {%- if opciones.size > 0 -%}
+      <ul class="regalo__lista">
+        {%- for gorra in opciones limit: 12 -%}
+          {%- assign variantes = gorra.variants | where: 'available' -%}
+          <li class="regalo__item">
+            {% form 'product', gorra, class: 'regalo__formulario', data-regalo-formulario: '' %}
+              {%- if gorra.featured_image != blank -%}
+                {{ gorra.featured_image | image_url: width: 240 | image_tag: widths: '120, 240', sizes: '96px', loading: 'lazy', alt: gorra.featured_image.alt | default: gorra.title, class: 'regalo__foto' }}
+              {%- endif -%}
+              <div class="regalo__datos">
+                <p class="regalo__nombre">{{ gorra.title }}</p>
+                {%- if variantes.size > 1 -%}
+                  <label class="oculto-visual" for="regalo-opcion-{{ gorra.id }}">{{ 'combos.regalo_variante' | t: gorra: gorra.title }}</label>
+                  <select class="regalo__opcion" id="regalo-opcion-{{ gorra.id }}" name="id">
+                    {%- for v in variantes -%}
+                      <option value="{{ v.id }}">{{ v.title }}</option>
+                    {%- endfor -%}
+                  </select>
+                {%- else -%}
+                  <input type="hidden" name="id" value="{{ variantes.first.id }}">
+                {%- endif -%}
+                <input type="hidden" name="quantity" value="1">
+                <input type="hidden" name="return_to" value="{{ routes.cart_url }}">
+                <button type="submit" class="boton boton--secundario">{{ 'combos.regalo_boton' | t }}</button>
+                <p class="regalo__error" role="alert" data-regalo-error hidden></p>
+              </div>
+            {% endform %}
+          </li>
+        {%- endfor -%}
+      </ul>
+    {%- else -%}
+      <p class="regalo__vacio">{{ 'combos.regalo_vacio' | t }}</p>
+    {%- endif -%}
+  </section>
+{%- endif -%}

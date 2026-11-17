@@ -12,7 +12,7 @@
   gap: var(--espacio-6);
 }
 @media (min-width: 750px) {
-  .combos__lista { grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); }
+  .combos__lista { grid-template-columns: repeat(auto-fit, minmax(var(--ancho-tarjeta-combo), 1fr)); }
 }
 
 .combo {
@@ -34,3 +34,30 @@
 .combo__nota { font-size: var(--texto-xs); color: var(--color-texto-2); margin: 0; }
 .combo__boton { margin-block-start: var(--espacio-2); }
 .combos__terminos { margin-block-start: var(--espacio-6); text-align: center; max-width: none; }
+.combo__descripcion { margin: 0; font-size: var(--texto-s); max-width: var(--ancho-texto); }
+.combos__cierre { margin-block: var(--espacio-8) 0; text-align: center; max-width: none; font-family: var(--fuente-eslogan); font-size: var(--texto-xl); }
+
+/* Mensajes de combos (carrito y ficha) */
+.combos-mensajes { display: block; }
+.combos-mensajes__lista { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--espacio-2); }
+.combos-mensajes__lista:empty { display: none; }
+.combos-mensajes__item { margin: 0; font-size: var(--texto-s); color: var(--color-texto-2); }
+.combos-mensajes__item--principal { color: var(--color-texto); padding: var(--espacio-3) var(--espacio-4); border: var(--borde-fino) solid var(--color-oro-suave); border-inline-start: var(--espacio-1) solid var(--color-oro); border-radius: var(--radio-s); background: var(--color-superficie); }
+.carrito .combos-mensajes { margin-block-end: var(--espacio-6); }
+.ficha__combo .combos-mensajes__item { font-size: var(--texto-s); }
+
+/* Gorra de regalo */
+.regalo { margin-block-end: var(--espacio-6); padding: var(--espacio-5); background: var(--color-superficie); border: var(--borde-fino) solid var(--color-oro); border-radius: var(--radio-m); display: grid; gap: var(--espacio-3); }
+.regalo[hidden] { display: none; }
+.regalo__titulo { margin: 0; font-size: var(--texto-xl); }
+.regalo__ayuda, .regalo__vacio { margin: 0; color: var(--color-texto-2); font-size: var(--texto-s); }
+.regalo__lista { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--espacio-4); }
+@media (min-width: 750px) { .regalo__lista { grid-template-columns: repeat(auto-fill, minmax(var(--ancho-tarjeta-regalo), 1fr)); } }
+.regalo__formulario { display: grid; grid-template-columns: 6rem 1fr; gap: var(--espacio-4); align-items: start; }
+.regalo__foto { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: var(--radio-s); background: var(--color-fondo); }
+.regalo__datos { display: grid; gap: var(--espacio-2); align-content: start; }
+.regalo__nombre { margin: 0; font-weight: var(--peso-medio); }
+.regalo__opcion { min-block-size: var(--tactil-min); }
+.regalo__datos .boton { min-block-size: var(--tactil-min); }
+.regalo__error { margin: 0; color: var(--color-error); font-size: var(--texto-s); }
+.regalo__error[hidden] { display: none; }

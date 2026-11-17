@@ -30,29 +30,36 @@
       "type": "combos-destacados",
       "settings": {
         "titulo": "Combos Noctra",
-        "texto": "Combos de precio fijo. El descuento se aplica solo en el carrito."
+        "texto": "Combos de precio fijo. El descuento se aplica solo en el carrito.",
+        "cierre": "Viste la noche."
       },
       "blocks": {
-        "look": {
+        "luna_nueva": {
           "type": "combo",
           "settings": {
-            "nombre": "Look completo",
-            "detalle": "2 tenis + 1 gorra",
-            "precio": "$350.000"
+            "combo": "1",
+            "enlace": "shopify://collections/tenis-en-combo"
           }
         },
-        "tres": {
+        "eclipse": {
           "type": "combo",
           "settings": {
-            "nombre": "Tres pares",
-            "detalle": "3 tenis",
-            "precio": "$420.000"
+            "combo": "2",
+            "enlace": "shopify://collections/tenis-en-combo"
+          }
+        },
+        "luna_llena": {
+          "type": "combo",
+          "settings": {
+            "combo": "3",
+            "enlace": "shopify://collections/tenis-en-combo"
           }
         }
       },
       "block_order": [
-        "look",
-        "tres"
+        "luna_nueva",
+        "eclipse",
+        "luna_llena"
       ]
     }
   },

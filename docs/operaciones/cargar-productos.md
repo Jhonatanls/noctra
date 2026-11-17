@@ -29,7 +29,7 @@ Los productos **no se programan**: se cargan en el admin de Shopify y el tema lo
    - **Plantilla de la ficha (solo gorras):** en la ficha de cada gorra, en **Plantilla de tema**, elige `gorra`. Esa plantilla no muestra selector de talla ni guía de tallas, muestra el selector de **Color** y el texto "Ajustable" (se cambia en el editor del tema: Productos → plantilla `gorra` → bloque "Texto"). Los tenis dejan la plantilla `Producto predeterminado`.
 8. **Organización del producto**:
    - **Tipo de producto**: `Tenis` o `Gorras` (alimenta las colecciones automáticas).
-   - **Etiquetas**: `grupo-tenis` o `grupo-gorras` (obligatoria para que entre a los combos) y `combo` si participa en combos. **Los productos Noctra Premium nunca llevan la etiqueta `combo`.** La etiqueta `nuevo` ya no se usa: el sello "Nuevo" sale solo durante 7 días desde que se publica el producto.
+   - **Etiquetas**: `grupo-tenis` o `grupo-gorras` y `combo` si participa en combos (la etiqueta `combo` más el tipo de producto lo meten en "Tenis en combo" o "Gorras en combo", que es lo que decide el descuento; las etiquetas `grupo-*` ya no deciden el combo, ver SPEC-005). **Los productos Noctra Premium nunca llevan la etiqueta `combo`.** La etiqueta `nuevo` ya no se usa: el sello "Nuevo" sale solo durante 7 días desde que se publica el producto.
    - **Metacampos** (sección "Metafields" del producto): **Género** (Hombre, Mujer, o los dos si es unisex) y **Gama** (`Noctra Premium` solo si lo es; si no, vacío). Género es obligatorio en todos los productos, o no aparecerán al filtrar por género. Cómo se crean: `docs/operaciones/filtros-y-metacampos.md`.
 9. **Publicación**: marca los canales Tienda online y Facebook e Instagram (para el catálogo de redes y WhatsApp).
 10. **SEO** (abajo): título y descripción cortos para Google.
@@ -46,7 +46,7 @@ También puedes pedirle a Claude Code: "Convierte esta hoja de productos en un C
 
 ## Precios de combos
 
-El precio individual de cada producto se pone en su ficha. Los combos (2 tenis + 1 gorra = $350.000) no se cargan como productos: los aplica el motor de descuentos (SPEC-005) a cualquier producto con las etiquetas `grupo-*`. Si cambian el precio de un combo, actualícenlo también en la sección "Combos destacados" del inicio.
+El precio individual de cada producto se pone en su ficha. Los combos no se cargan como productos: los aplican tres descuentos automáticos nativos de Shopify a los productos de las colecciones "Tenis en combo" y "Gorras en combo" (SPEC-005, `docs/operaciones/combos-nativos.md`). Para que el precio del combo cuadre, **todos los tenis en combo cuestan $175.000 y todas las gorras en combo $60.000**; un producto con otro precio no debe llevar la etiqueta `combo`. Si cambian el precio o el descuento de un combo, actualícenlo también en el metaobjeto `combo` y en la sección "Combos destacados" del inicio.
 
 ## Antes de activar un producto
 
