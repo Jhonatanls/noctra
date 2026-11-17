@@ -85,6 +85,8 @@
   --alto-barra-compra: 4.5rem;
   --zoom-ampliado: 200%;
   --ancho-valor-min: 3.5rem;
+  --ancho-tarjeta-combo: 16rem;
+  --ancho-tarjeta-regalo: 20rem;
 
   /* Movimiento */
   --duracion-corta: 160ms;

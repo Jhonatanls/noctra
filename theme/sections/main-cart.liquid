@@ -1,4 +1,6 @@
 {{ 'componente-carrito.css' | asset_url | stylesheet_tag }}
+{{ 'componente-combos.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'componente-combos.js' | asset_url }}" type="module"></script>
 
 {%- liquid
   assign numero_whatsapp = settings.whatsapp_numero | remove: '+' | remove: ' ' | remove: '-'
@@ -12,11 +14,17 @@
   endif
 -%}
 
+<carrito-combos class="carrito-combos" data-seccion="{{ section.id }}" data-url="{{ routes.cart_url }}" data-agregar="{{ routes.cart_add_url }}.js">
 <section class="seccion carrito">
   <div class="contenedor">
-    <h1>Tu carrito</h1>
+    <h1 tabindex="-1" data-foco>Tu carrito</h1>
+    <p class="oculto-visual" role="status" aria-live="polite" data-anuncio-combos></p>
 
+    <div data-reemplazable>
     {%- if cart.item_count > 0 -%}
+      {% render 'combos-mensajes', contexto: 'carrito' %}
+      {% render 'combos-regalo' %}
+
       {%- if umbral_envio > 0 -%}
         <div class="carrito__envio">
           {%- if falta_envio > 0 -%}
@@ -49,11 +57,12 @@
                   <p class="carrito__variante">{{ item.variant.title }}</p>
                 {%- endunless -%}
                 {%- for asignacion in item.line_level_discount_allocations -%}
+                  {%- if asignacion.amount == 0 -%}{%- continue -%}{%- endif -%}
                   <p class="carrito__descuento">{{ asignacion.discount_application.title }}: &minus;{{ asignacion.amount | money }}</p>
                 {%- endfor -%}
                 <label class="carrito__cantidad">
                   <span class="oculto-visual">Cantidad de {{ item.product.title }}</span>
-                  <input type="number" name="updates[]" value="{{ item.quantity }}" min="0" inputmode="numeric">
+                  <input type="number" name="updates[]" value="{{ item.quantity }}" min="0" inputmode="numeric" data-clave="{{ item.key }}">
                 </label>
                 <a class="carrito__quitar" href="{{ item.url_to_remove }}">Quitar</a>
               </div>
@@ -74,17 +83,20 @@
           {%- if cart.total_discount > 0 -%}
             <p class="carrito__ahorro">Ahorras <span class="precio">{{ cart.total_discount | money }}</span></p>
           {%- endif -%}
-          <p class="carrito__total">Total <span class="precio">{{ cart.total_price | money }}</span></p>
+          <p class="carrito__total">Total <span class="precio" data-total>{{ cart.total_price | money }}</span></p>
           <p class="carrito__nota">{% if cart.taxes_included %}IVA incluido. {% endif %}El envío se calcula al finalizar la compra.</p>
 
-          <button type="submit" name="update" class="boton boton--secundario">Actualizar cantidades</button>
+          <button type="submit" name="update" class="boton boton--secundario carrito__actualizar">Actualizar cantidades</button>
           <button type="submit" name="checkout" class="boton boton--ancho">Finalizar compra</button>
 
           {%- if numero_whatsapp != blank -%}
+            {%- capture linea_combo -%}{%- render 'combos-linea-whatsapp' -%}{%- endcapture -%}
+            {%- assign linea_combo = linea_combo | strip -%}
             {%- capture mensaje_wa -%}
 Hola, quiero hacer este pedido:
 {% for item in cart.items %}• {{ item.product.title }}{% unless item.product.has_only_default_variant %}, {{ item.variant.title }}{% endunless %} × {{ item.quantity }} — {{ item.final_line_price | money_without_trailing_zeros | strip_html }}
-{% endfor %}{% if cart.total_discount > 0 %}Ahorro aplicado: {{ cart.total_discount | money_without_trailing_zeros | strip_html }}
+{% endfor %}{% if linea_combo != blank %}{{ linea_combo }}
+{% endif %}{% if cart.total_discount > 0 %}Ahorro aplicado: {{ cart.total_discount | money_without_trailing_zeros | strip_html }}
 {% endif %}Total estimado: {{ cart.total_price | money_without_trailing_zeros | strip_html }}
 ¿Me confirman disponibilidad y envío a mi ciudad?
             {%- endcapture -%}
@@ -99,8 +111,10 @@ Hola, quiero hacer este pedido:
       <p>Tu carrito está vacío.</p>
       <a class="boton" href="{{ routes.all_products_collection_url }}">Ver la colección</a>
     {%- endif -%}
+    </div>
   </div>
 </section>
+</carrito-combos>
 
 {% schema %}
 {

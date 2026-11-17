@@ -51,8 +51,11 @@
     endif
   endif
 
-  # Las etiquetas se comparan en minúsculas: en el admin pueden quedar como "Combo" o "combo".
-  assign etiquetas = producto.tags | join: '|' | downcase | split: '|'
+  # Entra en combo si está en las colecciones tenis-en-combo o gorras-en-combo (SPEC-005)
+  capture grupo_combo
+    render 'combos-grupo', producto: producto
+  endcapture
+  assign grupo_combo = grupo_combo | strip
 
   # Precio anterior: el de la misma variante que da el precio mostrado (la más barata),
   # y solo si es mayor que su precio. Así no se mezclan precios de variantes distintas.
@@ -72,7 +75,7 @@
   endif
   if es_gama_alta
     assign sellos = sellos | append: 'premium,'
-  elsif etiquetas contains 'combo'
+  elsif grupo_combo != blank
     assign sellos = sellos | append: 'combo,'
   endif
   if es_nuevo
@@ -101,7 +104,7 @@
               {%- when 'agotado' -%}<li class="sello sello--agotado">Agotado</li>
               {%- when 'ultimas' -%}<li class="sello">Últimas unidades</li>
               {%- when 'premium' -%}<li class="sello sello--premium">{{ gama }}</li>
-              {%- when 'combo' -%}<li class="sello sello--combo">Combo</li>
+              {%- when 'combo' -%}<li class="sello sello--combo">{{ 'combos.sello_tarjeta' | t }}</li>
               {%- when 'nuevo' -%}<li class="sello">Nuevo</li>
             {%- endcase -%}
           {%- endfor -%}

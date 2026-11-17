@@ -4,11 +4,28 @@ Este archivo es la memoria del proyecto para Claude Code. Léelo completo al ini
 
 ## 1. Qué estamos construyendo
 
-Una tienda online de lujo accesible para Colombia que vende tenis y gorras de marca propia u originales, con el gancho comercial de **combos de precio fijo** (por ejemplo, 2 tenis + 1 gorra por $350.000, o 3 tenis por $420.000). Las personas llegan sobre todo desde Instagram y TikTok en el celular, conversan por WhatsApp y pagan con Addi, Sistecrédito, Mercado Pago, Wompi (tarjeta, PSE, Nequi, Daviplata), transferencia o contraentrega.
+Una tienda online de lujo accesible para Colombia que vende tenis y gorras de marca propia u originales, con el gancho comercial de **combos de precio fijo**: 1 par + 1 gorra por $189.800, 2 pares + 1 gorra por $349.800 y 3 pares por $399.700 con los precios vigentes (detalle en la sección 1.1). Las personas llegan sobre todo desde Instagram y TikTok en el celular, conversan por WhatsApp y pagan con Addi, Sistecrédito, Mercado Pago, transferencia o contraentrega.
 
 La marca se llama **Noctra**: una marca nocturna de lujo urbano. Su identidad es gótica y afilada (isotipo en forma de N con puntas de lanza y logotipo en letra gótica), en negro, blanco y plata. La prioridad número uno es la **impresión visual**: la página tiene que sentirse oscura, sobria e imponente, como una vitrina de noche donde solo brilla el producto. La prioridad número dos es que **comprar sea muy fácil** desde el celular, incluyendo cerrar la venta por WhatsApp.
 
 El proyecto es de largo plazo. Después vendrán ropa premium, lociones, accesorios y una tienda física. Todo lo que construyamos debe aguantar ese crecimiento sin rehacerse.
+
+### 1.1 Combos (SPEC-005, decisión del equipo del 16 nov 2026)
+
+La tienda se queda en **Shopify Basic, sin Plus y sin Shopify Functions propias**. Los combos son **descuentos automáticos nativos "Compra X lleva Y"** creados en el admin, con hasta 3 usos por pedido (un combo se puede repetir) y sin combinarse entre sí (Shopify aplica el que más ahorra en total).
+
+| Combo | Compra | Lleva | Total |
+| --- | --- | --- | --- |
+| Luna Nueva | 1 de Tenis en combo | 1 de Gorras en combo con $35.000 de descuento | $189.800 |
+| Eclipse | 2 de Tenis en combo | 1 de Gorras en combo gratis | $349.800 |
+| Luna Llena | 2 de Tenis en combo | 1 más de Tenis en combo con $125.000 de descuento | $399.700 |
+
+- Precios vigentes (16 nov 2026): todo tenis de la colección `tenis-en-combo` a $174.900 y toda gorra de `gorras-en-combo` a $49.900, un solo precio por colección. Los modelos premium no entran a esas colecciones.
+- **Precios calculados, no escritos**: el snippet `combos-precio` calcula precio, precio sin combo y ahorro de cada combo con los precios reales de las colecciones. Nunca escribas el precio de un combo a mano en código ni en textos; en los ajustes usa `{precio}` y `{ahorro}`.
+- **Manda Shopify**: el precio real lo ponen los descuentos del admin. `packages/combos` (copiado a `theme/assets/combos.js`) solo calcula para mostrar mensajes en carrito y ficha ("qué falta", "Elige tu gorra de regalo").
+- **Dos lugares que deben coincidir**: cada combo existe como descuento en el admin (Descuentos) y como combo en Ajustes del tema > Combos. El título del descuento debe ser idéntico al nombre del combo en el tema; si se cambia un combo, se cambia en los dos. Paso a paso: `docs/operaciones/combos-nativos.md`. Textos: `docs/contenido/combos.md`.
+- La gorra de regalo de Eclipse no se agrega sola: el carrito ofrece "Elige tu gorra de regalo".
+- La contraentrega por municipio se hace con la app pública "Control Contraentrega Colombia" (Moship), sin Function (SPEC-007).
 
 Contexto completo, requerimientos funcionales (RF-01 a RF-36) y no funcionales (RNF-01 a RNF-18): `docs/contexto/requerimientos.md`.
 
@@ -16,7 +33,7 @@ Contexto completo, requerimientos funcionales (RF-01 a RF-36) y no funcionales (
 
 1. **Catálogo legítimo.** Solo productos de marca propia u originales. Nunca escribas en código, contenido, metadatos, nombres de archivo, alt de imágenes ni datos de prueba nombres o logos de marcas de terceros (Nike, Adidas, New Era, etc.), ni palabras como "réplica", "AAA", "1.1" o "inspirado en". Las pasarelas, Meta y TikTok bloquean cuentas por esto (RNF-13). Si una tarea lo pide, detente y avisa al equipo.
 2. **Nada llega a producción sin aprobación humana.** Trabaja en local con `shopify theme dev -e desarrollo` y en ramas `spec/*` o `fix/*`. Nunca empujes a `test` ni a `prod`, nunca uses force push, `shopify theme publish`, `--live` ni `--allow-live`: los despliegues los hace GitHub Actions cuando el equipo une y aprueba.
-3. **Cero secretos en el repositorio.** Tokens, claves de API, contraseñas de tienda y datos de clientes van en variables de entorno o en el admin de Shopify, nunca en archivos versionados.
+3. **Cero secretos en el repositorio.** Tokens, claves de API, contraseñas de tienda y datos de clientes van en variables de entorno o en el admin de Shopify, nunca en archivos versionados, tienes permiso de revisar el archivo .env, solo para probar y temas de código.
 4. **Spec primero.** No se escribe código de una funcionalidad sin una spec en estado `aprobada` (ver sección 7). Los cambios menores de estilo o correcciones de bugs pueden ir con una nota en la spec existente.
 5. **Tokens, no valores sueltos.** Ningún color, fuente, tamaño de texto, espaciado ni radio va escrito a mano en un componente. Todo sale de `theme/assets/tokens.css` (RNF-04). El logotipo sale del snippet `logo` (SVG de `theme/assets/noctra-*.svg`) y el nombre de `settings.nombre_marca`; nunca se escribe ni se dibuja a mano.
 6. **Español de Colombia** en todo lo que ve el cliente: tuteo cercano, pesos con punto de miles (`$350.000`), sin anglicismos innecesarios. Los botones dicen exactamente lo que hacen ("Agregar al carrito", "Pedir por WhatsApp").
@@ -28,16 +45,16 @@ Contexto completo, requerimientos funcionales (RF-01 a RF-36) y no funcionales (
 | Actor | Responsabilidades | Lo que NO hace |
 | --- | --- | --- |
 | **Equipo (dueños del negocio)** | Nombre y marca final; proveedores, costos y precios; definición de combos y su vigencia; fotos y videos; aprobar specs y cada publicación; configurar el admin de Shopify (pagos, envíos, apps, impuestos); atender WhatsApp; trámites legales (SAS, SIC, DIAN) | Editar código del tema directamente en producción |
-| **Claude Code + subagentes** | Escribir y refinar specs; código del tema (Liquid, CSS, JS); lógica de combos y su Shopify Function; pruebas automáticas; revisiones de calidad, accesibilidad, rendimiento y cumplimiento; runbooks paso a paso para lo que se configura en el admin | Publicar el tema, tocar pagos o datos reales de clientes, aprobar sus propias specs, inventar datos (tallas, precios, políticas) |
-| **Shopify (plataforma)** | Hosting, CDN y disponibilidad; checkout y seguridad PCI; catálogo, variantes e inventario; pedidos y clientes; descuentos automáticos y ejecución de Functions; canales de Instagram, Facebook y TikTok; POS para la tienda física (fase 2) | Diseño de la marca, reglas de combos propias, mensajes de WhatsApp |
-| **Apps y servicios externos** | Addi y Sistecrédito (cuotas), Mercado Pago y Wompi (pagos), transportadora (guías y contraentrega), Alegra o Siigo (factura electrónica DIAN), Meta/WhatsApp Business (catálogo y mensajes) | Se configuran en el admin; el tema solo les deja espacio (bloques de app) |
+| **Claude Code + subagentes** | Escribir y refinar specs; código del tema (Liquid, CSS, JS); lógica de combos para los mensajes del tema; pruebas automáticas; revisiones de calidad, accesibilidad, rendimiento y cumplimiento; runbooks paso a paso para lo que se configura en el admin | Publicar el tema, tocar pagos o datos reales de clientes, aprobar sus propias specs, inventar datos (tallas, precios, políticas) |
+| **Shopify (plataforma)** | Hosting, CDN y disponibilidad; checkout y seguridad PCI; catálogo, variantes e inventario; pedidos y clientes; descuentos automáticos nativos (aplican los combos); canales de Instagram, Facebook y TikTok; POS para la tienda física (fase 2) | Diseño de la marca, reglas de combos propias, mensajes de WhatsApp |
+| **Apps y servicios externos** | Addi y Sistecrédito (cuotas), Mercado Pago (pagos), transportadora (guías y contraentrega), Control Contraentrega Colombia de Moship (contraentrega por municipio), Alegra o Siigo (factura electrónica DIAN), Meta/WhatsApp Business (catálogo y mensajes) | Se configuran en el admin; el tema solo les deja espacio (bloques de app) |
 
 Regla práctica: si algo se puede resolver con una función nativa de Shopify o una app oficial, no lo programamos. Programamos solo lo que nos diferencia: el diseño, la experiencia de tallas, los combos y el flujo con WhatsApp.
 
 ## 4. Stack y estructura del repositorio
 
 - **Shopify** (plan Basic al lanzar) con **tema propio Online Store 2.0** en Liquid, sin frameworks de CSS ni de JS. JavaScript con Web Components nativos, sin dependencias en el navegador.
-- **Shopify CLI** para desarrollo del tema y, en la etapa 3, para la app privada que aloja la Function de combos.
+- **Shopify CLI** para desarrollo del tema. No hay app privada ni Functions propias (plan Basic, sección 1.1).
 - **Node.js 22+** solo para pruebas y scripts de apoyo (`packages/`).
 - Git con tres ramas de ambiente: `dev` (tienda de desarrollo), `test` (pre-producción, tema no publicado en la tienda real) y `prod` (tema publicado, dominio propio). El trabajo se hace en ramas `spec/SPEC-00X-nombre-corto` o `fix/...` que salen de `dev`. CI/CD con GitHub Actions: `docs/operaciones/ramas-y-despliegue.md`.
 
@@ -55,7 +72,7 @@ Regla práctica: si algo se puede resolver con una función nativa de Shopify o 
 │   └── operaciones/           ← runbooks para configurar el admin
 ├── specs/                     ← specs ASDD (una por funcionalidad)
 ├── packages/
-│   └── combos/                ← lógica pura de combos + pruebas (fuente única)
+│   └── combos/                ← lógica de combos para mensajes del tema + pruebas (fuente única)
 ├── theme/                     ← tema de Shopify (raíz que se sube con la CLI)
 │   ├── layout/ templates/ sections/ snippets/
 │   ├── assets/                ← tokens.css, base.css, theme.js, combos.js
@@ -120,15 +137,15 @@ Cada funcionalidad vive en una spec en `specs/`. El ciclo es:
 | 0. Fundaciones | Repo, agentes, MCP, tienda de desarrollo | — | `shopify theme dev` levanta el tema base |
 | 1. Sistema de diseño y esqueleto | Tokens, modos, encabezado, pie, inicio | SPEC-001, SPEC-002 | Inicio navegable en ambos modos, Lighthouse móvil ≥ 85 |
 | 2. Catálogo y producto | Colecciones, filtros, ficha, tallas, WhatsApp | SPEC-003, SPEC-004 | Se puede elegir talla con guía y pedir por WhatsApp |
-| 3. Motor de combos | Function de descuento + mensajes en carrito | SPEC-005, SPEC-006 | Combos se aplican solos y el carrito dice qué falta |
+| 3. Motor de combos | Descuentos nativos en el admin + mensajes en carrito y ficha | SPEC-005, SPEC-006 | Combos se aplican solos y el carrito dice qué falta |
 | 4. Pagos y checkout | Configurar pasarelas, envíos, contraentrega | SPEC-007 | Compra de prueba aprobada con cada medio de pago |
 | 5. Canales y analítica | Catálogo en redes, notificaciones, píxeles | SPEC-008, SPEC-009 | Ventas atribuidas por canal y por combo |
 | 6. Contenido, legal y lanzamiento | Páginas, políticas, SEO, QA final | SPEC-010, SPEC-011 | Checklist de lanzamiento completo |
 | 7. Fase 2 | Precio Club, reseñas, lista de deseos, POS | Por escribir | Según plan de crecimiento |
 
-**Etapa activa: 1.** El esqueleto del tema y la lógica de combos ya tienen una primera versión (ver estado en cada spec). Para terminar la etapa 0, el equipo sigue `docs/operaciones/configuracion-inicial.md` (tienda de desarrollo, menús, colecciones, metaobjeto de tallas).
+**Etapa activa: 3.** Las etapas 1 y 2 están implementadas y probadas en la tienda de desarrollo; los criterios que faltan están en cada spec. Los combos (SPEC-005 y SPEC-006) están implementados y los tres descuentos creados en la tienda de desarrollo.
 
-**Estado verificado del código:** Theme Check sin errores ni avisos, fuentes autoalojadas, 13 pruebas de combos en verde y vista previa estática revisada a 390 px en ambos modos. El tema aún no se ha probado contra una tienda real.
+**Estado verificado del código:** Theme Check sin errores ni avisos, fuentes autoalojadas, 43 pruebas de combos en verde (`npm test`). El tema Noctra va publicado en la tienda de desarrollo (con contraseña) y se probó allí a 360 y 1280 px en ambos modos.
 
 ## 9. Subagentes
 
@@ -139,7 +156,7 @@ Están en `.claude/agents/`. Delega en ellos en vez de hacerlo todo en la conver
 | `arquitecto-specs` | Escribir o refinar specs, descomponer etapas en tareas, mantener la trazabilidad RF/RNF → spec → código |
 | `disenador-ui` | Tokens, CSS, composición visual, revisión de pantallas con capturas en ambos modos |
 | `dev-tema-liquid` | Secciones, snippets, plantillas, JavaScript del tema, configuración del editor |
-| `dev-funciones` | Lógica de combos en `packages/combos`, Shopify Function de descuento, pruebas |
+| `dev-funciones` | Lógica de combos en `packages/combos` (mensajes del tema) y sus pruebas |
 | `contenido-copy` | Textos de la tienda, fichas, páginas de ayuda, mensajes de WhatsApp, en español colombiano |
 | `cumplimiento` | Revisión legal y de políticas: datos personales, consumidor, catálogo legítimo, términos de combos |
 | `qa-calidad` | Theme Check, pruebas, accesibilidad, rendimiento y revisión visual antes de pedir aprobación |
@@ -171,7 +188,7 @@ No agregues un MCP con acceso de escritura a la tienda (Admin API) sin una spec 
 
 - **Eslogan**: "Viste la noche." Úsalo como cierre, no en cada frase. Hashtag de campaña: #VisteLaNoche.
 
-- **Combo**: promoción de precio fijo por un conjunto de productos (2 tenis + 1 gorra = $350.000).
+- **Combo**: promoción de precio fijo por un conjunto de productos, hecha con un descuento automático nativo. Hoy son tres: Luna Nueva (1 par + 1 gorra = $189.800), Eclipse (2 pares + 1 gorra = $349.800) y Luna Llena (3 pares = $399.700), con los precios vigentes. Ver sección 1.1.
 - **Precio Club**: precio especial para clientes registrados (fase 2).
 - **Talla EUR**: la talla del tenis se elige por el número europeo de la etiqueta de un tenis que le quede bien al cliente; la guía muestra la equivalencia en centímetros de pie.
 - **Contraentrega**: el cliente paga en efectivo al recibir; requiere confirmación por WhatsApp antes de despachar.
@@ -182,7 +199,6 @@ No agregues un MCP con acceso de escritura a la tienda (Admin API) sin una spec 
 - Verificación del nombre Noctra en la SIC (clases 25 y 35), dominio y usuarios de redes.
 - Archivo vectorial original del logo hecho por un diseñador (los SVG actuales son una vectorización automática de la imagen generada; ver `docs/marca/README.md`).
 - Verificar en la SIC que el eslogan "Viste la noche" se pueda registrar como lema comercial junto con la marca.
-- Combos definitivos y su vigencia (hoy los dos de ejemplo).
-- Número de WhatsApp Business (hoy vacío en la configuración).
+- Vigencia de los combos (fechas de inicio y fin).
 - Medidas reales por horma para la guía de tallas (hoy hay una tabla de referencia general marcada como provisional).
 - Umbral de envío gratis (hoy $150.000 de ejemplo).

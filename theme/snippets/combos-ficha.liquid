@@ -1,0 +1,11 @@
+{% doc %}
+  Mensaje de combo en la ficha de producto.
+  @param {product} producto - Producto de la ficha
+  @param {boolean} premium - Si el producto es de gama alta (no participa en combos)
+  @param {string} grupo - Grupo de combo del producto (vacío si no está en una colección de combo)
+{% enddoc %}
+{%- if premium -%}
+  <p class="combos-mensajes__item">{{ 'combos.sin_combo_ficha' | t }}</p>
+{%- elsif grupo != blank -%}
+  {% render 'combos-mensajes', contexto: 'ficha', producto: producto %}
+{%- endif -%}

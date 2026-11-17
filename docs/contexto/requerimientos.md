@@ -21,7 +21,7 @@ Noir y plata, derivada del logo de Noctra (reemplaza la paleta Noir y oro del do
 
 ## Stack
 
-Shopify con tema propio Online Store 2.0 (Liquid) en Git. Promociones con descuentos automáticos y Shopify Functions. Cuotas con las apps oficiales de Addi y Sistecrédito. Pagos con Mercado Pago y Wompi. Transferencia y contraentrega como métodos manuales. WhatsApp Business con catálogo sincronizado vía Meta. Apps de Facebook/Instagram y TikTok. Transportadora vía app cotizadora. Factura electrónica con Alegra o Siigo. Shopify POS en fase 2.
+Shopify con tema propio Online Store 2.0 (Liquid) en Git. Promociones con descuentos automáticos nativos "Compra X lleva Y" en plan Basic, sin Functions propias (decisión del equipo 16 nov 2026, ver SPEC-005). Contraentrega por municipio con una app pública de la App Store (SPEC-007). Cuotas con las apps oficiales de Addi y Sistecrédito. Pagos con Mercado Pago y Wompi. Transferencia y contraentrega como métodos manuales. WhatsApp Business con catálogo sincronizado vía Meta. Apps de Facebook/Instagram y TikTok. Transportadora vía app cotizadora. Factura electrónica con Alegra o Siigo. Shopify POS en fase 2.
 
 Costo a considerar: Shopify Payments no está disponible en Colombia, así que Shopify cobra una comisión adicional por venta con pasarela externa (2 % en Basic, 1 % en Grow), además de la comisión de cada pasarela.
 

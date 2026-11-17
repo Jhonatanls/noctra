@@ -1,0 +1,110 @@
+{% doc %}
+  JSON con los combos del tema (Ajustes del tema > Combos), el carrito con el grupo de cada
+  línea, los descuentos que Shopify aplicó y los textos. Lo lee el componente mensajes-combos.
+  El tema no cobra nada: solo muestra mensajes con estos datos.
+  @param {product} [producto] - Producto de la ficha, si se muestra en una ficha
+{% enddoc %}
+{%- liquid
+  assign hoy = 'now' | date: '%Y-%m-%d'
+  assign es_premium = false
+  if producto != blank
+    assign gama = producto.metafields.custom.gama.value
+    if settings.gama_premium_valor != blank and gama == settings.gama_premium_valor
+      assign es_premium = true
+    endif
+  endif
+-%}
+<script type="application/json" data-combos-datos>
+{
+  "hoy": {{ hoy | json }},
+  "pagina": { "premium": {{ es_premium }} },
+  "combos": [
+    {%- for i in (1..3) -%}
+      {%- liquid
+        assign p = 'combo_' | append: i | append: '_'
+        assign k_activo = p | append: 'activo'
+        assign k_nombre = p | append: 'nombre'
+        assign k_detalle = p | append: 'detalle'
+        assign k_precio = p | append: 'precio'
+        assign k_beneficio = p | append: 'beneficio'
+        assign k_cg = p | append: 'compra_grupo'
+        assign k_cc = p | append: 'compra_cantidad'
+        assign k_lg = p | append: 'lleva_grupo'
+        assign k_lc = p | append: 'lleva_cantidad'
+        assign k_vt = p | append: 'valor_tipo'
+        assign k_v = p | append: 'valor'
+        assign k_desde = p | append: 'desde'
+        assign k_hasta = p | append: 'hasta'
+        assign k_usos = p | append: 'usos'
+        assign usos = settings[k_usos] | default: 1 | at_least: 1
+        assign tipo_valor = settings[k_vt]
+        assign valor = settings[k_v] | default: 0
+        if tipo_valor == 'monto'
+          assign valor = valor | times: 100
+        endif
+      -%}
+{%- capture total_combo -%}{%- render 'combos-precio', i: i, dato: 'total' -%}{%- endcapture -%}
+{%- capture ahorro_combo -%}{%- render 'combos-precio', i: i, dato: 'ahorro' -%}{%- endcapture -%}
+{%- capture lista_combo -%}{%- render 'combos-precio', i: i, dato: 'lista' -%}{%- endcapture -%}
+{%- assign total_combo = total_combo | strip | plus: 0 -%}
+{%- assign ahorro_combo = ahorro_combo | strip | plus: 0 -%}
+{%- assign lista_combo = lista_combo | strip | plus: 0 -%}
+{%- assign precio_texto = total_combo | money_without_trailing_zeros | strip_html -%}
+{%- assign ahorro_texto = ahorro_combo | money_without_trailing_zeros | strip_html -%}
+{%- if settings[k_precio] != blank -%}{%- assign precio_texto = settings[k_precio] -%}{%- endif -%}
+      {%- assign beneficio = settings[k_beneficio] | replace: '{precio}', precio_texto | replace: '{ahorro}', ahorro_texto -%}
+      {
+        "id": "combo-{{ i }}",
+        "nombre": {{ settings[k_nombre] | json }},
+        "tipo": "compraXllevaY",
+        "activo": {% if settings[k_activo] %}true{% else %}false{% endif %},
+        "detalle": {{ settings[k_detalle] | json }},
+        "precio": {{ precio_texto | json }},
+        "beneficio": {{ beneficio | json }},
+        "desde": {% if settings[k_desde] != blank %}{{ settings[k_desde] | json }}{% else %}null{% endif %},
+        "hasta": {% if settings[k_hasta] != blank %}{{ settings[k_hasta] | json }}{% else %}null{% endif %},
+        "compra": { "grupo": {{ settings[k_cg] | json }}, "cantidad": {{ settings[k_cc] | default: 1 }} },
+        "lleva": {
+          "grupo": {{ settings[k_lg] | json }},
+          "cantidad": {{ settings[k_lc] | default: 1 }},
+          "valor": { "tipo": {{ tipo_valor | json }}{% if tipo_valor != 'gratis' %}, "valor": {{ valor }}{% endif %} }
+        },
+        "limitePorPedido": {{ usos }}
+      }{% unless forloop.last %},{% endunless %}
+    {%- endfor -%}
+  ],
+  "lineas": [
+    {%- for item in cart.items -%}
+      {%- capture grupo -%}{%- render 'combos-grupo', producto: item.product -%}{%- endcapture -%}
+      {%- assign grupo = grupo | strip -%}
+      { "id": {{ item.key | json }}, "precio": {{ item.original_price }}, "cantidad": {{ item.quantity }}, "grupo": {% if grupo != blank %}{{ grupo | json }}{% else %}null{% endif %} }{% unless forloop.last %},{% endunless %}
+    {%- endfor -%}
+  ],
+  "descuentos": [
+    {%- for d in cart.discount_applications -%}
+      { "titulo": {{ d.title | json }}, "monto": {{ d.total_allocated_amount }} }{% unless forloop.last %},{% endunless %}
+    {%- endfor -%}
+  ],
+  "textos": {
+    "par_uno": {{ 'combos.par_uno' | t | json }},
+    "par_otros": {{ 'combos.par_otros' | t | json }},
+    "gorra_uno": {{ 'combos.gorra_uno' | t | json }},
+    "gorra_otros": {{ 'combos.gorra_otros' | t | json }},
+    "arma": {{ 'combos.arma' | t | json }},
+    "agrega": {{ 'combos.agrega' | t | json }},
+    "activo": {{ 'combos.activo' | t | json }},
+    "mejor": {{ 'combos.mejor' | t | json }},
+    "elegido": {{ 'combos.elegido' | t | json }},
+    "extra_gorra": {{ 'combos.extra_gorra' | t | json }},
+    "no_acumulan": {{ 'combos.no_acumulan' | t | json }},
+    "un_uso": {{ 'combos.un_uso' | t | json }},
+    "varios_usos": {{ 'combos.varios_usos' | t | json }},
+    "repite": {{ 'combos.repite' | t | json }},
+    "cantidades_actualizadas": {{ 'combos.cantidades_actualizadas' | t | json }},
+    "cantidades_error": {{ 'combos.cantidades_error' | t | json }},
+    "aplicado_nota": {{ 'combos.aplicado_nota' | t | json }},
+    "regalo_agregada": {{ 'combos.regalo_agregada' | t | json }},
+    "regalo_error": {{ 'combos.regalo_error' | t | json }}
+  }
+}
+</script>

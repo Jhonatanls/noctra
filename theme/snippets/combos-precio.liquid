@@ -1,0 +1,50 @@
+{% doc %}
+  Calcula en centavos el precio de un combo con los precios REALES de sus colecciones
+  (primer producto de cada una: la regla es un solo precio por colección) y el descuento
+  configurado en Ajustes del tema > Combos. Así el precio que se anuncia sigue a la tienda
+  sin escribirlo a mano. Se usa con capture y luego | strip | plus: 0.
+  Si el ajuste "Precio del combo" tiene texto, ese texto manda y este snippet no se usa.
+  @param {number} i - Número del combo en los ajustes (1, 2 o 3)
+  @param {string} dato - 'total' (precio del combo), 'ahorro' o 'lista' (sin descuento)
+{% enddoc %}
+{%- liquid
+  assign p = 'combo_' | append: i | append: '_'
+  assign k_cg = p | append: 'compra_grupo'
+  assign k_cc = p | append: 'compra_cantidad'
+  assign k_lg = p | append: 'lleva_grupo'
+  assign k_lc = p | append: 'lleva_cantidad'
+  assign k_vt = p | append: 'valor_tipo'
+  assign k_v = p | append: 'valor'
+
+  assign precio_compra = collections[settings[k_cg]].products.first.price | default: 0
+  assign precio_lleva = collections[settings[k_lg]].products.first.price | default: 0
+  assign cantidad_compra = settings[k_cc] | default: 1
+  assign cantidad_lleva = settings[k_lc] | default: 1
+
+  case settings[k_vt]
+    when 'gratis'
+      assign descuento = precio_lleva
+    when 'porcentaje'
+      assign descuento = precio_lleva | times: settings[k_v] | divided_by: 100
+    else
+      assign descuento = settings[k_v] | default: 0 | times: 100
+  endcase
+  if descuento > precio_lleva
+    assign descuento = precio_lleva
+  endif
+
+  assign lista = precio_compra | times: cantidad_compra
+  assign lista_lleva = precio_lleva | times: cantidad_lleva
+  assign lista = lista | plus: lista_lleva
+  assign ahorro = descuento | times: cantidad_lleva
+  assign total = lista | minus: ahorro
+
+  case dato
+    when 'ahorro'
+      echo ahorro
+    when 'lista'
+      echo lista
+    else
+      echo total
+  endcase
+-%}

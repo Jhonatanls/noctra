@@ -17,7 +17,7 @@ Que el cliente pague como prefiera (cuotas, Mercado Pago, transferencia o contra
 | RF-15 | Dirección con departamento y ciudad de Colombia (formulario nativo del checkout) y costo de envío de la transportadora. El costo **por ciudad** depende de que la app de la transportadora calcule tarifas en el checkout; con zonas nativas el costo llega solo a nivel de departamento (ver "Envíos") | Admin: Envíos y entregas + app de la transportadora |
 | RF-17 | Medios de pago: **Addi, Sistecrédito, Mercado Pago (tarjeta, PSE y los demás medios que el equipo active en su cuenta), transferencia bancaria y pago contraentrega**. **Wompi sale del alcance** por decisión del equipo (16 nov 2026) | Admin: Configuración → Pagos + apps oficiales |
 | RF-18 | Activación del mensaje de cuotas ya construido en SPEC-004 (bloques de app + ajuste `mostrar_cuotas` + "Sujeto a aprobación.") y su prueba con las apps reales; cuotas en el carrito solo si las apps entregan un bloque para el carrito | Apps de Addi y Sistecrédito + editor del tema; tema solo si aplica la tarea 11 |
-| RF-19 | Contraentrega con monto máximo, ciudades con cobertura de recaudo de la transportadora y confirmación por WhatsApp antes de despachar. **Restricción del plan Basic:** no se puede ocultar el método con una Function propia (ver "Contraentrega") | Admin + proceso del equipo; app pública solo si el equipo la elige |
+| RF-19 | Contraentrega solo en los municipios habilitados, con la app pública "Control Contraentrega Colombia" (Moship), sin Function propia; monto máximo y confirmación por WhatsApp antes de despachar (ver "Contraentrega") | App pública + admin + proceso del equipo |
 | RF-20 | Transferencia como método manual con instrucciones; comprobante por WhatsApp o correo; pedido "pendiente de pago" hasta validar. **Cambio respecto al texto de RF-20:** la "carga de comprobante" no se hace en la tienda sino por WhatsApp o correo (para cumplir RNF-08) | Admin (método manual) + proceso del equipo |
 | RF-27 (parcial) | Estado de pago con que nace cada pedido según el medio y qué ve el cliente. Los estados de preparación, despacho y entrega los define SPEC-008 | Admin (estados nativos); detalle en SPEC-008 |
 | RNF-06 | Ningún dato de tarjeta pasa por el tema: todo lo procesan Mercado Pago, Addi y Sistecrédito en su propio flujo | Pasarelas; revisión de cumplimiento |
@@ -31,7 +31,7 @@ Que el cliente pague como prefiera (cuotas, Mercado Pago, transferencia o contra
 - RF-17 se reescribe sin Wompi. Propuesta aplicada en `docs/contexto/requerimientos.md` (fila RF-17, con la nota "cambio por decisión del equipo 16 nov 2026").
 - Quedan por actualizar, sin tocar en esta spec: la línea 24 de `docs/contexto/requerimientos.md` ("Pagos con Mercado Pago y Wompi"), `CLAUDE.md` sección 1 (párrafo inicial) y sección 3 (tabla "Quién hace qué"), `docs/decisiones/ADR-001-shopify-tema-propio.md`, `docs/GUIA-CLAUDE-CODE.md` (etapa 4) y la descripción del agente `.claude/agents/operaciones-shopify.md`. CLAUDE.md y la configuración de agentes los cambia el equipo.
 - RF-20: el comprobante se recibe por WhatsApp o correo, no con una carga en la tienda.
-- RF-19: si el equipo elige la alternativa A de contraentrega (recomendada), "ciudades habilitadas" se cumple con validación del equipo antes de despachar, no impidiendo elegir el método en el checkout. Requiere aceptación explícita del equipo al aprobar esta spec.
+- RF-19: "ciudades habilitadas" se cumple en el checkout con la app de Moship (el método no aparece fuera de los municipios habilitados). Si la app no permite tope por monto, el monto máximo se cumple con la confirmación por WhatsApp antes de despachar, no impidiendo elegir el método. Esa parte requiere aceptación explícita del equipo al aprobar esta spec.
 
 Sin spec: ninguno de los RF de pagos queda descubierto. La factura electrónica al quedar pagado un pedido (RNF-11) va en SPEC-010; la notificación de despacho y guía (RF-23) en SPEC-009.
 
@@ -39,7 +39,7 @@ Sin spec: ninguno de los RF de pagos queda descubierto. La factura electrónica 
 
 - Configuración en el admin de Mercado Pago, Addi, Sistecrédito, transferencia (método manual) y contraentrega (método manual), en modo de prueba primero.
 - Envíos con una sola transportadora (por definir) que ofrezca recaudo contraentrega: tarifas, zonas, cobertura y envío gratis desde el umbral que defina el equipo.
-- Modelo de contraentrega en plan Basic (alternativas, recomendación y criterios).
+- Contraentrega por municipio con la app "Control Contraentrega Colombia" (Moship), runbook `docs/operaciones/contraentrega-moship.md`.
 - Flujo de transferencia: instrucciones, recepción del comprobante y validación.
 - Estado de pago inicial por medio y lo que ve el cliente en la página de gracias y en el correo de confirmación.
 - Activación del mensaje de cuotas en la ficha (SPEC-004, C19) y decisión sobre el carrito.
@@ -50,7 +50,7 @@ Sin spec: ninguno de los RF de pagos queda descubierto. La factura electrónica 
 ## Fuera de alcance
 
 - **Wompi** (decisión del equipo, 16 nov 2026).
-- Una Shopify Function propia de personalización de pagos o de validación del checkout: en plan Basic no corre en producción (ver "Contraentrega").
+- Una Shopify Function propia de personalización de pagos o de validación del checkout: la tienda sigue en plan Basic, sin Plus (decisión del equipo, 16 nov 2026), y ahí las Functions propias no corren. La app de Moship trae su propia función como app pública, lo que sí se permite en Basic (por confirmar, pregunta 17).
 - Estados de preparación, despacho, entrega y devolución, y pedidos borrador por WhatsApp (SPEC-008).
 - Notificaciones de despacho y número de guía por WhatsApp y correo (SPEC-009).
 - Redacción de las políticas de envío, cambios y retracto (SPEC-010). Esta spec solo dice qué datos necesitan.
@@ -66,7 +66,8 @@ Sin spec: ninguno de los RF de pagos queda descubierto. La factura electrónica 
 | Apps oficiales de Addi y Sistecrédito (pago y mensaje de cuotas) | Shopify App Store + Configuración → Pagos | Equipo, con el runbook |
 | Transferencia: método de pago manual con nombre, detalles e instrucciones | Admin → Configuración → Pagos → Métodos de pago manuales | Equipo; textos de contenido-copy |
 | Contraentrega: método de pago manual con instrucciones | Igual que transferencia | Equipo; textos de contenido-copy |
-| Restricción de contraentrega por ciudad o monto | Proceso del equipo (alternativa A) o app pública de la App Store (alternativa B) | Equipo |
+| Restricción de contraentrega por municipio | App pública "Control Contraentrega Colombia" (Moship), instalada y configurada en el admin | Equipo, con `docs/operaciones/contraentrega-moship.md` |
+| Monto máximo de contraentrega | En la app, si lo permite; si no, revisión del equipo en la confirmación por WhatsApp | Equipo |
 | Transportadora: app de la transportadora o tarifas manuales por zona | Shopify App Store + Configuración → Envíos y entregas | Equipo |
 | Envío gratis | Tarifa con condición de precio del pedido en cada zona (nativo) + ajuste del tema `envio_gratis_desde` para la barra del carrito | Equipo |
 | Marca en el checkout | Editor del checkout (Configuración → Checkout → Personalizar) | Equipo, con el runbook |
@@ -76,7 +77,7 @@ Sin spec: ninguno de los RF de pagos queda descubierto. La factura electrónica 
 | Bloque de app de cuotas en el carrito | Tema (`sections/main-cart.liquid`), **solo si** la tarea 1 confirma que las apps lo entregan | dev-tema-liquid |
 | Texto de la barra de anuncios | Editor del tema (`sections/header-group.json`) | Equipo, tras revisión de cumplimiento |
 | Íconos de medios de pago en el pie | Tema (ya existe: `shop.enabled_payment_types` con `payment_type_svg_tag`) | Ninguno: solo verificar |
-| Shopify Function | **No aplica** en plan Basic (custom app con Functions solo en Plus) | — |
+| Shopify Function propia | **No aplica**: tienda en Basic sin Plus; la función de la app de Moship es de un tercero y no se programa aquí | — |
 
 ## Medios de pago (RF-17)
 
@@ -101,36 +102,29 @@ Sin spec: ninguno de los RF de pagos queda descubierto. La factura electrónica 
 
 ## Contraentrega (RF-19)
 
-### Restricción verificada
+### Recomendación: app "Control Contraentrega Colombia" (Moship)
 
-Verificado en shopify.dev el 16 nov 2026: "Stores on any plan can use public apps that are distributed through the Shopify App Store and contain functions. Only stores on a Shopify Plus plan can use custom apps that contain Shopify Function APIs." La tienda lanza en plan Basic, así que **no se puede ocultar la contraentrega por ciudad o por monto con una Function propia** (ni de personalización de pagos ni de validación del checkout). En la tienda de desarrollo sí se podría probar, pero no llegaría a producción. La versión anterior de esta spec contemplaba esa Function; queda descartada.
+La tienda sigue en plan Basic, sin Plus y sin Functions propias (decisión del equipo, 16 nov 2026). La contraentrega se controla por municipio con la app pública **"Control Contraentrega Colombia"** de Moship, instalada desde la App Store. No se programa nada: la app muestra u oculta el método de pago manual "Pago contraentrega" según el municipio de la dirección de envío. Pasos y verificaciones: `docs/operaciones/contraentrega-moship.md`.
 
-Por lo que se conoce, Shopify no permite de forma nativa mostrar u ocultar un método de pago manual según la ciudad o el total del pedido. Se confirma en la tarea 1.
+Por qué esta y no otra: cumple RF-19 en el checkout (el cliente fuera de cobertura no ve el método), sin código propio y sin cambiar de plan. Las apps públicas con funciones de personalización de pagos corren en cualquier plan; lo que exige Plus son las Functions propias en custom apps (restricción citada en "Historial").
 
-### Alternativas
+**Antes de instalarla hay que verificar** (pregunta 17): que la app existe en la App Store con ese nombre y desarrollador, su costo vigente y que funciona en plan Basic. El runbook registra lo que se leyó en la ficha el 16 nov 2026, incluida una nota de compatibilidad que no se pudo leer completa; nada de eso se da por confirmado hasta que el equipo lo vea en pantalla y lo pruebe en el periodo de prueba de la app.
 
-| Alternativa | Cómo funciona | Pros | Contras |
-| --- | --- | --- | --- |
-| **A. Método manual + validación del equipo por WhatsApp** | La contraentrega aparece en el checkout para todos. Sus instrucciones dicen que aplica solo en ciudades con cobertura de recaudo y hasta el monto máximo, y que se confirma por WhatsApp antes de despachar. Antes de despachar, el equipo revisa ciudad y monto. Si no cumple, ofrece otro medio de pago o cancela el pedido. La lista de ciudades se publica en la política de envíos | Sin costo ni código. Usa la confirmación por WhatsApp que RF-19 ya exige. Funciona desde el primer día | El cliente puede elegir contraentrega aunque su ciudad no tenga cobertura: es una mala experiencia y deja pedidos para cancelar. Depende de que el equipo revise cada pedido. No cumple RF-19 al pie de la letra ("no puede elegir") |
-| **B. App pública de la App Store que oculte métodos de pago** | Una app pública que trae funciones de personalización de pagos (permitido en cualquier plan) oculta la contraentrega según departamento, ciudad o total | Cumple RF-19 en el checkout: el cliente fuera de cobertura no ve el método. Sin código propio | Costo mensual. Dependencia de un tercero con acceso a datos de pedidos (revisión de cumplimiento, Ley 1581). Si la ciudad es texto libre, la regla por ciudad puede fallar. La app concreta está por elegir (pregunta 13) |
-| **C. Recaudo dentro de la app de la transportadora** | Algunas apps de transportadoras traen su propio manejo de contraentrega y cobertura | Ciudades y recaudo salen de la misma fuente que la guía | Depende de la transportadora elegida. Hay que verificar que su app sea pública y qué controla del checkout |
-| **D. Contraentrega solo por WhatsApp** | La contraentrega no aparece en el checkout. Quien la quiere escribe por WhatsApp y el equipo crea un pedido borrador con pago pendiente (SPEC-008) | Control total de ciudad y monto antes de crear el pedido | Más fricción. Quita del checkout uno de los medios que más usan los clientes del canal social. Más carga para el equipo |
-| **E. Subir a Shopify Plus** | Function propia de personalización de pagos | Regla exacta y sin terceros | Costo mucho mayor que el plan Basic. Sobredimensionado para el lanzamiento |
+Puntos que la app no resuelve o que están por confirmar:
 
-**Recomendación: A al lanzar**, con estas condiciones:
+1. **Monto máximo:** la ficha no menciona límite por monto. Si la app no lo permite, el monto máximo se revisa en la confirmación por WhatsApp antes de despachar (pregunta 2).
+2. **Cobertura real de recaudo:** la app solo muestra u oculta el método. Los municipios activos deben coincidir con la cobertura de recaudo de la transportadora (preguntas 1 y 3).
+3. **Datos personales:** la app pide acceso a datos de clientes y pedidos. Cumplimiento la revisa frente a la Ley 1581 y la política de datos antes de instalar.
+4. **Ciudad escrita a mano:** si la ciudad del checkout es texto libre, hay que probar variaciones de escritura (tarea 1 y C9).
 
-1. Las instrucciones del método y la política de envíos dicen, con los datos que confirme el equipo, el monto máximo, las ciudades con cobertura y que el pedido se confirma por WhatsApp antes de despachar.
-2. Ningún pedido con contraentrega se despacha sin confirmación por WhatsApp. El equipo revisa ciudad y monto en esa misma conversación.
-3. El equipo lleva la cuenta de pedidos con contraentrega cancelados por cobertura o monto. Si pasan del límite que el equipo defina (pregunta 14), se evalúa B o C.
+Si la app no pasa la verificación o no funciona en Basic, el plan de respaldo es la alternativa A del historial (método manual para todos y validación por WhatsApp), hasta que el equipo elija otra app pública.
 
-Si la transportadora elegida trae la alternativa C, se prefiere C a B.
+### Flujo
 
-### Flujo con la alternativa A
-
-1. El cliente elige "Pago contraentrega" en el checkout. Ve las instrucciones del método.
-2. El pedido nace con pago **pendiente**. La página de gracias y el correo de confirmación muestran las instrucciones.
-3. El equipo escribe al cliente por WhatsApp con la plantilla de confirmación (contenido-copy): productos, total, dirección, ciudad y, si aplica, el recargo (pregunta 7).
-4. Si la ciudad tiene cobertura, el total no pasa del máximo y el cliente confirma, el equipo prepara y despacha (SPEC-008).
+1. El cliente escribe su dirección en el checkout. Si el municipio está habilitado en la app, ve "Pago contraentrega" con sus instrucciones; si no, no lo ve.
+2. Al elegirlo, el pedido nace con pago **pendiente**. La página de gracias y el correo de confirmación muestran las instrucciones.
+3. El equipo escribe al cliente por WhatsApp con la plantilla de confirmación (contenido-copy): productos, combo aplicado si hay, total, dirección, municipio y, si aplica, el recargo (pregunta 7).
+4. Si el total no pasa del máximo (cuando la app no lo controla) y el cliente confirma, el equipo prepara y despacha (SPEC-008).
 5. Si no cumple, el equipo ofrece pagar por otro medio (enlace de pago o transferencia) o cancela el pedido. Cancelar devuelve el inventario.
 6. El pedido se marca como pagado cuando corresponda según la pregunta 12 (al entregar o al recibir el recaudo de la transportadora).
 
@@ -200,7 +194,7 @@ Todos los valores marcados "pregunta" los define el equipo. Ningún agente los i
 | --- | --- | --- |
 | Transportadora | Admin (app o tarifas) | Pregunta 1 |
 | Monto máximo de contraentrega | Instrucciones del método + política de envíos | Pregunta 2 |
-| Ciudades con cobertura de recaudo | Política de envíos (y la app, si se elige B o C) | Pregunta 3 |
+| Municipios con cobertura de recaudo | App de Moship + política de envíos | Pregunta 3 |
 | Quién paga el envío y tarifas | Envíos y entregas + política de envíos | Pregunta 4 |
 | Umbral de envío gratis | Tarifa nativa + `envio_gratis_desde` (hoy 0) | Pregunta 5 |
 | Tiempos de entrega | Política de envíos | Pregunta 6 |
@@ -221,9 +215,10 @@ Se verifican en la tienda de desarrollo con cada pasarela en modo de prueba. C3,
 | C4 | [ ] Lo mismo que C3 con Sistecrédito. |
 | C5 | [ ] Dada la transferencia como método manual, cuando el cliente la elige y completa el pedido, entonces el pedido queda "Pendiente" y la página de gracias y el correo muestran los datos bancarios y cómo enviar el comprobante por WhatsApp o correo, con el número de pedido. |
 | C6 | [ ] Dado un pedido por transferencia "Pendiente", cuando el equipo valida el comprobante y lo marca como pagado, entonces queda "Pagado"; el comprobante no aparece en Contenido → Archivos ni en ninguna URL pública (revisión de cumplimiento, RNF-08). |
-| C7 | [ ] Dada la contraentrega como método manual (alternativa A), cuando el cliente la elige, entonces ve antes de pagar las instrucciones con el monto máximo M, el enlace o la referencia a las ciudades con cobertura y el aviso de confirmación por WhatsApp; el pedido queda "Pendiente". |
-| C8 | [ ] Dado un pedido con contraentrega por M + $1.000 o a una ciudad sin cobertura, cuando el equipo lo revisa siguiendo el runbook, entonces no lo despacha y le ofrece otro medio por WhatsApp o lo cancela, y al cancelar el inventario de la talla 41 en Negro vuelve a subir 1 unidad. |
-| C9 | [ ] Solo si el equipo elige la alternativa B o C: dado un carrito de M + $1.000, o una dirección en una ciudad sin cobertura, cuando llego al paso de pago, entonces "Pago contraentrega" no aparece; con un carrito de $189.900 a una ciudad con cobertura, sí aparece. |
+| C7 | [ ] Dada la app de Moship activa y un municipio habilitado, cuando el cliente elige "Pago contraentrega", entonces ve antes de pagar las instrucciones con el monto máximo M y el aviso de confirmación por WhatsApp; el pedido queda "Pendiente". |
+| C8 | [ ] Dado un pedido con contraentrega por M + $1.000 en un municipio habilitado (si la app no limita por monto), cuando el equipo lo revisa siguiendo el runbook, entonces no lo despacha y le ofrece otro medio por WhatsApp o lo cancela, y al cancelar el inventario de la talla 41 en Negro vuelve a subir 1 unidad. |
+| C9 | [ ] Dada la app de Moship activa, cuando llego al paso de pago con una dirección en un municipio **no** habilitado, entonces "Pago contraentrega" no aparece; con el pedido de prueba de $189.900 en un municipio habilitado, sí aparece. Se repite escribiendo el mismo municipio con y sin tilde y con mayúsculas distintas. Si la app permite tope por monto, también: con M + $1.000 no aparece y con M sí. |
+| C20 | [ ] Antes de instalar la app, el equipo deja anotado en "Notas y decisiones" que la vio en la App Store con ese nombre y desarrollador, su costo vigente, que no exige un plan superior a Basic, y la revisión de cumplimiento sobre los datos que pide. |
 | C10 | [ ] Dado el pedido de prueba a una ciudad de cada zona configurada, cuando llego al paso de envío, entonces veo la tarifa de la transportadora para esa zona (o para esa ciudad, si la app calcula por ciudad). |
 | C11 | [ ] Dado un umbral de envío gratis U definido por el equipo, con la tarifa nativa y `envio_gratis_desde` = U: con un carrito de U − $1.000 el checkout cobra envío y el carrito dice cuánto falta; con un carrito de U, el checkout muestra envío gratis y el carrito dice "Tu pedido tiene envío gratis.". Con `envio_gratis_desde` en 0, la barra no aparece. |
 | C12 | [ ] Dado `mostrar_cuotas` apagado en `prod` mientras Addi y Sistecrédito no estén activos en producción, entonces la ficha no muestra cuotas ni "Sujeto a aprobación." (repite C18 de SPEC-004 en `prod`). |
@@ -239,16 +234,16 @@ Se verifican en la tienda de desarrollo con cada pasarela en modo de prueba. C3,
 
 Cada tarea cabe en menos de un día. La tarea 2 bloquea las de configuración real; las tareas 3 a 9 se pueden escribir antes con los datos marcados como pendientes.
 
-1. [ ] **Verificar plataforma** (operaciones-shopify, con el MCP `shopify-dev`): métodos manuales en plan Basic (nombre, instrucciones, estado "Pendiente", cuándo descuentan inventario, si Shopify les cobra comisión); si existe alguna forma nativa de limitar un método por ciudad o total; si las tarifas calculadas por terceros están disponibles en Basic y con qué condición; si la ciudad en direcciones de Colombia es lista o texto libre; opciones de fuente y colores del editor del checkout en Basic; qué entregan Addi y Sistecrédito (bloque de app, incrustación, bloque para carrito) y qué pasa con el pedido si el crédito se rechaza. Anotar en "Notas y decisiones".
-2. [ ] **Decisiones del equipo** (equipo): responder las preguntas 1 a 16, elegir la alternativa de contraentrega y aceptar los cambios de RF-19 y RF-20.
+1. [ ] **Verificar plataforma** (operaciones-shopify, con el MCP `shopify-dev`): métodos manuales en plan Basic (nombre, instrucciones, estado "Pendiente", cuándo descuentan inventario, si Shopify les cobra comisión); si el envío gratis nativo se calcula sobre el subtotal ya descontado por los combos (SPEC-006); si las tarifas calculadas por terceros están disponibles en Basic y con qué condición; si la ciudad en direcciones de Colombia es lista o texto libre; opciones de fuente y colores del editor del checkout en Basic; qué entregan Addi y Sistecrédito (bloque de app, incrustación, bloque para carrito) y qué pasa con el pedido si el crédito se rechaza. Anotar en "Notas y decisiones".
+2. [ ] **Decisiones del equipo** (equipo): responder las preguntas 1 a 17, verificar la app de Moship en la App Store (C20) y aceptar los cambios de RF-19 y RF-20.
 3. [ ] **Runbook, Mercado Pago** (operaciones-shopify): activar, modo de prueba, medios de la cuenta, prueba de pago (C1, C2).
 4. [ ] **Runbook, Addi y Sistecrédito** (operaciones-shopify): instalar, modo de prueba, bloques en las plantillas de tenis y gorras, cuándo y cómo encender `mostrar_cuotas` (C3, C4, C12, C13). Reemplaza la tarea 15 de SPEC-004.
 5. [ ] **Runbook, transferencia** (operaciones-shopify): método manual, instrucciones, validación del comprobante, dónde guardarlo y dónde no, plazo de cancelación (C5, C6).
-6. [ ] **Runbook, contraentrega** (operaciones-shopify): según la alternativa elegida; con A, la revisión de ciudad y monto antes de despachar y el registro de cancelaciones (C7, C8; C9 si B o C).
+6. [ ] **Runbook, contraentrega** (operaciones-shopify): completar `docs/operaciones/contraentrega-moship.md` con lo que confirme la tarea 2 (instalación, municipios, monto si la app lo permite) y la revisión del monto por WhatsApp antes de despachar si no lo permite (C7, C8, C9).
 7. [ ] **Runbook, envíos** (operaciones-shopify): app de la transportadora o tarifas por zona, envío gratis nativo y `envio_gratis_desde` con el mismo valor (C10, C11).
 8. [ ] **Runbook, checkout y notificaciones** (operaciones-shopify): marca del checkout, correo de confirmación con las instrucciones de pago manual (C19).
 9. [ ] **Textos** (contenido-copy): nombres e instrucciones de los métodos manuales, plantillas de WhatsApp para confirmar contraentrega y pedir el comprobante, sección de pagos y envíos de la política de envíos (con SPEC-010). Sin datos inventados: deja marcadores donde falten.
-10. [ ] **Revisión de cumplimiento** (cumplimiento): textos de la tarea 9, barra de anuncios, nota de cuotas frente a las condiciones de Addi y Sistecrédito, datos que pide una app pública si se elige B, RNF-06 y RNF-08 (C6, C16, C17, C18).
+10. [ ] **Revisión de cumplimiento** (cumplimiento): textos de la tarea 9, barra de anuncios, nota de cuotas frente a las condiciones de Addi y Sistecrédito, datos que pide la app de Moship (Ley 1581), RNF-06 y RNF-08 (C6, C16, C17, C18, C20).
 11. [ ] **Ajustes del tema** (dev-tema-liquid), solo lo que aplique tras las tareas 1 y 10: espacio de bloques de app de cuotas en `/cart` con la regla de `mostrar_cuotas` (C14); cambio del texto por defecto de la barra de anuncios si cumplimiento lo pide (traer antes la versión de `prod` de `sections/header-group.json`). Si no aplica nada, se marca como no aplica.
 12. [ ] **Pedidos de prueba en desarrollo** (qa-calidad con el equipo): un pedido por medio y los casos de C8, C10 y C11; registrar estado y capturas.
 13. [ ] **Verificación en producción** (qa-calidad con el equipo, tras aprobar el despliegue): Addi y Sistecrédito reales, encendido de `mostrar_cuotas`, C3, C4, C13 y C19; Theme Check sin errores si hubo cambios de tema.
@@ -259,7 +254,8 @@ Cada tarea cabe en menos de un día. La tarea 2 bloquea las de configuración re
   - Medios de pago: Addi, Sistecrédito, Mercado Pago, transferencia y contraentrega. **Wompi sale** del alcance.
   - Todos los envíos los hace una transportadora (por definir) con recaudo contraentrega.
   - Mercado Pago cubre tarjeta, PSE y los demás medios que el equipo active en su cuenta.
-- **16 nov 2026, restricción de plataforma** (verificada en shopify.dev): las custom apps con Functions solo corren en Plus; las apps públicas de la App Store con funciones corren en cualquier plan. Afecta a esta spec (contraentrega) y a SPEC-005 (motor de combos, ver su sección "Riesgo: plan de Shopify").
+- **16 nov 2026, restricción de plataforma** (verificada en shopify.dev): las custom apps con Functions solo corren en Plus; las apps públicas de la App Store con funciones corren en cualquier plan.
+- **16 nov 2026, decisión del equipo:** la tienda queda en Basic, sin Plus y sin Functions propias. Los combos van con descuentos nativos (SPEC-005, riesgo de plan resuelto) y la contraentrega por municipio con la app de Moship. Reemplaza la recomendación anterior (alternativa A al lanzar), que queda en "Historial" como respaldo.
 - La versión anterior de esta spec tenía el criterio "El checkout muestra la marca en ambos modos". Se cambió por C19: el checkout tiene un solo esquema.
 - Lo que la spec da como comportamiento esperado de Shopify y de las pasarelas (estados, rechazo de crédito, tarifas calculadas en Basic, comisión sobre métodos manuales) no está verificado. Lo confirma la tarea 1 o los pedidos de prueba, y se corrige aquí.
 
@@ -279,7 +275,24 @@ Bloquean las tareas de configuración real (tarea 2), no la redacción de los ru
 10. **Cuenta bancaria empresarial:** ¿ya existe a nombre de la empresa? ¿En qué banco? Los datos los escriben ustedes en el admin, no se pasan por el repositorio.
 11. **Persona jurídica:** ¿Addi y Sistecrédito les exigen la SAS ya constituida (RNF-12)? ¿En qué etapa va el trámite? Si se demora, ¿lanzan sin cuotas y con `mostrar_cuotas` apagado?
 12. **Contraentrega pagada:** ¿marcan el pedido como pagado cuando la transportadora confirma la entrega o cuando les gira el recaudo?
-13. **Alternativa de contraentrega:** ¿aceptan la A al lanzar (el cliente puede elegirla y ustedes validan por WhatsApp)? Si prefieren B, ¿tienen una app pública en mente? Cumplimiento la revisaría antes de instalarla.
-14. **Límite para cambiar de alternativa:** ¿cuántos pedidos con contraentrega cancelados por cobertura o monto (por semana o por mes) justifican pasar a B o C?
+13. **Respaldo de contraentrega:** si la app de Moship no pasa la verificación, ¿lanzan con la alternativa A del historial (el cliente puede elegirla y ustedes validan por WhatsApp) o esperan otra app?
+14. **Monto máximo sin la app:** si la app no limita por monto, ¿aceptan que el tope se revise en la confirmación por WhatsApp y no en el checkout?
 15. **Plazo de la transferencia:** ¿cuántas horas o días esperan el comprobante antes de cancelar el pedido?
 16. **Checkout:** ¿lo quieren en esquema oscuro (como la tienda) o claro? El checkout no tiene interruptor.
+17. **App "Control Contraentrega Colombia" (Moship):** verifiquen en la App Store que existe con ese nombre y desarrollador, cuánto cuesta hoy (y en qué moneda se cobra), que funciona en plan Basic (lean completa la nota de compatibilidad de la ficha) y si limita por monto. ¿Quién aprueba el cobro mensual?
+
+## Historial
+
+### Restricción de plataforma (16 nov 2026)
+
+Verificado en shopify.dev: "Stores on any plan can use public apps that are distributed through the Shopify App Store and contain functions. Only stores on a Shopify Plus plan can use custom apps that contain Shopify Function APIs." Por eso no se puede ocultar la contraentrega con una Function propia en Basic. La primera versión de esta spec contemplaba esa Function; quedó descartada.
+
+### Alternativas evaluadas antes de elegir la app de Moship
+
+| Alternativa | Cómo funciona | Estado |
+| --- | --- | --- |
+| **A. Método manual + validación del equipo por WhatsApp** | La contraentrega aparece en el checkout para todos; las instrucciones dicen ciudades y monto; el equipo revisa antes de despachar y, si no cumple, ofrece otro medio o cancela | Era la recomendación al lanzar. Queda como **respaldo** si la app no pasa la verificación (pregunta 13). No cumple RF-19 al pie de la letra (el cliente puede elegirla) |
+| **B. App pública que oculte métodos de pago** | Una app pública con funciones de personalización de pagos oculta la contraentrega por municipio o total | **Elegida**, en la forma concreta de la app de Moship |
+| **C. Recaudo dentro de la app de la transportadora** | La app de la transportadora maneja cobertura y contraentrega | Descartada por ahora: la transportadora no está definida |
+| **D. Contraentrega solo por WhatsApp** | No aparece en el checkout; el equipo crea un pedido borrador | Descartada: más fricción y más carga para el equipo |
+| **E. Subir a Shopify Plus** | Function propia de personalización de pagos | Descartada por la decisión del 16 nov 2026 (sin Plus) |

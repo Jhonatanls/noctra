@@ -10,45 +10,567 @@
   {
     "name": "Marca",
     "settings": [
-      { "type": "text", "id": "nombre_marca", "label": "Nombre de la marca", "default": "Noctra", "info": "Se usa como nombre accesible del logotipo y en textos." },
-      { "type": "image_picker", "id": "logo", "label": "Logo alternativo", "info": "Opcional. Si se deja vacío, se usa el logotipo vectorial de Noctra, que cambia de color con el modo." },
+      {
+        "type": "text",
+        "id": "nombre_marca",
+        "label": "Nombre de la marca",
+        "default": "Noctra",
+        "info": "Se usa como nombre accesible del logotipo y en textos."
+      },
+      {
+        "type": "image_picker",
+        "id": "logo",
+        "label": "Logo alternativo",
+        "info": "Opcional. Si se deja vacío, se usa el logotipo vectorial de Noctra, que cambia de color con el modo."
+      },
       {
         "type": "select",
         "id": "modo_predeterminado",
         "label": "Modo al entrar",
         "options": [
-          { "value": "oscuro", "label": "Oscuro (decisión de marca)" },
-          { "value": "sistema", "label": "Seguir el modo del celular" }
+          {
+            "value": "oscuro",
+            "label": "Oscuro (decisión de marca)"
+          },
+          {
+            "value": "sistema",
+            "label": "Seguir el modo del celular"
+          }
         ],
         "default": "oscuro",
         "info": "El cliente siempre puede cambiarlo con el interruptor."
       },
-      { "type": "image_picker", "id": "favicon", "label": "Ícono del navegador" },
-      { "type": "text", "id": "eslogan", "label": "Eslogan", "default": "Viste la noche" }
+      {
+        "type": "image_picker",
+        "id": "favicon",
+        "label": "Ícono del navegador"
+      },
+      {
+        "type": "text",
+        "id": "eslogan",
+        "label": "Eslogan",
+        "default": "Viste la noche"
+      }
     ]
   },
   {
     "name": "WhatsApp",
     "settings": [
-      { "type": "text", "id": "whatsapp_numero", "label": "Número de WhatsApp Business", "info": "Con indicativo de país, solo números. Ejemplo: 573001234567. Si está vacío, no se muestran los botones." },
-      { "type": "text", "id": "whatsapp_mensaje", "label": "Mensaje inicial", "default": "Hola, quiero información sobre sus productos" }
+      {
+        "type": "text",
+        "id": "whatsapp_numero",
+        "label": "Número de WhatsApp Business",
+        "info": "Con indicativo de país, solo números. Ejemplo: 573001234567. Si está vacío, no se muestran los botones."
+      },
+      {
+        "type": "text",
+        "id": "whatsapp_mensaje",
+        "label": "Mensaje inicial",
+        "default": "Hola, quiero información sobre sus productos"
+      }
     ]
   },
   {
     "name": "Ventas",
     "settings": [
-      { "type": "number", "id": "envio_gratis_desde", "label": "Envío gratis desde (pesos)", "default": 0, "info": "0 oculta la barra de envío gratis. Antes de activarla, publica las condiciones en la política de envíos." },
-      { "type": "number", "id": "umbral_ultimas_unidades", "label": "Mostrar «Últimas unidades» con este inventario o menos", "default": 3, "info": "Se cuenta sobre el inventario total del producto (todas las tallas). 0 apaga el sello." },
-      { "type": "number", "id": "dias_sello_nuevo", "label": "Días que un producto muestra el sello «Nuevo»", "default": 7, "info": "Cuenta desde que el producto se publicó en la tienda. 0 apaga el sello." },
-      { "type": "text", "id": "gama_premium_valor", "label": "Valor de Gama que lleva el sello de gama alta", "default": "Noctra Premium", "info": "Debe coincidir exactamente con el valor del metacampo Gama. Los productos con este valor muestran este sello y no muestran el de combo." },
-      { "type": "checkbox", "id": "mostrar_cuotas", "label": "Mostrar mensaje de cuotas en la ficha de producto", "default": false, "info": "Actívalo solo cuando Addi o Sistecrédito estén activos en tu tienda. Muestra los bloques de app de cuotas que agregues debajo del bloque «Mensaje de cuotas» y la nota «Sujeto a aprobación.»." }
+      {
+        "type": "number",
+        "id": "envio_gratis_desde",
+        "label": "Envío gratis desde (pesos)",
+        "default": 0,
+        "info": "0 oculta la barra de envío gratis. Antes de activarla, publica las condiciones en la política de envíos."
+      },
+      {
+        "type": "number",
+        "id": "umbral_ultimas_unidades",
+        "label": "Mostrar «Últimas unidades» con este inventario o menos",
+        "default": 3,
+        "info": "Se cuenta sobre el inventario total del producto (todas las tallas). 0 apaga el sello."
+      },
+      {
+        "type": "number",
+        "id": "dias_sello_nuevo",
+        "label": "Días que un producto muestra el sello «Nuevo»",
+        "default": 7,
+        "info": "Cuenta desde que el producto se publicó en la tienda. 0 apaga el sello."
+      },
+      {
+        "type": "text",
+        "id": "gama_premium_valor",
+        "label": "Valor de Gama que lleva el sello de gama alta",
+        "default": "Noctra Premium",
+        "info": "Debe coincidir exactamente con el valor del metacampo Gama. Los productos con este valor muestran este sello y no muestran el de combo."
+      },
+      {
+        "type": "checkbox",
+        "id": "mostrar_cuotas",
+        "label": "Mostrar mensaje de cuotas en la ficha de producto",
+        "default": false,
+        "info": "Actívalo solo cuando Addi o Sistecrédito estén activos en tu tienda. Muestra los bloques de app de cuotas que agregues debajo del bloque «Mensaje de cuotas» y la nota «Sujeto a aprobación.»."
+      }
+    ]
+  },
+  {
+    "name": "Combos",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Estos datos solo se MUESTRAN en mensajes del tema. El precio real lo pone Shopify con los descuentos automáticos «Compra X lleva Y» del admin: deben tener el mismo título que el nombre de cada combo y las mismas reglas. Guía: docs/operaciones/combos-nativos.md."
+      },
+      {
+        "type": "header",
+        "content": "Combo 1"
+      },
+      {
+        "type": "checkbox",
+        "id": "combo_1_activo",
+        "label": "Combo activo",
+        "default": true,
+        "info": "Desmárcalo para apagarlo en el tema (el descuento del admin se apaga aparte)."
+      },
+      {
+        "type": "text",
+        "id": "combo_1_nombre",
+        "label": "Nombre",
+        "default": "Luna Nueva",
+        "info": "Debe ser igual al título del descuento automático en el admin de Shopify."
+      },
+      {
+        "type": "text",
+        "id": "combo_1_detalle",
+        "label": "Qué incluye",
+        "default": "1 par + 1 gorra"
+      },
+      {
+        "type": "text",
+        "id": "combo_1_detalle_wa",
+        "label": "Qué incluye en WhatsApp",
+        "info": "Opcional. Si está vacío se usa «Qué incluye»."
+      },
+      {
+        "type": "text",
+        "id": "combo_1_precio",
+        "label": "Precio del combo (opcional)",
+        "info": "Déjalo vacío: el tema lo calcula con los precios de las colecciones y el descuento de este combo. Escríbelo solo si quieres mostrar otro texto."
+      },
+      {
+        "type": "textarea",
+        "id": "combo_1_descripcion",
+        "label": "Descripción",
+        "default": "Tu primer par y la gorra que lo cierra. La gorra te queda {ahorro} más baja.",
+        "info": "Puedes usar {precio} y {ahorro}: el tema los reemplaza por los valores reales."
+      },
+      {
+        "type": "text",
+        "id": "combo_1_beneficio",
+        "label": "Beneficio en mensajes",
+        "default": "pagas {precio} por los dos",
+        "info": "Completa la frase «Agrega 1 gorra y activa el combo: …». Puedes usar {precio} y {ahorro}: el tema los reemplaza por los valores reales."
+      },
+      {
+        "type": "select",
+        "id": "combo_1_compra_grupo",
+        "label": "Compra: colección",
+        "options": [
+          {
+            "value": "tenis-en-combo",
+            "label": "Colección Tenis en combo"
+          },
+          {
+            "value": "gorras-en-combo",
+            "label": "Colección Gorras en combo"
+          }
+        ],
+        "default": "tenis-en-combo"
+      },
+      {
+        "type": "range",
+        "id": "combo_1_compra_cantidad",
+        "label": "Compra: cantidad",
+        "min": 1,
+        "max": 5,
+        "step": 1,
+        "default": 1
+      },
+      {
+        "type": "select",
+        "id": "combo_1_lleva_grupo",
+        "label": "Lleva: colección",
+        "options": [
+          {
+            "value": "tenis-en-combo",
+            "label": "Colección Tenis en combo"
+          },
+          {
+            "value": "gorras-en-combo",
+            "label": "Colección Gorras en combo"
+          }
+        ],
+        "default": "gorras-en-combo"
+      },
+      {
+        "type": "range",
+        "id": "combo_1_lleva_cantidad",
+        "label": "Lleva: cantidad",
+        "min": 1,
+        "max": 5,
+        "step": 1,
+        "default": 1
+      },
+      {
+        "type": "select",
+        "id": "combo_1_valor_tipo",
+        "label": "Lo que lleva tiene",
+        "options": [
+          {
+            "value": "gratis",
+            "label": "Gratis"
+          },
+          {
+            "value": "monto",
+            "label": "Descuento en pesos por artículo"
+          },
+          {
+            "value": "porcentaje",
+            "label": "Descuento en porcentaje"
+          }
+        ],
+        "default": "monto"
+      },
+      {
+        "type": "number",
+        "id": "combo_1_valor",
+        "label": "Valor del descuento",
+        "default": 35000,
+        "info": "Igual al descuento del admin. Pesos por artículo (ej. 35000) o porcentaje de 1 a 100. Ignorado si es gratis."
+      },
+      {
+        "type": "number",
+        "id": "combo_1_usos",
+        "label": "Máximo de usos por pedido",
+        "default": 3,
+        "info": "Debe ser igual al \"máximo de usos por pedido\" del descuento en el admin."
+      },
+      {
+        "type": "text",
+        "id": "combo_1_desde",
+        "label": "Vigente desde (AAAA-MM-DD)",
+        "info": "Opcional."
+      },
+      {
+        "type": "text",
+        "id": "combo_1_hasta",
+        "label": "Vigente hasta (AAAA-MM-DD)",
+        "info": "Opcional. Debe coincidir con la fecha de fin del descuento en el admin."
+      },
+      {
+        "type": "header",
+        "content": "Combo 2"
+      },
+      {
+        "type": "checkbox",
+        "id": "combo_2_activo",
+        "label": "Combo activo",
+        "default": true,
+        "info": "Desmárcalo para apagarlo en el tema (el descuento del admin se apaga aparte)."
+      },
+      {
+        "type": "text",
+        "id": "combo_2_nombre",
+        "label": "Nombre",
+        "default": "Eclipse",
+        "info": "Debe ser igual al título del descuento automático en el admin de Shopify."
+      },
+      {
+        "type": "text",
+        "id": "combo_2_detalle",
+        "label": "Qué incluye",
+        "default": "2 pares + 1 gorra gratis"
+      },
+      {
+        "type": "text",
+        "id": "combo_2_detalle_wa",
+        "label": "Qué incluye en WhatsApp",
+        "default": "2 pares + 1 gorra de regalo",
+        "info": "Opcional. Si está vacío se usa «Qué incluye»."
+      },
+      {
+        "type": "text",
+        "id": "combo_2_precio",
+        "label": "Precio del combo (opcional)",
+        "info": "Déjalo vacío: el tema lo calcula con los precios de las colecciones y el descuento de este combo. Escríbelo solo si quieres mostrar otro texto."
+      },
+      {
+        "type": "textarea",
+        "id": "combo_2_descripcion",
+        "label": "Descripción",
+        "default": "Dos pares al precio de siempre y la gorra la ponemos nosotros. Tú la eliges.",
+        "info": "Puedes usar {precio} y {ahorro}: el tema los reemplaza por los valores reales."
+      },
+      {
+        "type": "text",
+        "id": "combo_2_beneficio",
+        "label": "Beneficio en mensajes",
+        "default": "la gorra va por nosotros",
+        "info": "Completa la frase «Agrega 1 gorra y activa el combo: …». Puedes usar {precio} y {ahorro}: el tema los reemplaza por los valores reales."
+      },
+      {
+        "type": "select",
+        "id": "combo_2_compra_grupo",
+        "label": "Compra: colección",
+        "options": [
+          {
+            "value": "tenis-en-combo",
+            "label": "Colección Tenis en combo"
+          },
+          {
+            "value": "gorras-en-combo",
+            "label": "Colección Gorras en combo"
+          }
+        ],
+        "default": "tenis-en-combo"
+      },
+      {
+        "type": "range",
+        "id": "combo_2_compra_cantidad",
+        "label": "Compra: cantidad",
+        "min": 1,
+        "max": 5,
+        "step": 1,
+        "default": 2
+      },
+      {
+        "type": "select",
+        "id": "combo_2_lleva_grupo",
+        "label": "Lleva: colección",
+        "options": [
+          {
+            "value": "tenis-en-combo",
+            "label": "Colección Tenis en combo"
+          },
+          {
+            "value": "gorras-en-combo",
+            "label": "Colección Gorras en combo"
+          }
+        ],
+        "default": "gorras-en-combo"
+      },
+      {
+        "type": "range",
+        "id": "combo_2_lleva_cantidad",
+        "label": "Lleva: cantidad",
+        "min": 1,
+        "max": 5,
+        "step": 1,
+        "default": 1
+      },
+      {
+        "type": "select",
+        "id": "combo_2_valor_tipo",
+        "label": "Lo que lleva tiene",
+        "options": [
+          {
+            "value": "gratis",
+            "label": "Gratis"
+          },
+          {
+            "value": "monto",
+            "label": "Descuento en pesos por artículo"
+          },
+          {
+            "value": "porcentaje",
+            "label": "Descuento en porcentaje"
+          }
+        ],
+        "default": "gratis"
+      },
+      {
+        "type": "number",
+        "id": "combo_2_valor",
+        "label": "Valor del descuento",
+        "default": 0,
+        "info": "Igual al descuento del admin. Pesos por artículo (ej. 35000) o porcentaje de 1 a 100. Ignorado si es gratis."
+      },
+      {
+        "type": "number",
+        "id": "combo_2_usos",
+        "label": "Máximo de usos por pedido",
+        "default": 3,
+        "info": "Debe ser igual al \"máximo de usos por pedido\" del descuento en el admin."
+      },
+      {
+        "type": "text",
+        "id": "combo_2_desde",
+        "label": "Vigente desde (AAAA-MM-DD)",
+        "info": "Opcional."
+      },
+      {
+        "type": "text",
+        "id": "combo_2_hasta",
+        "label": "Vigente hasta (AAAA-MM-DD)",
+        "info": "Opcional. Debe coincidir con la fecha de fin del descuento en el admin."
+      },
+      {
+        "type": "header",
+        "content": "Combo 3"
+      },
+      {
+        "type": "checkbox",
+        "id": "combo_3_activo",
+        "label": "Combo activo",
+        "default": true,
+        "info": "Desmárcalo para apagarlo en el tema (el descuento del admin se apaga aparte)."
+      },
+      {
+        "type": "text",
+        "id": "combo_3_nombre",
+        "label": "Nombre",
+        "default": "Luna Llena",
+        "info": "Debe ser igual al título del descuento automático en el admin de Shopify."
+      },
+      {
+        "type": "text",
+        "id": "combo_3_detalle",
+        "label": "Qué incluye",
+        "default": "3 pares"
+      },
+      {
+        "type": "text",
+        "id": "combo_3_detalle_wa",
+        "label": "Qué incluye en WhatsApp",
+        "info": "Opcional. Si está vacío se usa «Qué incluye»."
+      },
+      {
+        "type": "text",
+        "id": "combo_3_precio",
+        "label": "Precio del combo (opcional)",
+        "info": "Déjalo vacío: el tema lo calcula con los precios de las colecciones y el descuento de este combo. Escríbelo solo si quieres mostrar otro texto."
+      },
+      {
+        "type": "textarea",
+        "id": "combo_3_descripcion",
+        "label": "Descripción",
+        "default": "Tres pares para toda la semana. El de menor precio baja {ahorro}.",
+        "info": "Puedes usar {precio} y {ahorro}: el tema los reemplaza por los valores reales."
+      },
+      {
+        "type": "text",
+        "id": "combo_3_beneficio",
+        "label": "Beneficio en mensajes",
+        "default": "3 pares por {precio}",
+        "info": "Completa la frase «Agrega 1 gorra y activa el combo: …». Puedes usar {precio} y {ahorro}: el tema los reemplaza por los valores reales."
+      },
+      {
+        "type": "select",
+        "id": "combo_3_compra_grupo",
+        "label": "Compra: colección",
+        "options": [
+          {
+            "value": "tenis-en-combo",
+            "label": "Colección Tenis en combo"
+          },
+          {
+            "value": "gorras-en-combo",
+            "label": "Colección Gorras en combo"
+          }
+        ],
+        "default": "tenis-en-combo"
+      },
+      {
+        "type": "range",
+        "id": "combo_3_compra_cantidad",
+        "label": "Compra: cantidad",
+        "min": 1,
+        "max": 5,
+        "step": 1,
+        "default": 2
+      },
+      {
+        "type": "select",
+        "id": "combo_3_lleva_grupo",
+        "label": "Lleva: colección",
+        "options": [
+          {
+            "value": "tenis-en-combo",
+            "label": "Colección Tenis en combo"
+          },
+          {
+            "value": "gorras-en-combo",
+            "label": "Colección Gorras en combo"
+          }
+        ],
+        "default": "tenis-en-combo"
+      },
+      {
+        "type": "range",
+        "id": "combo_3_lleva_cantidad",
+        "label": "Lleva: cantidad",
+        "min": 1,
+        "max": 5,
+        "step": 1,
+        "default": 1
+      },
+      {
+        "type": "select",
+        "id": "combo_3_valor_tipo",
+        "label": "Lo que lleva tiene",
+        "options": [
+          {
+            "value": "gratis",
+            "label": "Gratis"
+          },
+          {
+            "value": "monto",
+            "label": "Descuento en pesos por artículo"
+          },
+          {
+            "value": "porcentaje",
+            "label": "Descuento en porcentaje"
+          }
+        ],
+        "default": "monto"
+      },
+      {
+        "type": "number",
+        "id": "combo_3_valor",
+        "label": "Valor del descuento",
+        "default": 125000,
+        "info": "Igual al descuento del admin. Pesos por artículo (ej. 35000) o porcentaje de 1 a 100. Ignorado si es gratis."
+      },
+      {
+        "type": "number",
+        "id": "combo_3_usos",
+        "label": "Máximo de usos por pedido",
+        "default": 3,
+        "info": "Debe ser igual al \"máximo de usos por pedido\" del descuento en el admin."
+      },
+      {
+        "type": "text",
+        "id": "combo_3_desde",
+        "label": "Vigente desde (AAAA-MM-DD)",
+        "info": "Opcional."
+      },
+      {
+        "type": "text",
+        "id": "combo_3_hasta",
+        "label": "Vigente hasta (AAAA-MM-DD)",
+        "info": "Opcional. Debe coincidir con la fecha de fin del descuento en el admin."
+      }
     ]
   },
   {
     "name": "Redes sociales",
     "settings": [
-      { "type": "url", "id": "instagram_url", "label": "Instagram" },
-      { "type": "url", "id": "tiktok_url", "label": "TikTok" }
+      {
+        "type": "url",
+        "id": "instagram_url",
+        "label": "Instagram"
+      },
+      {
+        "type": "url",
+        "id": "tiktok_url",
+        "label": "TikTok"
+      }
     ]
   }
 ]

@@ -1,5 +1,37 @@
 {
   "general": {
     "saltar_contenido": "Saltar al contenido"
+  },
+  "combos": {
+    "sello_ficha": "Entra en combo",
+    "sello_tarjeta": "Combo",
+    "favorito": "El favorito",
+    "sin_combo_ficha": "Este modelo no participa en combos.",
+    "par_uno": "1 par",
+    "par_otros": "{n} pares",
+    "gorra_uno": "1 gorra",
+    "gorra_otros": "{n} gorras",
+    "arma": "Arma tu combo desde {detalle} por {precio}.",
+    "agrega": "Agrega {faltan} y activa {combo}: {beneficio}.",
+    "activo": "{combo} activo: ahorras {ahorro}.",
+    "mejor": "Agrega {faltan} y pasas a {combo}: ahorras {ahorro}.",
+    "mejor_sin_monto": "Agrega {faltan} y pasas a {combo}.",
+    "elegido": "Aplicamos {combo}, el que más te ahorra: {ahorro}.",
+    "extra_gorra": "{combo} incluye {gratis} gratis. Las demás gorras van a {precio_gorra} cada una.",
+    "no_acumulan": "Los combos no se acumulan. Si calificas para varios, aplicamos el que más ahorra.",
+    "un_uso": "Cada combo se aplica una vez por pedido.",
+    "varios_usos": "Cada combo se aplica hasta {n} veces por pedido.",
+    "repite": "Agrega {faltan} y {combo} se aplica {veces} veces: ahorras {ahorro}.",
+    "cantidades_actualizadas": "Carrito actualizado. Total: {total}.",
+    "cantidades_error": "No pudimos cambiar la cantidad. Puede que no haya más unidades disponibles.",
+    "aplicado_nota": "Precio combo aplicado automáticamente.",
+    "regalo_titulo": "Elige tu gorra de regalo",
+    "regalo_ayuda": "Con {{ compra }}, {{ combo }} incluye una gorra gratis. Elígela y agrégala: se descuenta sola en el carrito.",
+    "regalo_boton": "Agregar gorra de regalo",
+    "regalo_variante": "Opción de {{ gorra }}",
+    "regalo_agregada": "Gorra de regalo agregada.",
+    "regalo_error": "No pudimos agregar la gorra. Inténtalo de nuevo.",
+    "regalo_vacio": "Hoy no hay gorras de combo disponibles. Escríbenos por WhatsApp y te ayudamos a elegir otra opción.",
+    "whatsapp_linea": "Combo: {{ combo }} ({{ detalle }}) - {{ precio }} - ahorro {{ ahorro }}"
   }
 }
