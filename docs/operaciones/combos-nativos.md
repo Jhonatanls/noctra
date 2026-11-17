@@ -157,6 +157,18 @@ Qué comprueba cada una: 1 el combo base; 2 y 5 la elección de mayor ahorro; 3 
 
 Para cada carrito: agrega los productos, entra al checkout con una dirección de prueba, confirma que el nombre del combo aparece en el resumen y que el subtotal coincide. No es necesario pagar.
 
+## Cambiar el precio de una promoción
+
+El precio de un combo sale del precio de los productos y del descuento. Para cambiarlo:
+
+1. En el admin, **Descuentos**, abre el combo (por ejemplo, Luna Nueva) y cambia el valor del descuento. Guarda.
+2. En el editor del tema, **Ajustes del tema > Combos**, busca el mismo combo y escribe **el mismo valor** en "Valor del descuento" (en pesos, sin punto: `35000`). Guarda.
+3. Abre el inicio: la sección Combos (la página de ofertas) muestra el precio nuevo, el precio sin combo tachado y lo que ahorras. Arma ese combo en el carrito y confirma que el total coincide.
+
+Si cambias el **precio de los productos** de una colección de combo, no hace falta tocar los ajustes: el tema recalcula solo. Si cambias el **tipo** de descuento (de monto a porcentaje o gratis), cambia también "Lo que lleva tiene" en los ajustes.
+
+Si el valor del admin y el de los ajustes no coinciden, el carrito cobra lo del admin (manda Shopify), pero el inicio y los mensajes anuncian otro precio. Revisa los dos cada vez que cambies una promoción.
+
 ## Pausar o terminar un combo
 
 Fuente: [Administrar descuentos](https://help.shopify.com/en/manual/discounts/managing-discount-codes) (nombres de botones: verificar en pantalla).
