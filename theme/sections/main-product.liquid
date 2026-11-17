@@ -411,6 +411,27 @@
     </div>
   {%- endif -%}
 
+  {%- comment -%} Aviso al agregar al carrito sin salir de la ficha (con JavaScript; sin JS el formulario lleva al carrito) {%- endcomment -%}
+  <p class="oculto-visual" role="status" aria-live="polite" data-aviso-anuncio></p>
+  <div
+    class="aviso-carrito"
+    data-aviso-carrito
+    data-texto-agregado="{{ 'carrito.agregado' | t }}"
+    data-texto-agregando="{{ 'carrito.agregando' | t }}"
+    data-texto-error="{{ 'carrito.error_agregar' | t }}"
+    data-texto-sin-unidades="{{ 'carrito.sin_unidades' | t }}"
+    hidden
+  >
+    <div class="aviso-carrito__cuerpo">
+      <p class="aviso-carrito__titulo" data-aviso-titulo></p>
+      <p class="aviso-carrito__detalle" data-aviso-detalle></p>
+    </div>
+    <div class="aviso-carrito__acciones" data-aviso-acciones>
+      <a class="boton" href="{{ routes.cart_url }}">{{ 'carrito.ver_carrito' | t }}</a>
+      <button type="button" class="boton boton--secundario" data-aviso-cerrar>{{ 'carrito.seguir' | t }}</button>
+    </div>
+  </div>
+
   <script type="application/json" data-variantes>{{ product.variants | json }}</script>
 </ficha-producto>
 

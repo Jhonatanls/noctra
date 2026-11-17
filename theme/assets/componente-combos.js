@@ -135,9 +135,10 @@ class MensajesCombos extends HTMLElement {
 if (!customElements.get('mensajes-combos')) customElements.define('mensajes-combos', MensajesCombos);
 
 /**
- * Envuelve la sección del carrito: agrega la gorra de regalo y cambia cantidades sin recargar,
- * y refresca la sección para que total, descuentos de Shopify y mensajes de combo queden al día.
- * Sin JavaScript siguen funcionando los formularios normales ("Actualizar cantidades").
+ * Envuelve la sección del carrito: agrega la gorra de regalo y cambia cantidades (botones − y +
+ * o el campo) sin recargar, y refresca la sección para que total, descuentos de Shopify y
+ * mensajes de combo queden al día. Sin JavaScript sigue el botón "Actualizar cantidades".
+ * Avisa con el evento `carrito:cambio` (theme.js actualiza el contador del encabezado).
  */
 class CarritoCombos extends HTMLElement {
   connectedCallback() {
@@ -147,23 +148,54 @@ class CarritoCombos extends HTMLElement {
       evento.preventDefault();
       this.agregarRegalo(formulario);
     });
+    // Botones − y +: cambian el número al instante y se guardan juntos tras una pausa corta
+    this.addEventListener('click', (evento) => {
+      const boton = evento.target.closest('[data-paso]');
+      if (!boton) return;
+      evento.preventDefault();
+      if (this.ocupado) return;
+      const campo = boton.parentElement.querySelector('input[data-clave]');
+      if (!campo) return;
+      const paso = Number(boton.dataset.paso);
+      const actual = Math.max(0, Number.parseInt(campo.value, 10) || 0);
+      const maximo = campo.max ? Number(campo.max) : Infinity;
+      const nuevo = Math.min(maximo, Math.max(0, actual + paso));
+      if (nuevo === actual) {
+        if (paso > 0) this.anunciar(this.textos().sin_stock);
+        return;
+      }
+      campo.value = String(nuevo);
+      this.programar({ variante: boton.dataset.variante, paso: boton.dataset.paso });
+    });
     this.addEventListener('change', (evento) => {
-      if (!evento.target.matches('input[data-clave]')) return;
-      clearTimeout(this.espera);
-      this.espera = setTimeout(() => this.actualizarCantidades(evento.target.dataset.clave), 350);
+      const campo = evento.target;
+      if (!campo.matches('input[data-clave]') || this.ocupado) return;
+      const maximo = campo.max ? Number(campo.max) : Infinity;
+      const valor = Math.max(0, Number.parseInt(campo.value, 10) || 0);
+      if (valor > maximo) {
+        campo.value = String(maximo);
+        this.anunciar(this.textos().sin_stock);
+      }
+      this.programar({ variante: campo.dataset.variante, paso: null });
     });
     this.addEventListener('combos:actualizado', (evento) => {
       if (!this.pendiente) return;
-      const anuncio = this.querySelector('[data-anuncio-combos]');
       const textos = this.textos();
-      if (anuncio) anuncio.textContent = `${textos.regalo_agregada} ${evento.detail.activo}`.trim();
+      this.anunciar(`${textos.regalo_agregada} ${evento.detail.activo}`.trim());
       this.pendiente = false;
     });
   }
 
   textos() {
     const crudo = this.querySelector('script[data-combos-datos]');
-    try { return JSON.parse(crudo.textContent).textos; } catch (error) { return { regalo_agregada: '', regalo_error: '' }; }
+    try { return JSON.parse(crudo.textContent).textos; } catch (error) { return { regalo_agregada: '', regalo_error: '', sin_stock: '' }; }
+  }
+
+  anunciar(texto) {
+    const anuncio = this.querySelector('[data-anuncio-combos]');
+    if (!anuncio || !texto) return;
+    anuncio.textContent = '';
+    requestAnimationFrame(() => { anuncio.textContent = texto; });
   }
 
   async agregarRegalo(formulario) {
@@ -182,7 +214,9 @@ class CarritoCombos extends HTMLElement {
       this.pendiente = true;
       await this.refrescar();
       this.querySelector('[data-foco]')?.focus();
+      document.dispatchEvent(new CustomEvent('carrito:cambio'));
     } catch (fallo) {
+      // Se muestra el error junto al botón y se deja intentar de nuevo
       if (error) { error.textContent = this.textos().regalo_error; error.hidden = false; }
       if (boton) boton.disabled = false;
     }
@@ -197,16 +231,31 @@ class CarritoCombos extends HTMLElement {
     actual.replaceChildren(...nuevo.childNodes);
   }
 
-  /** Envía todas las cantidades a /cart/update.js y refresca; devuelve el foco al campo editado. */
-  async actualizarCantidades(clave) {
+  programar(foco) {
+    this.foco = foco;
+    clearTimeout(this.espera);
+    this.espera = setTimeout(() => this.actualizarCantidades(), 450);
+  }
+
+  /**
+   * Envía las cantidades a /cart/update.js y refresca la sección.
+   * Shopify puede dividir una misma referencia en dos líneas cuando un combo aplica a parte de ella,
+   * y esas líneas pueden compartir la misma clave: por eso se SUMAN las cantidades por clave
+   * (enviar cada línea por separado hacía que la última pisara a la primera).
+   * Solo hay una solicitud a la vez; mientras tanto los botones no responden.
+   */
+  async actualizarCantidades() {
+    if (this.ocupado) return;
     const textos = this.textos();
-    const anuncio = this.querySelector('[data-anuncio-combos]');
     const updates = {};
     for (const campo of this.querySelectorAll('input[data-clave]')) {
-      updates[campo.dataset.clave] = Math.max(0, Number.parseInt(campo.value, 10) || 0);
+      const clave = campo.dataset.clave;
+      updates[clave] = (updates[clave] ?? 0) + Math.max(0, Number.parseInt(campo.value, 10) || 0);
     }
+    this.ocupado = true;
     this.setAttribute('aria-busy', 'true');
     let fallo = false;
+    let sinStock = false;
     try {
       const respuesta = await fetch(`${this.dataset.url}/update.js`, {
         method: 'POST',
@@ -214,6 +263,7 @@ class CarritoCombos extends HTMLElement {
         body: JSON.stringify({ updates }),
       });
       fallo = !respuesta.ok;
+      sinStock = respuesta.status === 422;
     } catch (error) {
       fallo = true;
     }
@@ -223,11 +273,21 @@ class CarritoCombos extends HTMLElement {
       window.location.reload();
       return;
     }
+    this.ocupado = false;
     this.removeAttribute('aria-busy');
-    const campo = [...this.querySelectorAll('input[data-clave]')].find((c) => c.dataset.clave === clave);
-    (campo || this.querySelector('[data-foco]'))?.focus();
+    document.dispatchEvent(new CustomEvent('carrito:cambio'));
+
+    // El foco vuelve al mismo botón (− o +) o al campo de esa referencia, aunque la línea haya cambiado de clave
+    const { variante, paso } = this.foco ?? {};
+    const destino = (paso && this.querySelector(`[data-paso="${paso}"][data-variante="${variante}"]`))
+      || this.querySelector(`input[data-variante="${variante}"]`)
+      || this.querySelector('[data-foco]');
+    destino?.focus();
+
     const total = this.querySelector('[data-total]')?.textContent.trim() ?? '';
-    if (anuncio) anuncio.textContent = fallo ? textos.cantidades_error : rellenar(textos.cantidades_actualizadas, { total });
+    if (sinStock) this.anunciar(textos.sin_stock);
+    else this.anunciar(fallo ? textos.cantidades_error : rellenar(textos.cantidades_actualizadas, { total }));
   }
 }
+
 if (!customElements.get('carrito-combos')) customElements.define('carrito-combos', CarritoCombos);

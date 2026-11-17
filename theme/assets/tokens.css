@@ -87,6 +87,7 @@
   --ancho-valor-min: 3.5rem;
   --ancho-tarjeta-combo: 16rem;
   --ancho-tarjeta-regalo: 20rem;
+  --ancho-aviso-carrito: 26rem;
 
   /* Movimiento */
   --duracion-corta: 160ms;

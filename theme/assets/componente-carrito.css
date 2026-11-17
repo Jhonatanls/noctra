@@ -17,7 +17,6 @@
 .carrito__nombre { text-decoration: none; font-weight: var(--peso-medio); display: inline-flex; align-items: center; min-block-size: var(--tactil-min); }
 .carrito__variante, .carrito__descuento { margin: 0; font-size: var(--texto-s); color: var(--color-texto-2); }
 .carrito__descuento { color: var(--color-oro); }
-.carrito__cantidad input { width: 5rem; }
 /* Objetivo táctil de 44 px (RNF-05) */
 .carrito__quitar { font-size: var(--texto-s); display: inline-flex; align-items: center; min-block-size: var(--tactil-min); }
 .carrito__precio { margin: 0; text-align: end; display: grid; }
@@ -29,3 +28,48 @@
 
 /* Con JavaScript las cantidades se guardan solas al cambiarlas (componente-combos.js). */
 html[data-js] .carrito__actualizar { display: none; }
+
+/* Selector de cantidad  |  −  |  1  |  +  | (SPEC-006). Sin JavaScript solo queda el campo. */
+.cantidad {
+  display: inline-grid;
+  grid-template-columns: var(--tactil-min) minmax(var(--tactil-min), var(--ancho-valor-min)) var(--tactil-min);
+  inline-size: max-content;
+  border: var(--borde-fino) solid var(--color-borde);
+  border-radius: var(--radio-s);
+}
+.cantidad__boton {
+  display: grid;
+  place-items: center;
+  min-block-size: var(--tactil-min);
+  padding: 0;
+  background: transparent;
+  color: var(--color-texto);
+  border: 0;
+  font-size: var(--texto-l);
+  line-height: 1;
+  cursor: pointer;
+}
+.cantidad__boton:hover:not([aria-disabled="true"]) { color: var(--color-oro); }
+.cantidad__boton:focus-visible { outline: var(--anillo-foco) solid var(--color-oro); outline-offset: calc(-1 * var(--anillo-foco)); }
+.cantidad__boton[aria-disabled="true"] { color: var(--color-texto-2); cursor: not-allowed; }
+.cantidad__campo {
+  inline-size: 100%;
+  min-block-size: var(--tactil-min);
+  padding: 0;
+  text-align: center;
+  background: transparent;
+  color: var(--color-texto);
+  font: inherit;
+  border: 0;
+  border-inline: var(--borde-fino) solid var(--color-borde);
+  border-radius: 0;
+  appearance: textfield;
+}
+.cantidad__campo::-webkit-inner-spin-button,
+.cantidad__campo::-webkit-outer-spin-button { appearance: none; margin: 0; }
+.cantidad__campo:focus-visible { outline: var(--anillo-foco) solid var(--color-oro); outline-offset: calc(-1 * var(--anillo-foco)); }
+html:not([data-js]) .cantidad { grid-template-columns: minmax(var(--tactil-min), var(--ancho-valor-min)); }
+html:not([data-js]) .cantidad__boton { display: none; }
+html:not([data-js]) .cantidad__campo { border-inline: 0; }
+carrito-combos[aria-busy="true"] .cantidad { cursor: progress; }
+.carrito__aviso-stock { margin: 0; font-size: var(--texto-xs); color: var(--color-texto-2); }

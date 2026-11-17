@@ -55,6 +55,23 @@ Que el carrito venda: muestre el combo que Shopify aplicó y lo que ahorra, empu
 - **Si hay diferencia, manda Shopify.** Si la predicción dice un combo y Shopify aplicó otro (o ninguno), el carrito muestra lo de Shopify y no muestra el mensaje que lo contradiga. Así nunca se promete un precio que el checkout no cobra.
 - El combo aplicado se reconoce comparando el título del descuento con `tituloDescuento` del metaobjeto `combo`.
 
+## Corrección: cantidades en el carrito (pedido del equipo, 17 nov 2026)
+
+El equipo reportó que subir la cantidad en el carrito fallaba seguido y pidió un selector **|  −  |  1  |  +  |**. Causas encontradas en el código:
+
+1. **Líneas divididas con la misma clave.** Cuando un combo aplica a parte de una línea, Shopify la divide en dos (por ejemplo, 3 pares del mismo tenis quedan en 2 + 1). Esas líneas pueden compartir la clave, y el carrito enviaba la cantidad de cada línea por separado: la última pisaba a la primera y la cantidad bajaba en vez de subir. Ahora se **suman las cantidades por clave** antes de enviarlas.
+2. **Inventario de 1 unidad por talla.** Pedir más de lo disponible devolvía un error sin explicación. Ahora el campo tiene máximo según el inventario (descontando lo que ya está en otras líneas de la misma referencia), el botón + se apaga al llegar al tope, aparece "No hay más unidades disponibles de esta referencia." y un error 422 se anuncia con ese mismo texto.
+3. **Cambios cruzados.** El campo solo guardaba al salir de él y dos cambios rápidos podían cruzarse. Ahora los botones cambian el número al instante, se guarda tras una pausa de 0,45 s y hay **una sola solicitud a la vez**; mientras tanto los botones no responden. Al terminar, el foco vuelve al mismo botón aunque la línea haya cambiado de clave.
+
+Sin JavaScript queda el campo numérico con "Actualizar cantidades". Los botones tienen 44 px y nombre accesible ("Agregar una unidad de …", "Quitar una unidad de …"). El contador del encabezado se actualiza sin recargar (evento `carrito:cambio`).
+
+Criterios nuevos:
+- [ ] C-CANT1: con 1 par en el carrito, tocar + tres veces seguidas deja 4 pares (si hay inventario) y el total y el combo se actualizan solos.
+- [ ] C-CANT2: con 3 pares del mismo tenis divididos en 2 + 1 por Luna Llena, tocar + en cualquiera de las dos líneas deja 4 pares, nunca menos.
+- [ ] C-CANT3: con una talla de 1 unidad, el botón + está apagado, se ve "No hay más unidades disponibles de esta referencia." y escribir 5 en el campo lo deja en 1 con el aviso.
+- [ ] C-CANT4: tocar − con 1 unidad quita la línea del carrito.
+- [ ] C-CANT5: con lector de pantalla, cada botón dice qué hace y el cambio se anuncia ("Carrito actualizado. Total: …").
+
 ## Mensajes por combo en el carrito
 
 Precios de lista: tenis en combo (T) $175.000, gorra en combo (G) $60.000. Textos propuestos; la redacción final es de contenido-copy, con revisión de cumplimiento. El único texto literal del equipo es el de la fila 3.
